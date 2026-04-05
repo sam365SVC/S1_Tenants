@@ -13,7 +13,7 @@ type Tenant struct {
 
 func (Tenant) Fields()[]ent.Field{
 	return []ent.Field{
-		field.String("name").MaxLen(50).NotEmpty(),
+		field.String("name").MaxLen(50).NotEmpty().Unique(),
 		field.Time("end_suscription").SchemaType(map[string]string{
 			dialect.Postgres:"date",
 		}).Optional(),

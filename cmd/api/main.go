@@ -6,12 +6,14 @@ import (
 	"log"
 	"os"
 	"saas_identidad/ent"
+	"saas_identidad/pkg/validation"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
 func main() {
+	validation.InitValidator()
 	err:=godotenv.Load()
 	if err!=nil {
 		log.Fatalf("Error al cargar el archivo .env: %v",err)

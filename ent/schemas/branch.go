@@ -11,12 +11,11 @@ import (
 type Branch struct {
 	ent.Schema
 }
-
 func (Branch) Fields() []ent.Field {
 	return []ent.Field{
 		// Datos Generales
-		field.String("name").NotEmpty().MaxLen(100),
-		field.String("phone").Optional().MaxLen(14), // Optional, por si es un acopio sin teléfono fijo
+		field.String("name").NotEmpty().MaxLen(100).Unique(),
+		field.String("phone").Optional().MaxLen(14).Unique(), // Optional, por si es un acopio sin teléfono fijo
 
 		// Dirección Estructurada
 		field.String("street").
@@ -40,7 +39,7 @@ func (Branch) Fields() []ent.Field {
 		// Departamentos completos de Bolivia
 		field.Enum("state").
 			Values("LP", "SC", "CB", "OR", "PT", "TJ", "CH", "BE", "PA").
-			Default("SC"),
+			Default("LP"),
 
 		// si es que quiere añadir mapas donde la gente pueda ver las dirrecciones mediante un mapa creado por el frontend
 		// field.Float("latitude").Optional().Nillable(),

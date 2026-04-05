@@ -11,13 +11,13 @@ var (
 	// BranchesColumns holds the columns for the "branches" table.
 	BranchesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString, Size: 100},
-		{Name: "phone", Type: field.TypeString, Nullable: true, Size: 14},
+		{Name: "name", Type: field.TypeString, Unique: true, Size: 100},
+		{Name: "phone", Type: field.TypeString, Unique: true, Nullable: true, Size: 14},
 		{Name: "street", Type: field.TypeString, Size: 150},
 		{Name: "zone", Type: field.TypeString, Nullable: true, Size: 100},
 		{Name: "reference", Type: field.TypeString, Nullable: true, Size: 200},
 		{Name: "city", Type: field.TypeString, Size: 50, Default: "Santa Cruz de la Sierra"},
-		{Name: "state", Type: field.TypeEnum, Enums: []string{"LP", "SC", "CB", "OR", "PT", "TJ", "CH", "BE", "PA"}, Default: "SC"},
+		{Name: "state", Type: field.TypeEnum, Enums: []string{"LP", "SC", "CB", "OR", "PT", "TJ", "CH", "BE", "PA"}, Default: "LP"},
 		{Name: "is_active", Type: field.TypeBool, Default: true},
 		{Name: "create_at", Type: field.TypeTime},
 		{Name: "tenant_branchs", Type: field.TypeInt, Nullable: true},
@@ -92,7 +92,7 @@ var (
 	// TenantsColumns holds the columns for the "tenants" table.
 	TenantsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString, Size: 50},
+		{Name: "name", Type: field.TypeString, Unique: true, Size: 50},
 		{Name: "end_suscription", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"postgres": "date"}},
 		{Name: "plan_tenants", Type: field.TypeInt, Nullable: true},
 	}
@@ -115,7 +115,9 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString, Size: 50},
 		{Name: "last_name", Type: field.TypeString, Size: 50},
-		{Name: "ci", Type: field.TypeInt},
+		{Name: "ci", Type: field.TypeInt, Unique: true},
+		{Name: "rol", Type: field.TypeEnum, Enums: []string{"DEVELOPER", "USER"}, Default: "USER"},
+		{Name: "phone", Type: field.TypeString, Size: 14},
 		{Name: "date_birth", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "date"}},
 		{Name: "email", Type: field.TypeString, Unique: true, Size: 100},
 		{Name: "password_hash", Type: field.TypeString, Size: 150},

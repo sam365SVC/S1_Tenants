@@ -114,8 +114,8 @@ var (
 // State defines the type for the "state" enum field.
 type State string
 
-// StateSC is the default value of the State enum.
-const DefaultState = StateSC
+// StateLP is the default value of the State enum.
+const DefaultState = StateLP
 
 // State values.
 const (

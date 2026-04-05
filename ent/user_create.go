@@ -39,6 +39,26 @@ func (_c *UserCreate) SetCi(v int) *UserCreate {
 	return _c
 }
 
+// SetRol sets the "rol" field.
+func (_c *UserCreate) SetRol(v user.Rol) *UserCreate {
+	_c.mutation.SetRol(v)
+	return _c
+}
+
+// SetNillableRol sets the "rol" field if the given value is not nil.
+func (_c *UserCreate) SetNillableRol(v *user.Rol) *UserCreate {
+	if v != nil {
+		_c.SetRol(*v)
+	}
+	return _c
+}
+
+// SetPhone sets the "phone" field.
+func (_c *UserCreate) SetPhone(v string) *UserCreate {
+	_c.mutation.SetPhone(v)
+	return _c
+}
+
 // SetDateBirth sets the "date_birth" field.
 func (_c *UserCreate) SetDateBirth(v time.Time) *UserCreate {
 	_c.mutation.SetDateBirth(v)
@@ -79,6 +99,7 @@ func (_c *UserCreate) Mutation() *UserMutation {
 
 // Save creates the User in the database.
 func (_c *UserCreate) Save(ctx context.Context) (*User, error) {
+	_c.defaults()
 	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
@@ -101,6 +122,14 @@ func (_c *UserCreate) Exec(ctx context.Context) error {
 func (_c *UserCreate) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (_c *UserCreate) defaults() {
+	if _, ok := _c.mutation.Rol(); !ok {
+		v := user.DefaultRol
+		_c.mutation.SetRol(v)
 	}
 }
 
@@ -128,6 +157,22 @@ func (_c *UserCreate) check() error {
 	if v, ok := _c.mutation.Ci(); ok {
 		if err := user.CiValidator(v); err != nil {
 			return &ValidationError{Name: "ci", err: fmt.Errorf(`ent: validator failed for field "User.ci": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.Rol(); !ok {
+		return &ValidationError{Name: "rol", err: errors.New(`ent: missing required field "User.rol"`)}
+	}
+	if v, ok := _c.mutation.Rol(); ok {
+		if err := user.RolValidator(v); err != nil {
+			return &ValidationError{Name: "rol", err: fmt.Errorf(`ent: validator failed for field "User.rol": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.Phone(); !ok {
+		return &ValidationError{Name: "phone", err: errors.New(`ent: missing required field "User.phone"`)}
+	}
+	if v, ok := _c.mutation.Phone(); ok {
+		if err := user.PhoneValidator(v); err != nil {
+			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "User.phone": %w`, err)}
 		}
 	}
 	if _, ok := _c.mutation.DateBirth(); !ok {
@@ -187,6 +232,14 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldCi, field.TypeInt, value)
 		_node.Ci = value
 	}
+	if value, ok := _c.mutation.Rol(); ok {
+		_spec.SetField(user.FieldRol, field.TypeEnum, value)
+		_node.Rol = value
+	}
+	if value, ok := _c.mutation.Phone(); ok {
+		_spec.SetField(user.FieldPhone, field.TypeString, value)
+		_node.Phone = value
+	}
 	if value, ok := _c.mutation.DateBirth(); ok {
 		_spec.SetField(user.FieldDateBirth, field.TypeTime, value)
 		_node.DateBirth = value
@@ -236,6 +289,7 @@ func (_c *UserCreateBulk) Save(ctx context.Context) ([]*User, error) {
 	for i := range _c.builders {
 		func(i int, root context.Context) {
 			builder := _c.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*UserMutation)
 				if !ok {

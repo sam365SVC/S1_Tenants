@@ -3171,6 +3171,8 @@ type UserMutation struct {
 	last_name        *string
 	ci               *int
 	addci            *int
+	rol              *user.Rol
+	phone            *string
 	date_birth       *time.Time
 	email            *string
 	password_hash    *string
@@ -3409,6 +3411,78 @@ func (m *UserMutation) ResetCi() {
 	m.addci = nil
 }
 
+// SetRol sets the "rol" field.
+func (m *UserMutation) SetRol(u user.Rol) {
+	m.rol = &u
+}
+
+// Rol returns the value of the "rol" field in the mutation.
+func (m *UserMutation) Rol() (r user.Rol, exists bool) {
+	v := m.rol
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRol returns the old "rol" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldRol(ctx context.Context) (v user.Rol, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRol is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRol requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRol: %w", err)
+	}
+	return oldValue.Rol, nil
+}
+
+// ResetRol resets all changes to the "rol" field.
+func (m *UserMutation) ResetRol() {
+	m.rol = nil
+}
+
+// SetPhone sets the "phone" field.
+func (m *UserMutation) SetPhone(s string) {
+	m.phone = &s
+}
+
+// Phone returns the value of the "phone" field in the mutation.
+func (m *UserMutation) Phone() (r string, exists bool) {
+	v := m.phone
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPhone returns the old "phone" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldPhone(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPhone is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPhone requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPhone: %w", err)
+	}
+	return oldValue.Phone, nil
+}
+
+// ResetPhone resets all changes to the "phone" field.
+func (m *UserMutation) ResetPhone() {
+	m.phone = nil
+}
+
 // SetDateBirth sets the "date_birth" field.
 func (m *UserMutation) SetDateBirth(t time.Time) {
 	m.date_birth = &t
@@ -3605,7 +3679,7 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 8)
 	if m.name != nil {
 		fields = append(fields, user.FieldName)
 	}
@@ -3614,6 +3688,12 @@ func (m *UserMutation) Fields() []string {
 	}
 	if m.ci != nil {
 		fields = append(fields, user.FieldCi)
+	}
+	if m.rol != nil {
+		fields = append(fields, user.FieldRol)
+	}
+	if m.phone != nil {
+		fields = append(fields, user.FieldPhone)
 	}
 	if m.date_birth != nil {
 		fields = append(fields, user.FieldDateBirth)
@@ -3638,6 +3718,10 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.LastName()
 	case user.FieldCi:
 		return m.Ci()
+	case user.FieldRol:
+		return m.Rol()
+	case user.FieldPhone:
+		return m.Phone()
 	case user.FieldDateBirth:
 		return m.DateBirth()
 	case user.FieldEmail:
@@ -3659,6 +3743,10 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldLastName(ctx)
 	case user.FieldCi:
 		return m.OldCi(ctx)
+	case user.FieldRol:
+		return m.OldRol(ctx)
+	case user.FieldPhone:
+		return m.OldPhone(ctx)
 	case user.FieldDateBirth:
 		return m.OldDateBirth(ctx)
 	case user.FieldEmail:
@@ -3694,6 +3782,20 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCi(v)
+		return nil
+	case user.FieldRol:
+		v, ok := value.(user.Rol)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRol(v)
+		return nil
+	case user.FieldPhone:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPhone(v)
 		return nil
 	case user.FieldDateBirth:
 		v, ok := value.(time.Time)
@@ -3788,6 +3890,12 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldCi:
 		m.ResetCi()
+		return nil
+	case user.FieldRol:
+		m.ResetRol()
+		return nil
+	case user.FieldPhone:
+		m.ResetPhone()
 		return nil
 	case user.FieldDateBirth:
 		m.ResetDateBirth()

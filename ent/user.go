@@ -23,6 +23,10 @@ type User struct {
 	LastName string `json:"last_name,omitempty"`
 	// Ci holds the value of the "ci" field.
 	Ci int `json:"ci,omitempty"`
+	// Rol holds the value of the "rol" field.
+	Rol user.Rol `json:"rol,omitempty"`
+	// Phone holds the value of the "phone" field.
+	Phone string `json:"phone,omitempty"`
 	// DateBirth holds the value of the "date_birth" field.
 	DateBirth time.Time `json:"date_birth,omitempty"`
 	// Email holds the value of the "email" field.
@@ -60,7 +64,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case user.FieldID, user.FieldCi:
 			values[i] = new(sql.NullInt64)
-		case user.FieldName, user.FieldLastName, user.FieldEmail, user.FieldPasswordHash:
+		case user.FieldName, user.FieldLastName, user.FieldRol, user.FieldPhone, user.FieldEmail, user.FieldPasswordHash:
 			values[i] = new(sql.NullString)
 		case user.FieldDateBirth:
 			values[i] = new(sql.NullTime)
@@ -102,6 +106,18 @@ func (_m *User) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field ci", values[i])
 			} else if value.Valid {
 				_m.Ci = int(value.Int64)
+			}
+		case user.FieldRol:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field rol", values[i])
+			} else if value.Valid {
+				_m.Rol = user.Rol(value.String)
+			}
+		case user.FieldPhone:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field phone", values[i])
+			} else if value.Valid {
+				_m.Phone = value.String
 			}
 		case user.FieldDateBirth:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -170,6 +186,12 @@ func (_m *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("ci=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Ci))
+	builder.WriteString(", ")
+	builder.WriteString("rol=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Rol))
+	builder.WriteString(", ")
+	builder.WriteString("phone=")
+	builder.WriteString(_m.Phone)
 	builder.WriteString(", ")
 	builder.WriteString("date_birth=")
 	builder.WriteString(_m.DateBirth.Format(time.ANSIC))

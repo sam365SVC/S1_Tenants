@@ -78,6 +78,34 @@ func (_u *UserUpdate) AddCi(v int) *UserUpdate {
 	return _u
 }
 
+// SetRol sets the "rol" field.
+func (_u *UserUpdate) SetRol(v user.Rol) *UserUpdate {
+	_u.mutation.SetRol(v)
+	return _u
+}
+
+// SetNillableRol sets the "rol" field if the given value is not nil.
+func (_u *UserUpdate) SetNillableRol(v *user.Rol) *UserUpdate {
+	if v != nil {
+		_u.SetRol(*v)
+	}
+	return _u
+}
+
+// SetPhone sets the "phone" field.
+func (_u *UserUpdate) SetPhone(v string) *UserUpdate {
+	_u.mutation.SetPhone(v)
+	return _u
+}
+
+// SetNillablePhone sets the "phone" field if the given value is not nil.
+func (_u *UserUpdate) SetNillablePhone(v *string) *UserUpdate {
+	if v != nil {
+		_u.SetPhone(*v)
+	}
+	return _u
+}
+
 // SetDateBirth sets the "date_birth" field.
 func (_u *UserUpdate) SetDateBirth(v time.Time) *UserUpdate {
 	_u.mutation.SetDateBirth(v)
@@ -205,6 +233,16 @@ func (_u *UserUpdate) check() error {
 			return &ValidationError{Name: "ci", err: fmt.Errorf(`ent: validator failed for field "User.ci": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.Rol(); ok {
+		if err := user.RolValidator(v); err != nil {
+			return &ValidationError{Name: "rol", err: fmt.Errorf(`ent: validator failed for field "User.rol": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.Phone(); ok {
+		if err := user.PhoneValidator(v); err != nil {
+			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "User.phone": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.Email(); ok {
 		if err := user.EmailValidator(v); err != nil {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "User.email": %w`, err)}
@@ -241,6 +279,12 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.AddedCi(); ok {
 		_spec.AddField(user.FieldCi, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.Rol(); ok {
+		_spec.SetField(user.FieldRol, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.Phone(); ok {
+		_spec.SetField(user.FieldPhone, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.DateBirth(); ok {
 		_spec.SetField(user.FieldDateBirth, field.TypeTime, value)
@@ -362,6 +406,34 @@ func (_u *UserUpdateOne) SetNillableCi(v *int) *UserUpdateOne {
 // AddCi adds value to the "ci" field.
 func (_u *UserUpdateOne) AddCi(v int) *UserUpdateOne {
 	_u.mutation.AddCi(v)
+	return _u
+}
+
+// SetRol sets the "rol" field.
+func (_u *UserUpdateOne) SetRol(v user.Rol) *UserUpdateOne {
+	_u.mutation.SetRol(v)
+	return _u
+}
+
+// SetNillableRol sets the "rol" field if the given value is not nil.
+func (_u *UserUpdateOne) SetNillableRol(v *user.Rol) *UserUpdateOne {
+	if v != nil {
+		_u.SetRol(*v)
+	}
+	return _u
+}
+
+// SetPhone sets the "phone" field.
+func (_u *UserUpdateOne) SetPhone(v string) *UserUpdateOne {
+	_u.mutation.SetPhone(v)
+	return _u
+}
+
+// SetNillablePhone sets the "phone" field if the given value is not nil.
+func (_u *UserUpdateOne) SetNillablePhone(v *string) *UserUpdateOne {
+	if v != nil {
+		_u.SetPhone(*v)
+	}
 	return _u
 }
 
@@ -505,6 +577,16 @@ func (_u *UserUpdateOne) check() error {
 			return &ValidationError{Name: "ci", err: fmt.Errorf(`ent: validator failed for field "User.ci": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.Rol(); ok {
+		if err := user.RolValidator(v); err != nil {
+			return &ValidationError{Name: "rol", err: fmt.Errorf(`ent: validator failed for field "User.rol": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.Phone(); ok {
+		if err := user.PhoneValidator(v); err != nil {
+			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "User.phone": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.Email(); ok {
 		if err := user.EmailValidator(v); err != nil {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "User.email": %w`, err)}
@@ -558,6 +640,12 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 	}
 	if value, ok := _u.mutation.AddedCi(); ok {
 		_spec.AddField(user.FieldCi, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.Rol(); ok {
+		_spec.SetField(user.FieldRol, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.Phone(); ok {
+		_spec.SetField(user.FieldPhone, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.DateBirth(); ok {
 		_spec.SetField(user.FieldDateBirth, field.TypeTime, value)

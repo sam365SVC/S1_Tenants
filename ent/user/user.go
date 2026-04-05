@@ -3,6 +3,8 @@
 package user
 
 import (
+	"fmt"
+
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -18,6 +20,10 @@ const (
 	FieldLastName = "last_name"
 	// FieldCi holds the string denoting the ci field in the database.
 	FieldCi = "ci"
+	// FieldRol holds the string denoting the rol field in the database.
+	FieldRol = "rol"
+	// FieldPhone holds the string denoting the phone field in the database.
+	FieldPhone = "phone"
 	// FieldDateBirth holds the string denoting the date_birth field in the database.
 	FieldDateBirth = "date_birth"
 	// FieldEmail holds the string denoting the email field in the database.
@@ -43,6 +49,8 @@ var Columns = []string{
 	FieldName,
 	FieldLastName,
 	FieldCi,
+	FieldRol,
+	FieldPhone,
 	FieldDateBirth,
 	FieldEmail,
 	FieldPasswordHash,
@@ -65,11 +73,39 @@ var (
 	LastNameValidator func(string) error
 	// CiValidator is a validator for the "ci" field. It is called by the builders before save.
 	CiValidator func(int) error
+	// PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
+	PhoneValidator func(string) error
 	// EmailValidator is a validator for the "email" field. It is called by the builders before save.
 	EmailValidator func(string) error
 	// PasswordHashValidator is a validator for the "password_hash" field. It is called by the builders before save.
 	PasswordHashValidator func(string) error
 )
+
+// Rol defines the type for the "rol" enum field.
+type Rol string
+
+// RolUSER is the default value of the Rol enum.
+const DefaultRol = RolUSER
+
+// Rol values.
+const (
+	RolDEVELOPER Rol = "DEVELOPER"
+	RolUSER      Rol = "USER"
+)
+
+func (r Rol) String() string {
+	return string(r)
+}
+
+// RolValidator is a validator for the "rol" field enum values. It is called by the builders before save.
+func RolValidator(r Rol) error {
+	switch r {
+	case RolDEVELOPER, RolUSER:
+		return nil
+	default:
+		return fmt.Errorf("user: invalid enum value for rol field: %q", r)
+	}
+}
 
 // OrderOption defines the ordering options for the User queries.
 type OrderOption func(*sql.Selector)
@@ -92,6 +128,16 @@ func ByLastName(opts ...sql.OrderTermOption) OrderOption {
 // ByCi orders the results by the ci field.
 func ByCi(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCi, opts...).ToFunc()
+}
+
+// ByRol orders the results by the rol field.
+func ByRol(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRol, opts...).ToFunc()
+}
+
+// ByPhone orders the results by the phone field.
+func ByPhone(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPhone, opts...).ToFunc()
 }
 
 // ByDateBirth orders the results by the date_birth field.
