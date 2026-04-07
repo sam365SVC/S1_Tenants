@@ -4,7 +4,9 @@ package runtime
 
 import (
 	"saas_identidad/ent/branch"
+	"saas_identidad/ent/email"
 	"saas_identidad/ent/employee"
+	"saas_identidad/ent/invitation"
 	"saas_identidad/ent/plan"
 	"saas_identidad/ent/schemas"
 	"saas_identidad/ent/tenant"
@@ -94,6 +96,55 @@ func init() {
 	branchDescCreateAt := branchFields[8].Descriptor()
 	// branch.DefaultCreateAt holds the default value on creation for the create_at field.
 	branch.DefaultCreateAt = branchDescCreateAt.Default.(func() time.Time)
+	emailFields := schemas.Email{}.Fields()
+	_ = emailFields
+	// emailDescEmail is the schema descriptor for email field.
+	emailDescEmail := emailFields[0].Descriptor()
+	// email.EmailValidator is a validator for the "email" field. It is called by the builders before save.
+	email.EmailValidator = func() func(string) error {
+		validators := emailDescEmail.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+			validators[2].(func(string) error),
+		}
+		return func(email string) error {
+			for _, fn := range fns {
+				if err := fn(email); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// emailDescPaswordHash is the schema descriptor for pasword_hash field.
+	emailDescPaswordHash := emailFields[1].Descriptor()
+	// email.PaswordHashValidator is a validator for the "pasword_hash" field. It is called by the builders before save.
+	email.PaswordHashValidator = func() func(string) error {
+		validators := emailDescPaswordHash.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(pasword_hash string) error {
+			for _, fn := range fns {
+				if err := fn(pasword_hash); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// emailDescCreateAt is the schema descriptor for create_at field.
+	emailDescCreateAt := emailFields[3].Descriptor()
+	// email.DefaultCreateAt holds the default value on creation for the create_at field.
+	email.DefaultCreateAt = emailDescCreateAt.Default.(func() time.Time)
+	// emailDescUpdateAt is the schema descriptor for update_at field.
+	emailDescUpdateAt := emailFields[4].Descriptor()
+	// email.DefaultUpdateAt holds the default value on creation for the update_at field.
+	email.DefaultUpdateAt = emailDescUpdateAt.Default.(func() time.Time)
+	// email.UpdateDefaultUpdateAt holds the default value on update for the update_at field.
+	email.UpdateDefaultUpdateAt = emailDescUpdateAt.UpdateDefault.(func() time.Time)
 	employeeHooks := schemas.Employee{}.Hooks()
 	employee.Hooks[0] = employeeHooks[0]
 	employeeFields := schemas.Employee{}.Fields()
@@ -110,6 +161,49 @@ func init() {
 	employeeDescJoinAt := employeeFields[3].Descriptor()
 	// employee.DefaultJoinAt holds the default value on creation for the join_at field.
 	employee.DefaultJoinAt = employeeDescJoinAt.Default.(func() time.Time)
+	invitationFields := schemas.Invitation{}.Fields()
+	_ = invitationFields
+	// invitationDescEmail is the schema descriptor for email field.
+	invitationDescEmail := invitationFields[0].Descriptor()
+	// invitation.EmailValidator is a validator for the "email" field. It is called by the builders before save.
+	invitation.EmailValidator = func() func(string) error {
+		validators := invitationDescEmail.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+			validators[2].(func(string) error),
+		}
+		return func(email string) error {
+			for _, fn := range fns {
+				if err := fn(email); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// invitationDescToken is the schema descriptor for token field.
+	invitationDescToken := invitationFields[1].Descriptor()
+	// invitation.TokenValidator is a validator for the "token" field. It is called by the builders before save.
+	invitation.TokenValidator = func() func(string) error {
+		validators := invitationDescToken.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(token string) error {
+			for _, fn := range fns {
+				if err := fn(token); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// invitationDescExpireAt is the schema descriptor for expire_at field.
+	invitationDescExpireAt := invitationFields[3].Descriptor()
+	// invitation.DefaultExpireAt holds the default value on creation for the expire_at field.
+	invitation.DefaultExpireAt = invitationDescExpireAt.Default.(time.Time)
 	planFields := schemas.Plan{}.Fields()
 	_ = planFields
 	// planDescSubscription is the schema descriptor for subscription field.
@@ -197,31 +291,9 @@ func init() {
 	// user.CiValidator is a validator for the "ci" field. It is called by the builders before save.
 	user.CiValidator = userDescCi.Validators[0].(func(int) error)
 	// userDescPhone is the schema descriptor for phone field.
-	userDescPhone := userFields[4].Descriptor()
+	userDescPhone := userFields[3].Descriptor()
 	// user.PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
-	user.PhoneValidator = func() func(string) error {
-		validators := userDescPhone.Validators
-		fns := [...]func(string) error{
-			validators[0].(func(string) error),
-			validators[1].(func(string) error),
-		}
-		return func(phone string) error {
-			for _, fn := range fns {
-				if err := fn(phone); err != nil {
-					return err
-				}
-			}
-			return nil
-		}
-	}()
-	// userDescEmail is the schema descriptor for email field.
-	userDescEmail := userFields[6].Descriptor()
-	// user.EmailValidator is a validator for the "email" field. It is called by the builders before save.
-	user.EmailValidator = userDescEmail.Validators[0].(func(string) error)
-	// userDescPasswordHash is the schema descriptor for password_hash field.
-	userDescPasswordHash := userFields[7].Descriptor()
-	// user.PasswordHashValidator is a validator for the "password_hash" field. It is called by the builders before save.
-	user.PasswordHashValidator = userDescPasswordHash.Validators[0].(func(string) error)
+	user.PhoneValidator = userDescPhone.Validators[0].(func(string) error)
 }
 
 const (

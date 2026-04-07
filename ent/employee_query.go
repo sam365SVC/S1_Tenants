@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"math"
 	"saas_identidad/ent/branch"
+	"saas_identidad/ent/email"
 	"saas_identidad/ent/employee"
 	"saas_identidad/ent/predicate"
 	"saas_identidad/ent/tenant"
-	"saas_identidad/ent/user"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -25,7 +25,7 @@ type EmployeeQuery struct {
 	order      []employee.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Employee
-	withUser   *UserQuery
+	withEmails *EmailQuery
 	withTenant *TenantQuery
 	withBranch *BranchQuery
 	withFKs    bool
@@ -65,9 +65,9 @@ func (_q *EmployeeQuery) Order(o ...employee.OrderOption) *EmployeeQuery {
 	return _q
 }
 
-// QueryUser chains the current query on the "user" edge.
-func (_q *EmployeeQuery) QueryUser() *UserQuery {
-	query := (&UserClient{config: _q.config}).Query()
+// QueryEmails chains the current query on the "emails" edge.
+func (_q *EmployeeQuery) QueryEmails() *EmailQuery {
+	query := (&EmailClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -78,8 +78,8 @@ func (_q *EmployeeQuery) QueryUser() *UserQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(employee.Table, employee.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, employee.UserTable, employee.UserColumn),
+			sqlgraph.To(email.Table, email.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, employee.EmailsTable, employee.EmailsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -323,7 +323,7 @@ func (_q *EmployeeQuery) Clone() *EmployeeQuery {
 		order:      append([]employee.OrderOption{}, _q.order...),
 		inters:     append([]Interceptor{}, _q.inters...),
 		predicates: append([]predicate.Employee{}, _q.predicates...),
-		withUser:   _q.withUser.Clone(),
+		withEmails: _q.withEmails.Clone(),
 		withTenant: _q.withTenant.Clone(),
 		withBranch: _q.withBranch.Clone(),
 		// clone intermediate query.
@@ -332,14 +332,14 @@ func (_q *EmployeeQuery) Clone() *EmployeeQuery {
 	}
 }
 
-// WithUser tells the query-builder to eager-load the nodes that are connected to
-// the "user" edge. The optional arguments are used to configure the query builder of the edge.
-func (_q *EmployeeQuery) WithUser(opts ...func(*UserQuery)) *EmployeeQuery {
-	query := (&UserClient{config: _q.config}).Query()
+// WithEmails tells the query-builder to eager-load the nodes that are connected to
+// the "emails" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *EmployeeQuery) WithEmails(opts ...func(*EmailQuery)) *EmployeeQuery {
+	query := (&EmailClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	_q.withUser = query
+	_q.withEmails = query
 	return _q
 }
 
@@ -445,12 +445,12 @@ func (_q *EmployeeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Emp
 		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
 		loadedTypes = [3]bool{
-			_q.withUser != nil,
+			_q.withEmails != nil,
 			_q.withTenant != nil,
 			_q.withBranch != nil,
 		}
 	)
-	if _q.withUser != nil || _q.withTenant != nil || _q.withBranch != nil {
+	if _q.withEmails != nil || _q.withTenant != nil || _q.withBranch != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -474,9 +474,9 @@ func (_q *EmployeeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Emp
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := _q.withUser; query != nil {
-		if err := _q.loadUser(ctx, query, nodes, nil,
-			func(n *Employee, e *User) { n.Edges.User = e }); err != nil {
+	if query := _q.withEmails; query != nil {
+		if err := _q.loadEmails(ctx, query, nodes, nil,
+			func(n *Employee, e *Email) { n.Edges.Emails = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -495,14 +495,14 @@ func (_q *EmployeeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Emp
 	return nodes, nil
 }
 
-func (_q *EmployeeQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*Employee, init func(*Employee), assign func(*Employee, *User)) error {
+func (_q *EmployeeQuery) loadEmails(ctx context.Context, query *EmailQuery, nodes []*Employee, init func(*Employee), assign func(*Employee, *Email)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Employee)
 	for i := range nodes {
-		if nodes[i].user_employees == nil {
+		if nodes[i].email_employees == nil {
 			continue
 		}
-		fk := *nodes[i].user_employees
+		fk := *nodes[i].email_employees
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -511,7 +511,7 @@ func (_q *EmployeeQuery) loadUser(ctx context.Context, query *UserQuery, nodes [
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(user.IDIn(ids...))
+	query.Where(email.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -519,7 +519,7 @@ func (_q *EmployeeQuery) loadUser(ctx context.Context, query *UserQuery, nodes [
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "user_employees" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "email_employees" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

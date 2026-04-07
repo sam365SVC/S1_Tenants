@@ -36,6 +36,30 @@ var (
 			},
 		},
 	}
+	// EmailsColumns holds the columns for the "emails" table.
+	EmailsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "email", Type: field.TypeString, Unique: true, Size: 150},
+		{Name: "pasword_hash", Type: field.TypeString, Size: 250},
+		{Name: "account", Type: field.TypeEnum, Enums: []string{"DEVELOPER", "USER", "ADMIN"}},
+		{Name: "create_at", Type: field.TypeTime},
+		{Name: "update_at", Type: field.TypeTime},
+		{Name: "user_emails", Type: field.TypeInt, Nullable: true},
+	}
+	// EmailsTable holds the schema information for the "emails" table.
+	EmailsTable = &schema.Table{
+		Name:       "emails",
+		Columns:    EmailsColumns,
+		PrimaryKey: []*schema.Column{EmailsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "emails_users_emails",
+				Columns:    []*schema.Column{EmailsColumns[6]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// EmployeesColumns holds the columns for the "employees" table.
 	EmployeesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -45,8 +69,8 @@ var (
 		{Name: "join_at", Type: field.TypeTime},
 		{Name: "left_at", Type: field.TypeTime, Nullable: true},
 		{Name: "branch_employees", Type: field.TypeInt, Nullable: true},
+		{Name: "email_employees", Type: field.TypeInt, Nullable: true},
 		{Name: "tenant_employees", Type: field.TypeInt, Nullable: true},
-		{Name: "user_employees", Type: field.TypeInt, Nullable: true},
 	}
 	// EmployeesTable holds the schema information for the "employees" table.
 	EmployeesTable = &schema.Table{
@@ -61,18 +85,32 @@ var (
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "employees_tenants_employees",
+				Symbol:     "employees_emails_employees",
 				Columns:    []*schema.Column{EmployeesColumns[7]},
-				RefColumns: []*schema.Column{TenantsColumns[0]},
+				RefColumns: []*schema.Column{EmailsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "employees_users_employees",
+				Symbol:     "employees_tenants_employees",
 				Columns:    []*schema.Column{EmployeesColumns[8]},
-				RefColumns: []*schema.Column{UsersColumns[0]},
+				RefColumns: []*schema.Column{TenantsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
+	}
+	// InvitationsColumns holds the columns for the "invitations" table.
+	InvitationsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "email", Type: field.TypeString, Unique: true, Size: 100},
+		{Name: "token", Type: field.TypeString, Unique: true, Size: 64},
+		{Name: "account", Type: field.TypeEnum, Enums: []string{"DEVELOPER", "USER", "ADMIN"}},
+		{Name: "expire_at", Type: field.TypeTime},
+	}
+	// InvitationsTable holds the schema information for the "invitations" table.
+	InvitationsTable = &schema.Table{
+		Name:       "invitations",
+		Columns:    InvitationsColumns,
+		PrimaryKey: []*schema.Column{InvitationsColumns[0]},
 	}
 	// PlansColumns holds the columns for the "plans" table.
 	PlansColumns = []*schema.Column{
@@ -116,11 +154,8 @@ var (
 		{Name: "name", Type: field.TypeString, Size: 50},
 		{Name: "last_name", Type: field.TypeString, Size: 50},
 		{Name: "ci", Type: field.TypeInt, Unique: true},
-		{Name: "rol", Type: field.TypeEnum, Enums: []string{"DEVELOPER", "USER"}, Default: "USER"},
-		{Name: "phone", Type: field.TypeString, Size: 14},
+		{Name: "phone", Type: field.TypeString, Nullable: true, Size: 14},
 		{Name: "date_birth", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "date"}},
-		{Name: "email", Type: field.TypeString, Unique: true, Size: 100},
-		{Name: "password_hash", Type: field.TypeString, Size: 150},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
@@ -131,7 +166,9 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		BranchesTable,
+		EmailsTable,
 		EmployeesTable,
+		InvitationsTable,
 		PlansTable,
 		TenantsTable,
 		UsersTable,
@@ -140,8 +177,9 @@ var (
 
 func init() {
 	BranchesTable.ForeignKeys[0].RefTable = TenantsTable
+	EmailsTable.ForeignKeys[0].RefTable = UsersTable
 	EmployeesTable.ForeignKeys[0].RefTable = BranchesTable
-	EmployeesTable.ForeignKeys[1].RefTable = TenantsTable
-	EmployeesTable.ForeignKeys[2].RefTable = UsersTable
+	EmployeesTable.ForeignKeys[1].RefTable = EmailsTable
+	EmployeesTable.ForeignKeys[2].RefTable = TenantsTable
 	TenantsTable.ForeignKeys[0].RefTable = PlansTable
 }

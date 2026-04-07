@@ -23,16 +23,10 @@ type User struct {
 	LastName string `json:"last_name,omitempty"`
 	// Ci holds the value of the "ci" field.
 	Ci int `json:"ci,omitempty"`
-	// Rol holds the value of the "rol" field.
-	Rol user.Rol `json:"rol,omitempty"`
 	// Phone holds the value of the "phone" field.
 	Phone string `json:"phone,omitempty"`
 	// DateBirth holds the value of the "date_birth" field.
 	DateBirth time.Time `json:"date_birth,omitempty"`
-	// Email holds the value of the "email" field.
-	Email string `json:"email,omitempty"`
-	// PasswordHash holds the value of the "password_hash" field.
-	PasswordHash string `json:"password_hash,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges        UserEdges `json:"edges"`
@@ -41,20 +35,20 @@ type User struct {
 
 // UserEdges holds the relations/edges for other nodes in the graph.
 type UserEdges struct {
-	// Employees holds the value of the employees edge.
-	Employees []*Employee `json:"employees,omitempty"`
+	// Emails holds the value of the emails edge.
+	Emails []*Email `json:"emails,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
-// EmployeesOrErr returns the Employees value or an error if the edge
+// EmailsOrErr returns the Emails value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) EmployeesOrErr() ([]*Employee, error) {
+func (e UserEdges) EmailsOrErr() ([]*Email, error) {
 	if e.loadedTypes[0] {
-		return e.Employees, nil
+		return e.Emails, nil
 	}
-	return nil, &NotLoadedError{edge: "employees"}
+	return nil, &NotLoadedError{edge: "emails"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -64,7 +58,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case user.FieldID, user.FieldCi:
 			values[i] = new(sql.NullInt64)
-		case user.FieldName, user.FieldLastName, user.FieldRol, user.FieldPhone, user.FieldEmail, user.FieldPasswordHash:
+		case user.FieldName, user.FieldLastName, user.FieldPhone:
 			values[i] = new(sql.NullString)
 		case user.FieldDateBirth:
 			values[i] = new(sql.NullTime)
@@ -107,12 +101,6 @@ func (_m *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Ci = int(value.Int64)
 			}
-		case user.FieldRol:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field rol", values[i])
-			} else if value.Valid {
-				_m.Rol = user.Rol(value.String)
-			}
 		case user.FieldPhone:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field phone", values[i])
@@ -124,18 +112,6 @@ func (_m *User) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field date_birth", values[i])
 			} else if value.Valid {
 				_m.DateBirth = value.Time
-			}
-		case user.FieldEmail:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field email", values[i])
-			} else if value.Valid {
-				_m.Email = value.String
-			}
-		case user.FieldPasswordHash:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field password_hash", values[i])
-			} else if value.Valid {
-				_m.PasswordHash = value.String
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -150,9 +126,9 @@ func (_m *User) Value(name string) (ent.Value, error) {
 	return _m.selectValues.Get(name)
 }
 
-// QueryEmployees queries the "employees" edge of the User entity.
-func (_m *User) QueryEmployees() *EmployeeQuery {
-	return NewUserClient(_m.config).QueryEmployees(_m)
+// QueryEmails queries the "emails" edge of the User entity.
+func (_m *User) QueryEmails() *EmailQuery {
+	return NewUserClient(_m.config).QueryEmails(_m)
 }
 
 // Update returns a builder for updating this User.
@@ -187,20 +163,11 @@ func (_m *User) String() string {
 	builder.WriteString("ci=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Ci))
 	builder.WriteString(", ")
-	builder.WriteString("rol=")
-	builder.WriteString(fmt.Sprintf("%v", _m.Rol))
-	builder.WriteString(", ")
 	builder.WriteString("phone=")
 	builder.WriteString(_m.Phone)
 	builder.WriteString(", ")
 	builder.WriteString("date_birth=")
 	builder.WriteString(_m.DateBirth.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("email=")
-	builder.WriteString(_m.Email)
-	builder.WriteString(", ")
-	builder.WriteString("password_hash=")
-	builder.WriteString(_m.PasswordHash)
 	builder.WriteByte(')')
 	return builder.String()
 }

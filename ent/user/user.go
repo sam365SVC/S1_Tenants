@@ -3,8 +3,6 @@
 package user
 
 import (
-	"fmt"
-
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -20,27 +18,21 @@ const (
 	FieldLastName = "last_name"
 	// FieldCi holds the string denoting the ci field in the database.
 	FieldCi = "ci"
-	// FieldRol holds the string denoting the rol field in the database.
-	FieldRol = "rol"
 	// FieldPhone holds the string denoting the phone field in the database.
 	FieldPhone = "phone"
 	// FieldDateBirth holds the string denoting the date_birth field in the database.
 	FieldDateBirth = "date_birth"
-	// FieldEmail holds the string denoting the email field in the database.
-	FieldEmail = "email"
-	// FieldPasswordHash holds the string denoting the password_hash field in the database.
-	FieldPasswordHash = "password_hash"
-	// EdgeEmployees holds the string denoting the employees edge name in mutations.
-	EdgeEmployees = "employees"
+	// EdgeEmails holds the string denoting the emails edge name in mutations.
+	EdgeEmails = "emails"
 	// Table holds the table name of the user in the database.
 	Table = "users"
-	// EmployeesTable is the table that holds the employees relation/edge.
-	EmployeesTable = "employees"
-	// EmployeesInverseTable is the table name for the Employee entity.
-	// It exists in this package in order to avoid circular dependency with the "employee" package.
-	EmployeesInverseTable = "employees"
-	// EmployeesColumn is the table column denoting the employees relation/edge.
-	EmployeesColumn = "user_employees"
+	// EmailsTable is the table that holds the emails relation/edge.
+	EmailsTable = "emails"
+	// EmailsInverseTable is the table name for the Email entity.
+	// It exists in this package in order to avoid circular dependency with the "email" package.
+	EmailsInverseTable = "emails"
+	// EmailsColumn is the table column denoting the emails relation/edge.
+	EmailsColumn = "user_emails"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -49,11 +41,8 @@ var Columns = []string{
 	FieldName,
 	FieldLastName,
 	FieldCi,
-	FieldRol,
 	FieldPhone,
 	FieldDateBirth,
-	FieldEmail,
-	FieldPasswordHash,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -75,37 +64,7 @@ var (
 	CiValidator func(int) error
 	// PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
 	PhoneValidator func(string) error
-	// EmailValidator is a validator for the "email" field. It is called by the builders before save.
-	EmailValidator func(string) error
-	// PasswordHashValidator is a validator for the "password_hash" field. It is called by the builders before save.
-	PasswordHashValidator func(string) error
 )
-
-// Rol defines the type for the "rol" enum field.
-type Rol string
-
-// RolUSER is the default value of the Rol enum.
-const DefaultRol = RolUSER
-
-// Rol values.
-const (
-	RolDEVELOPER Rol = "DEVELOPER"
-	RolUSER      Rol = "USER"
-)
-
-func (r Rol) String() string {
-	return string(r)
-}
-
-// RolValidator is a validator for the "rol" field enum values. It is called by the builders before save.
-func RolValidator(r Rol) error {
-	switch r {
-	case RolDEVELOPER, RolUSER:
-		return nil
-	default:
-		return fmt.Errorf("user: invalid enum value for rol field: %q", r)
-	}
-}
 
 // OrderOption defines the ordering options for the User queries.
 type OrderOption func(*sql.Selector)
@@ -130,11 +89,6 @@ func ByCi(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCi, opts...).ToFunc()
 }
 
-// ByRol orders the results by the rol field.
-func ByRol(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldRol, opts...).ToFunc()
-}
-
 // ByPhone orders the results by the phone field.
 func ByPhone(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPhone, opts...).ToFunc()
@@ -145,33 +99,23 @@ func ByDateBirth(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDateBirth, opts...).ToFunc()
 }
 
-// ByEmail orders the results by the email field.
-func ByEmail(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldEmail, opts...).ToFunc()
-}
-
-// ByPasswordHash orders the results by the password_hash field.
-func ByPasswordHash(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldPasswordHash, opts...).ToFunc()
-}
-
-// ByEmployeesCount orders the results by employees count.
-func ByEmployeesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByEmailsCount orders the results by emails count.
+func ByEmailsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newEmployeesStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newEmailsStep(), opts...)
 	}
 }
 
-// ByEmployees orders the results by employees terms.
-func ByEmployees(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByEmails orders the results by emails terms.
+func ByEmails(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEmployeesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newEmailsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newEmployeesStep() *sqlgraph.Step {
+func newEmailsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(EmployeesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, EmployeesTable, EmployeesColumn),
+		sqlgraph.To(EmailsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, EmailsTable, EmailsColumn),
 	)
 }

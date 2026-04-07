@@ -9,8 +9,14 @@ import (
 // Branch is the predicate function for branch builders.
 type Branch func(*sql.Selector)
 
+// Email is the predicate function for email builders.
+type Email func(*sql.Selector)
+
 // Employee is the predicate function for employee builders.
 type Employee func(*sql.Selector)
+
+// Invitation is the predicate function for invitation builders.
+type Invitation func(*sql.Selector)
 
 // Plan is the predicate function for plan builders.
 type Plan func(*sql.Selector)

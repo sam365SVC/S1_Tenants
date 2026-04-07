@@ -14,8 +14,12 @@ type Tx struct {
 	config
 	// Branch is the client for interacting with the Branch builders.
 	Branch *BranchClient
+	// Email is the client for interacting with the Email builders.
+	Email *EmailClient
 	// Employee is the client for interacting with the Employee builders.
 	Employee *EmployeeClient
+	// Invitation is the client for interacting with the Invitation builders.
+	Invitation *InvitationClient
 	// Plan is the client for interacting with the Plan builders.
 	Plan *PlanClient
 	// Tenant is the client for interacting with the Tenant builders.
@@ -154,7 +158,9 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Branch = NewBranchClient(tx.config)
+	tx.Email = NewEmailClient(tx.config)
 	tx.Employee = NewEmployeeClient(tx.config)
+	tx.Invitation = NewInvitationClient(tx.config)
 	tx.Plan = NewPlanClient(tx.config)
 	tx.Tenant = NewTenantClient(tx.config)
 	tx.User = NewUserClient(tx.config)

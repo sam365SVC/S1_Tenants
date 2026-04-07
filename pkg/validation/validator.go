@@ -2,6 +2,7 @@ package validation
 
 import (
 	"regexp"
+	"time"
 	"unicode"
 
 	"github.com/go-playground/validator/v10"
@@ -38,6 +39,23 @@ func isPasswordSecure(fl validator.FieldLevel)bool{
 	return haveUpper&&haveLower&&haveNumber&&haveSpecial&&!haveSpace
 }
 
+func isOlderThan16(fl validator.FieldLevel) bool {
+	dateStr:=fl.Field().String()
+
+	dateBirth,err:=time.Parse("02/01/2006",dateStr)
+	if err!=nil {
+		return false
+	}
+	now:=time.Now()
+
+	age:=now.Year()-dateBirth.Year()
+
+	if now.Month() < dateBirth.Month() || (now.Month() == dateBirth.Month() && now.Day() < dateBirth.Day()) {
+		age--
+	}
+	return age >= 16 &&age<=100
+}
+
 func InitValidator()  {
 	Validator=validator.New()
 
@@ -45,4 +63,5 @@ func InitValidator()  {
 		return nameValidatorRegex.MatchString(fl.Field().String())
 	})
 	Validator.RegisterValidation("secure_password",isPasswordSecure)
+	Validator.RegisterValidation("age_gte_16",isOlderThan16)
 }

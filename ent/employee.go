@@ -5,9 +5,9 @@ package ent
 import (
 	"fmt"
 	"saas_identidad/ent/branch"
+	"saas_identidad/ent/email"
 	"saas_identidad/ent/employee"
 	"saas_identidad/ent/tenant"
-	"saas_identidad/ent/user"
 	"strings"
 	"time"
 
@@ -34,15 +34,15 @@ type Employee struct {
 	// The values are being populated by the EmployeeQuery when eager-loading is set.
 	Edges            EmployeeEdges `json:"edges"`
 	branch_employees *int
+	email_employees  *int
 	tenant_employees *int
-	user_employees   *int
 	selectValues     sql.SelectValues
 }
 
 // EmployeeEdges holds the relations/edges for other nodes in the graph.
 type EmployeeEdges struct {
-	// User holds the value of the user edge.
-	User *User `json:"user,omitempty"`
+	// Emails holds the value of the emails edge.
+	Emails *Email `json:"emails,omitempty"`
 	// Tenant holds the value of the tenant edge.
 	Tenant *Tenant `json:"tenant,omitempty"`
 	// Branch holds the value of the branch edge.
@@ -52,15 +52,15 @@ type EmployeeEdges struct {
 	loadedTypes [3]bool
 }
 
-// UserOrErr returns the User value or an error if the edge
+// EmailsOrErr returns the Emails value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e EmployeeEdges) UserOrErr() (*User, error) {
-	if e.User != nil {
-		return e.User, nil
+func (e EmployeeEdges) EmailsOrErr() (*Email, error) {
+	if e.Emails != nil {
+		return e.Emails, nil
 	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: user.Label}
+		return nil, &NotFoundError{label: email.Label}
 	}
-	return nil, &NotLoadedError{edge: "user"}
+	return nil, &NotLoadedError{edge: "emails"}
 }
 
 // TenantOrErr returns the Tenant value or an error if the edge
@@ -100,9 +100,9 @@ func (*Employee) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullTime)
 		case employee.ForeignKeys[0]: // branch_employees
 			values[i] = new(sql.NullInt64)
-		case employee.ForeignKeys[1]: // tenant_employees
+		case employee.ForeignKeys[1]: // email_employees
 			values[i] = new(sql.NullInt64)
-		case employee.ForeignKeys[2]: // user_employees
+		case employee.ForeignKeys[2]: // tenant_employees
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -165,17 +165,17 @@ func (_m *Employee) assignValues(columns []string, values []any) error {
 			}
 		case employee.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field email_employees", value)
+			} else if value.Valid {
+				_m.email_employees = new(int)
+				*_m.email_employees = int(value.Int64)
+			}
+		case employee.ForeignKeys[2]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field tenant_employees", value)
 			} else if value.Valid {
 				_m.tenant_employees = new(int)
 				*_m.tenant_employees = int(value.Int64)
-			}
-		case employee.ForeignKeys[2]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field user_employees", value)
-			} else if value.Valid {
-				_m.user_employees = new(int)
-				*_m.user_employees = int(value.Int64)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -190,9 +190,9 @@ func (_m *Employee) Value(name string) (ent.Value, error) {
 	return _m.selectValues.Get(name)
 }
 
-// QueryUser queries the "user" edge of the Employee entity.
-func (_m *Employee) QueryUser() *UserQuery {
-	return NewEmployeeClient(_m.config).QueryUser(_m)
+// QueryEmails queries the "emails" edge of the Employee entity.
+func (_m *Employee) QueryEmails() *EmailQuery {
+	return NewEmployeeClient(_m.config).QueryEmails(_m)
 }
 
 // QueryTenant queries the "tenant" edge of the Employee entity.

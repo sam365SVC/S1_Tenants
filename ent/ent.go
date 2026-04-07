@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"reflect"
 	"saas_identidad/ent/branch"
+	"saas_identidad/ent/email"
 	"saas_identidad/ent/employee"
+	"saas_identidad/ent/invitation"
 	"saas_identidad/ent/plan"
 	"saas_identidad/ent/tenant"
 	"saas_identidad/ent/user"
@@ -77,11 +79,13 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			branch.Table:   branch.ValidColumn,
-			employee.Table: employee.ValidColumn,
-			plan.Table:     plan.ValidColumn,
-			tenant.Table:   tenant.ValidColumn,
-			user.Table:     user.ValidColumn,
+			branch.Table:     branch.ValidColumn,
+			email.Table:      email.ValidColumn,
+			employee.Table:   employee.ValidColumn,
+			invitation.Table: invitation.ValidColumn,
+			plan.Table:       plan.ValidColumn,
+			tenant.Table:     tenant.ValidColumn,
+			user.Table:       user.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

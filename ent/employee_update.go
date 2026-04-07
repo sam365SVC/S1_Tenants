@@ -7,10 +7,10 @@ import (
 	"errors"
 	"fmt"
 	"saas_identidad/ent/branch"
+	"saas_identidad/ent/email"
 	"saas_identidad/ent/employee"
 	"saas_identidad/ent/predicate"
 	"saas_identidad/ent/tenant"
-	"saas_identidad/ent/user"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -107,23 +107,23 @@ func (_u *EmployeeUpdate) ClearLeftAt() *EmployeeUpdate {
 	return _u
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (_u *EmployeeUpdate) SetUserID(id int) *EmployeeUpdate {
-	_u.mutation.SetUserID(id)
+// SetEmailsID sets the "emails" edge to the Email entity by ID.
+func (_u *EmployeeUpdate) SetEmailsID(id int) *EmployeeUpdate {
+	_u.mutation.SetEmailsID(id)
 	return _u
 }
 
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (_u *EmployeeUpdate) SetNillableUserID(id *int) *EmployeeUpdate {
+// SetNillableEmailsID sets the "emails" edge to the Email entity by ID if the given value is not nil.
+func (_u *EmployeeUpdate) SetNillableEmailsID(id *int) *EmployeeUpdate {
 	if id != nil {
-		_u = _u.SetUserID(*id)
+		_u = _u.SetEmailsID(*id)
 	}
 	return _u
 }
 
-// SetUser sets the "user" edge to the User entity.
-func (_u *EmployeeUpdate) SetUser(v *User) *EmployeeUpdate {
-	return _u.SetUserID(v.ID)
+// SetEmails sets the "emails" edge to the Email entity.
+func (_u *EmployeeUpdate) SetEmails(v *Email) *EmployeeUpdate {
+	return _u.SetEmailsID(v.ID)
 }
 
 // SetTenantID sets the "tenant" edge to the Tenant entity by ID.
@@ -169,9 +169,9 @@ func (_u *EmployeeUpdate) Mutation() *EmployeeMutation {
 	return _u.mutation
 }
 
-// ClearUser clears the "user" edge to the User entity.
-func (_u *EmployeeUpdate) ClearUser() *EmployeeUpdate {
-	_u.mutation.ClearUser()
+// ClearEmails clears the "emails" edge to the Email entity.
+func (_u *EmployeeUpdate) ClearEmails() *EmployeeUpdate {
+	_u.mutation.ClearEmails()
 	return _u
 }
 
@@ -259,28 +259,28 @@ func (_u *EmployeeUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if _u.mutation.LeftAtCleared() {
 		_spec.ClearField(employee.FieldLeftAt, field.TypeTime)
 	}
-	if _u.mutation.UserCleared() {
+	if _u.mutation.EmailsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.UserTable,
-			Columns: []string{employee.UserColumn},
+			Table:   employee.EmailsTable,
+			Columns: []string{employee.EmailsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := _u.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.EmailsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.UserTable,
-			Columns: []string{employee.UserColumn},
+			Table:   employee.EmailsTable,
+			Columns: []string{employee.EmailsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -442,23 +442,23 @@ func (_u *EmployeeUpdateOne) ClearLeftAt() *EmployeeUpdateOne {
 	return _u
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (_u *EmployeeUpdateOne) SetUserID(id int) *EmployeeUpdateOne {
-	_u.mutation.SetUserID(id)
+// SetEmailsID sets the "emails" edge to the Email entity by ID.
+func (_u *EmployeeUpdateOne) SetEmailsID(id int) *EmployeeUpdateOne {
+	_u.mutation.SetEmailsID(id)
 	return _u
 }
 
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (_u *EmployeeUpdateOne) SetNillableUserID(id *int) *EmployeeUpdateOne {
+// SetNillableEmailsID sets the "emails" edge to the Email entity by ID if the given value is not nil.
+func (_u *EmployeeUpdateOne) SetNillableEmailsID(id *int) *EmployeeUpdateOne {
 	if id != nil {
-		_u = _u.SetUserID(*id)
+		_u = _u.SetEmailsID(*id)
 	}
 	return _u
 }
 
-// SetUser sets the "user" edge to the User entity.
-func (_u *EmployeeUpdateOne) SetUser(v *User) *EmployeeUpdateOne {
-	return _u.SetUserID(v.ID)
+// SetEmails sets the "emails" edge to the Email entity.
+func (_u *EmployeeUpdateOne) SetEmails(v *Email) *EmployeeUpdateOne {
+	return _u.SetEmailsID(v.ID)
 }
 
 // SetTenantID sets the "tenant" edge to the Tenant entity by ID.
@@ -504,9 +504,9 @@ func (_u *EmployeeUpdateOne) Mutation() *EmployeeMutation {
 	return _u.mutation
 }
 
-// ClearUser clears the "user" edge to the User entity.
-func (_u *EmployeeUpdateOne) ClearUser() *EmployeeUpdateOne {
-	_u.mutation.ClearUser()
+// ClearEmails clears the "emails" edge to the Email entity.
+func (_u *EmployeeUpdateOne) ClearEmails() *EmployeeUpdateOne {
+	_u.mutation.ClearEmails()
 	return _u
 }
 
@@ -624,28 +624,28 @@ func (_u *EmployeeUpdateOne) sqlSave(ctx context.Context) (_node *Employee, err 
 	if _u.mutation.LeftAtCleared() {
 		_spec.ClearField(employee.FieldLeftAt, field.TypeTime)
 	}
-	if _u.mutation.UserCleared() {
+	if _u.mutation.EmailsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.UserTable,
-			Columns: []string{employee.UserColumn},
+			Table:   employee.EmailsTable,
+			Columns: []string{employee.EmailsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := _u.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.EmailsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.UserTable,
-			Columns: []string{employee.UserColumn},
+			Table:   employee.EmailsTable,
+			Columns: []string{employee.EmailsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

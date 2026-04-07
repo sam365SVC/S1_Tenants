@@ -7,9 +7,9 @@ import (
 	"errors"
 	"fmt"
 	"saas_identidad/ent/branch"
+	"saas_identidad/ent/email"
 	"saas_identidad/ent/employee"
 	"saas_identidad/ent/tenant"
-	"saas_identidad/ent/user"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -77,23 +77,23 @@ func (_c *EmployeeCreate) SetNillableLeftAt(v *time.Time) *EmployeeCreate {
 	return _c
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (_c *EmployeeCreate) SetUserID(id int) *EmployeeCreate {
-	_c.mutation.SetUserID(id)
+// SetEmailsID sets the "emails" edge to the Email entity by ID.
+func (_c *EmployeeCreate) SetEmailsID(id int) *EmployeeCreate {
+	_c.mutation.SetEmailsID(id)
 	return _c
 }
 
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (_c *EmployeeCreate) SetNillableUserID(id *int) *EmployeeCreate {
+// SetNillableEmailsID sets the "emails" edge to the Email entity by ID if the given value is not nil.
+func (_c *EmployeeCreate) SetNillableEmailsID(id *int) *EmployeeCreate {
 	if id != nil {
-		_c = _c.SetUserID(*id)
+		_c = _c.SetEmailsID(*id)
 	}
 	return _c
 }
 
-// SetUser sets the "user" edge to the User entity.
-func (_c *EmployeeCreate) SetUser(v *User) *EmployeeCreate {
-	return _c.SetUserID(v.ID)
+// SetEmails sets the "emails" edge to the Email entity.
+func (_c *EmployeeCreate) SetEmails(v *Email) *EmployeeCreate {
+	return _c.SetEmailsID(v.ID)
 }
 
 // SetTenantID sets the "tenant" edge to the Tenant entity by ID.
@@ -255,21 +255,21 @@ func (_c *EmployeeCreate) createSpec() (*Employee, *sqlgraph.CreateSpec) {
 		_spec.SetField(employee.FieldLeftAt, field.TypeTime, value)
 		_node.LeftAt = &value
 	}
-	if nodes := _c.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.EmailsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.UserTable,
-			Columns: []string{employee.UserColumn},
+			Table:   employee.EmailsTable,
+			Columns: []string{employee.EmailsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.user_employees = &nodes[0]
+		_node.email_employees = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.TenantIDs(); len(nodes) > 0 {

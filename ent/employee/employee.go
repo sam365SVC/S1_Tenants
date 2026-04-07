@@ -26,21 +26,21 @@ const (
 	FieldJoinAt = "join_at"
 	// FieldLeftAt holds the string denoting the left_at field in the database.
 	FieldLeftAt = "left_at"
-	// EdgeUser holds the string denoting the user edge name in mutations.
-	EdgeUser = "user"
+	// EdgeEmails holds the string denoting the emails edge name in mutations.
+	EdgeEmails = "emails"
 	// EdgeTenant holds the string denoting the tenant edge name in mutations.
 	EdgeTenant = "tenant"
 	// EdgeBranch holds the string denoting the branch edge name in mutations.
 	EdgeBranch = "branch"
 	// Table holds the table name of the employee in the database.
 	Table = "employees"
-	// UserTable is the table that holds the user relation/edge.
-	UserTable = "employees"
-	// UserInverseTable is the table name for the User entity.
-	// It exists in this package in order to avoid circular dependency with the "user" package.
-	UserInverseTable = "users"
-	// UserColumn is the table column denoting the user relation/edge.
-	UserColumn = "user_employees"
+	// EmailsTable is the table that holds the emails relation/edge.
+	EmailsTable = "employees"
+	// EmailsInverseTable is the table name for the Email entity.
+	// It exists in this package in order to avoid circular dependency with the "email" package.
+	EmailsInverseTable = "emails"
+	// EmailsColumn is the table column denoting the emails relation/edge.
+	EmailsColumn = "email_employees"
 	// TenantTable is the table that holds the tenant relation/edge.
 	TenantTable = "employees"
 	// TenantInverseTable is the table name for the Tenant entity.
@@ -71,8 +71,8 @@ var Columns = []string{
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"branch_employees",
+	"email_employees",
 	"tenant_employees",
-	"user_employees",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -163,10 +163,10 @@ func ByLeftAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLeftAt, opts...).ToFunc()
 }
 
-// ByUserField orders the results by user field.
-func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByEmailsField orders the results by emails field.
+func ByEmailsField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUserStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newEmailsStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -183,11 +183,11 @@ func ByBranchField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newBranchStep(), sql.OrderByField(field, opts...))
 	}
 }
-func newUserStep() *sqlgraph.Step {
+func newEmailsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UserInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
+		sqlgraph.To(EmailsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, EmailsTable, EmailsColumn),
 	)
 }
 func newTenantStep() *sqlgraph.Step {
