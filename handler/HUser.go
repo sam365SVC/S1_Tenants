@@ -77,7 +77,7 @@ func (h *UserHandler) CreateUser(c echo.Context) error {
 		switch status {
 		case http.StatusUnauthorized:
 			return c.JSON(status, echo.Map{
-				"error": "token or email incorrects",
+				"error": "token or email incorrect",
 			})
 		case http.StatusConflict:
 			return c.JSON(status, echo.Map{

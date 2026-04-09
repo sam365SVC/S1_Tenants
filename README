@@ -1,0 +1,53 @@
+# SaaS Identidad API - Inquilino Recicla
+
+Esta es una API backend desarrollada en **Go**, diseñada con una arquitectura multi-inquilino (SaaS). Utiliza el framework **Echo** para el enrutamiento HTTP, **Ent ORM** para la interacción segura y eficiente con la base de datos, y autenticación mediante **JWT**.
+
+## 🚀 Tecnologías Principales
+
+* **Lenguaje:** [Go](https://go.dev/)
+* **Framework Web:** [Echo v4](https://echo.labstack.com/)
+* **ORM:** [Ent](https://entgo.io/)
+* **Base de Datos:** PostgreSQL (Optimizado con [Supabase Pooler] para IPv4)
+* **Seguridad:** Bcrypt para contraseñas y `golang-jwt/v5` para tokens.
+* **Validación:** `go-playground/validator/v10` para DTOs.
+
+---
+
+## 📋 Requisitos Previos
+
+Asegúrate de tener instalado lo siguiente en tu entorno de desarrollo:
+* [Go](https://go.dev/doc/install) (versión 1.20 o superior).
+* Acceso a una base de datos PostgreSQL (en este caso, Supabase).
+
+---
+
+## ⚙️ Configuración del Entorno
+
+Antes de ejecutar el proyecto, necesitas configurar las variables de entorno. 
+
+1. Crea un archivo llamado `.env` en la raíz del proyecto.
+2. Agrega las siguientes variables (reemplaza los valores con tus credenciales reales):
+
+```env
+#variable JWT
+JWT_KEY=
+# variables correo
+EMAIL_APP=
+EMAIL_ACCESS=
+# variables DB
+PGHOST=
+PGUSER=
+PGPORT=
+PGDATABASE=
+PGPASSWORD=
+```
+
+## Descarga las dependencias:
+Ejecuta el siguiente comando para descargar todos los módulos de Go necesarios, incluyendo Echo, Ent y Validator:
+
+go mod tidy
+
+## Ejecución del Proyecto
+Para levantar el servidor de desarrollo, ejecuta el punto de entrada principal de la API:
+
+go run cmd/api/main.go

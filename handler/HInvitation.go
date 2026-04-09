@@ -35,11 +35,11 @@ func (h *InvitationHandler) InvitationDeveloper(c echo.Context) error{
 		switch status{
 		case http.StatusConflict:
 			return c.JSON(status,echo.Map{
-				"error":"email exist in api",
+				"error":err.Error(),
 			})
 		case http.StatusBadRequest:
 			return c.JSON(status,echo.Map{
-				"error":"error request not valid",
+				"error":"Invalid request data",
 			})
 		case http.StatusInternalServerError:
 			return c.JSON(status,echo.Map{

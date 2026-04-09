@@ -31,7 +31,7 @@ func main() {
 
 	dsn:=fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=require",
 						host,port,user,dbpassword,dbname)
-	log.Println("Conectandose a Azure PostgreSQL ...")
+	log.Println("Conectandose a suparbase ...")
 	
 	client,err:=ent.Open("postgres",dsn)
 	if err!=nil {
@@ -45,9 +45,12 @@ func main() {
 	app:=echo.New()
 
 	// create services
+	SLogin:=services.NewLoginServices(client)
 	SInvitation:=services.NewInvitationServices(client)
 	SUser:=services.NewUserServices(client)
 	// create handler
+	// Cambia AuthHandler por NewAuthHandler
+	HLogin := handler.NewAuthHandler(SLogin, validation.Validator)
 	HInvitation:=handler.NewInvitationHandler(SInvitation,validation.Validator)
 	HUser:=handler.NewUserHandler(SUser,validation.Validator)
 	api:=app.Group("/tenant/v1")
@@ -59,6 +62,10 @@ func main() {
 	RUser:=api.Group("/user")
 	{
 		RUser.POST("",HUser.CreateUser)
+	}
+	RLogin:=api.Group("/login")
+	{
+		RLogin.POST("",HLogin.Login)
 	}
 
 	app.Logger.Fatal(app.Start(":8080"))
