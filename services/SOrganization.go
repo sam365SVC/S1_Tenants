@@ -28,7 +28,9 @@ func (s *OrganizationServices) CreateOrganization(ctx context.Context, userId in
 	}
 	defer tx.Rollback()
 	tenantCreated, err := tx.Tenant.Create().
-		SetName(req.Tenant.Name).SetOwnerID(userId).
+		SetName(req.Tenant.Name).
+		SetOwnerID(userId).
+		SetPlanID(1).
 		Save(ctx)
 	if err != nil {
 		if ent.IsConstraintError(err) {

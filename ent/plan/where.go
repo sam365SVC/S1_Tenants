@@ -64,19 +64,19 @@ func Price(v float64) predicate.Plan {
 	return predicate.Plan(sql.FieldEQ(FieldPrice, v))
 }
 
-// MaxUsers applies equality check predicate on the "max_users" field. It's identical to MaxUsersEQ.
-func MaxUsers(v int32) predicate.Plan {
-	return predicate.Plan(sql.FieldEQ(FieldMaxUsers, v))
+// MaxEmployees applies equality check predicate on the "max_employees" field. It's identical to MaxEmployeesEQ.
+func MaxEmployees(v int32) predicate.Plan {
+	return predicate.Plan(sql.FieldEQ(FieldMaxEmployees, v))
 }
 
-// MaxBranch applies equality check predicate on the "max_branch" field. It's identical to MaxBranchEQ.
-func MaxBranch(v int32) predicate.Plan {
-	return predicate.Plan(sql.FieldEQ(FieldMaxBranch, v))
+// MaxBranches applies equality check predicate on the "max_branches" field. It's identical to MaxBranchesEQ.
+func MaxBranches(v int32) predicate.Plan {
+	return predicate.Plan(sql.FieldEQ(FieldMaxBranches, v))
 }
 
-// MaxBoss applies equality check predicate on the "max_boss" field. It's identical to MaxBossEQ.
-func MaxBoss(v int32) predicate.Plan {
-	return predicate.Plan(sql.FieldEQ(FieldMaxBoss, v))
+// MaxBosses applies equality check predicate on the "max_bosses" field. It's identical to MaxBossesEQ.
+func MaxBosses(v int32) predicate.Plan {
+	return predicate.Plan(sql.FieldEQ(FieldMaxBosses, v))
 }
 
 // SubscriptionEQ applies the EQ predicate on the "subscription" field.
@@ -184,124 +184,124 @@ func PriceLTE(v float64) predicate.Plan {
 	return predicate.Plan(sql.FieldLTE(FieldPrice, v))
 }
 
-// MaxUsersEQ applies the EQ predicate on the "max_users" field.
-func MaxUsersEQ(v int32) predicate.Plan {
-	return predicate.Plan(sql.FieldEQ(FieldMaxUsers, v))
+// MaxEmployeesEQ applies the EQ predicate on the "max_employees" field.
+func MaxEmployeesEQ(v int32) predicate.Plan {
+	return predicate.Plan(sql.FieldEQ(FieldMaxEmployees, v))
 }
 
-// MaxUsersNEQ applies the NEQ predicate on the "max_users" field.
-func MaxUsersNEQ(v int32) predicate.Plan {
-	return predicate.Plan(sql.FieldNEQ(FieldMaxUsers, v))
+// MaxEmployeesNEQ applies the NEQ predicate on the "max_employees" field.
+func MaxEmployeesNEQ(v int32) predicate.Plan {
+	return predicate.Plan(sql.FieldNEQ(FieldMaxEmployees, v))
 }
 
-// MaxUsersIn applies the In predicate on the "max_users" field.
-func MaxUsersIn(vs ...int32) predicate.Plan {
-	return predicate.Plan(sql.FieldIn(FieldMaxUsers, vs...))
+// MaxEmployeesIn applies the In predicate on the "max_employees" field.
+func MaxEmployeesIn(vs ...int32) predicate.Plan {
+	return predicate.Plan(sql.FieldIn(FieldMaxEmployees, vs...))
 }
 
-// MaxUsersNotIn applies the NotIn predicate on the "max_users" field.
-func MaxUsersNotIn(vs ...int32) predicate.Plan {
-	return predicate.Plan(sql.FieldNotIn(FieldMaxUsers, vs...))
+// MaxEmployeesNotIn applies the NotIn predicate on the "max_employees" field.
+func MaxEmployeesNotIn(vs ...int32) predicate.Plan {
+	return predicate.Plan(sql.FieldNotIn(FieldMaxEmployees, vs...))
 }
 
-// MaxUsersGT applies the GT predicate on the "max_users" field.
-func MaxUsersGT(v int32) predicate.Plan {
-	return predicate.Plan(sql.FieldGT(FieldMaxUsers, v))
+// MaxEmployeesGT applies the GT predicate on the "max_employees" field.
+func MaxEmployeesGT(v int32) predicate.Plan {
+	return predicate.Plan(sql.FieldGT(FieldMaxEmployees, v))
 }
 
-// MaxUsersGTE applies the GTE predicate on the "max_users" field.
-func MaxUsersGTE(v int32) predicate.Plan {
-	return predicate.Plan(sql.FieldGTE(FieldMaxUsers, v))
+// MaxEmployeesGTE applies the GTE predicate on the "max_employees" field.
+func MaxEmployeesGTE(v int32) predicate.Plan {
+	return predicate.Plan(sql.FieldGTE(FieldMaxEmployees, v))
 }
 
-// MaxUsersLT applies the LT predicate on the "max_users" field.
-func MaxUsersLT(v int32) predicate.Plan {
-	return predicate.Plan(sql.FieldLT(FieldMaxUsers, v))
+// MaxEmployeesLT applies the LT predicate on the "max_employees" field.
+func MaxEmployeesLT(v int32) predicate.Plan {
+	return predicate.Plan(sql.FieldLT(FieldMaxEmployees, v))
 }
 
-// MaxUsersLTE applies the LTE predicate on the "max_users" field.
-func MaxUsersLTE(v int32) predicate.Plan {
-	return predicate.Plan(sql.FieldLTE(FieldMaxUsers, v))
+// MaxEmployeesLTE applies the LTE predicate on the "max_employees" field.
+func MaxEmployeesLTE(v int32) predicate.Plan {
+	return predicate.Plan(sql.FieldLTE(FieldMaxEmployees, v))
 }
 
-// MaxBranchEQ applies the EQ predicate on the "max_branch" field.
-func MaxBranchEQ(v int32) predicate.Plan {
-	return predicate.Plan(sql.FieldEQ(FieldMaxBranch, v))
+// MaxBranchesEQ applies the EQ predicate on the "max_branches" field.
+func MaxBranchesEQ(v int32) predicate.Plan {
+	return predicate.Plan(sql.FieldEQ(FieldMaxBranches, v))
 }
 
-// MaxBranchNEQ applies the NEQ predicate on the "max_branch" field.
-func MaxBranchNEQ(v int32) predicate.Plan {
-	return predicate.Plan(sql.FieldNEQ(FieldMaxBranch, v))
+// MaxBranchesNEQ applies the NEQ predicate on the "max_branches" field.
+func MaxBranchesNEQ(v int32) predicate.Plan {
+	return predicate.Plan(sql.FieldNEQ(FieldMaxBranches, v))
 }
 
-// MaxBranchIn applies the In predicate on the "max_branch" field.
-func MaxBranchIn(vs ...int32) predicate.Plan {
-	return predicate.Plan(sql.FieldIn(FieldMaxBranch, vs...))
+// MaxBranchesIn applies the In predicate on the "max_branches" field.
+func MaxBranchesIn(vs ...int32) predicate.Plan {
+	return predicate.Plan(sql.FieldIn(FieldMaxBranches, vs...))
 }
 
-// MaxBranchNotIn applies the NotIn predicate on the "max_branch" field.
-func MaxBranchNotIn(vs ...int32) predicate.Plan {
-	return predicate.Plan(sql.FieldNotIn(FieldMaxBranch, vs...))
+// MaxBranchesNotIn applies the NotIn predicate on the "max_branches" field.
+func MaxBranchesNotIn(vs ...int32) predicate.Plan {
+	return predicate.Plan(sql.FieldNotIn(FieldMaxBranches, vs...))
 }
 
-// MaxBranchGT applies the GT predicate on the "max_branch" field.
-func MaxBranchGT(v int32) predicate.Plan {
-	return predicate.Plan(sql.FieldGT(FieldMaxBranch, v))
+// MaxBranchesGT applies the GT predicate on the "max_branches" field.
+func MaxBranchesGT(v int32) predicate.Plan {
+	return predicate.Plan(sql.FieldGT(FieldMaxBranches, v))
 }
 
-// MaxBranchGTE applies the GTE predicate on the "max_branch" field.
-func MaxBranchGTE(v int32) predicate.Plan {
-	return predicate.Plan(sql.FieldGTE(FieldMaxBranch, v))
+// MaxBranchesGTE applies the GTE predicate on the "max_branches" field.
+func MaxBranchesGTE(v int32) predicate.Plan {
+	return predicate.Plan(sql.FieldGTE(FieldMaxBranches, v))
 }
 
-// MaxBranchLT applies the LT predicate on the "max_branch" field.
-func MaxBranchLT(v int32) predicate.Plan {
-	return predicate.Plan(sql.FieldLT(FieldMaxBranch, v))
+// MaxBranchesLT applies the LT predicate on the "max_branches" field.
+func MaxBranchesLT(v int32) predicate.Plan {
+	return predicate.Plan(sql.FieldLT(FieldMaxBranches, v))
 }
 
-// MaxBranchLTE applies the LTE predicate on the "max_branch" field.
-func MaxBranchLTE(v int32) predicate.Plan {
-	return predicate.Plan(sql.FieldLTE(FieldMaxBranch, v))
+// MaxBranchesLTE applies the LTE predicate on the "max_branches" field.
+func MaxBranchesLTE(v int32) predicate.Plan {
+	return predicate.Plan(sql.FieldLTE(FieldMaxBranches, v))
 }
 
-// MaxBossEQ applies the EQ predicate on the "max_boss" field.
-func MaxBossEQ(v int32) predicate.Plan {
-	return predicate.Plan(sql.FieldEQ(FieldMaxBoss, v))
+// MaxBossesEQ applies the EQ predicate on the "max_bosses" field.
+func MaxBossesEQ(v int32) predicate.Plan {
+	return predicate.Plan(sql.FieldEQ(FieldMaxBosses, v))
 }
 
-// MaxBossNEQ applies the NEQ predicate on the "max_boss" field.
-func MaxBossNEQ(v int32) predicate.Plan {
-	return predicate.Plan(sql.FieldNEQ(FieldMaxBoss, v))
+// MaxBossesNEQ applies the NEQ predicate on the "max_bosses" field.
+func MaxBossesNEQ(v int32) predicate.Plan {
+	return predicate.Plan(sql.FieldNEQ(FieldMaxBosses, v))
 }
 
-// MaxBossIn applies the In predicate on the "max_boss" field.
-func MaxBossIn(vs ...int32) predicate.Plan {
-	return predicate.Plan(sql.FieldIn(FieldMaxBoss, vs...))
+// MaxBossesIn applies the In predicate on the "max_bosses" field.
+func MaxBossesIn(vs ...int32) predicate.Plan {
+	return predicate.Plan(sql.FieldIn(FieldMaxBosses, vs...))
 }
 
-// MaxBossNotIn applies the NotIn predicate on the "max_boss" field.
-func MaxBossNotIn(vs ...int32) predicate.Plan {
-	return predicate.Plan(sql.FieldNotIn(FieldMaxBoss, vs...))
+// MaxBossesNotIn applies the NotIn predicate on the "max_bosses" field.
+func MaxBossesNotIn(vs ...int32) predicate.Plan {
+	return predicate.Plan(sql.FieldNotIn(FieldMaxBosses, vs...))
 }
 
-// MaxBossGT applies the GT predicate on the "max_boss" field.
-func MaxBossGT(v int32) predicate.Plan {
-	return predicate.Plan(sql.FieldGT(FieldMaxBoss, v))
+// MaxBossesGT applies the GT predicate on the "max_bosses" field.
+func MaxBossesGT(v int32) predicate.Plan {
+	return predicate.Plan(sql.FieldGT(FieldMaxBosses, v))
 }
 
-// MaxBossGTE applies the GTE predicate on the "max_boss" field.
-func MaxBossGTE(v int32) predicate.Plan {
-	return predicate.Plan(sql.FieldGTE(FieldMaxBoss, v))
+// MaxBossesGTE applies the GTE predicate on the "max_bosses" field.
+func MaxBossesGTE(v int32) predicate.Plan {
+	return predicate.Plan(sql.FieldGTE(FieldMaxBosses, v))
 }
 
-// MaxBossLT applies the LT predicate on the "max_boss" field.
-func MaxBossLT(v int32) predicate.Plan {
-	return predicate.Plan(sql.FieldLT(FieldMaxBoss, v))
+// MaxBossesLT applies the LT predicate on the "max_bosses" field.
+func MaxBossesLT(v int32) predicate.Plan {
+	return predicate.Plan(sql.FieldLT(FieldMaxBosses, v))
 }
 
-// MaxBossLTE applies the LTE predicate on the "max_boss" field.
-func MaxBossLTE(v int32) predicate.Plan {
-	return predicate.Plan(sql.FieldLTE(FieldMaxBoss, v))
+// MaxBossesLTE applies the LTE predicate on the "max_bosses" field.
+func MaxBossesLTE(v int32) predicate.Plan {
+	return predicate.Plan(sql.FieldLTE(FieldMaxBosses, v))
 }
 
 // HasTenants applies the HasEdge predicate on the "tenants" edge.

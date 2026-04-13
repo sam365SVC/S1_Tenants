@@ -16,12 +16,12 @@ const (
 	FieldSubscription = "subscription"
 	// FieldPrice holds the string denoting the price field in the database.
 	FieldPrice = "price"
-	// FieldMaxUsers holds the string denoting the max_users field in the database.
-	FieldMaxUsers = "max_users"
-	// FieldMaxBranch holds the string denoting the max_branch field in the database.
-	FieldMaxBranch = "max_branch"
-	// FieldMaxBoss holds the string denoting the max_boss field in the database.
-	FieldMaxBoss = "max_boss"
+	// FieldMaxEmployees holds the string denoting the max_employees field in the database.
+	FieldMaxEmployees = "max_employees"
+	// FieldMaxBranches holds the string denoting the max_branches field in the database.
+	FieldMaxBranches = "max_branches"
+	// FieldMaxBosses holds the string denoting the max_bosses field in the database.
+	FieldMaxBosses = "max_bosses"
 	// EdgeTenants holds the string denoting the tenants edge name in mutations.
 	EdgeTenants = "tenants"
 	// Table holds the table name of the plan in the database.
@@ -40,9 +40,9 @@ var Columns = []string{
 	FieldID,
 	FieldSubscription,
 	FieldPrice,
-	FieldMaxUsers,
-	FieldMaxBranch,
-	FieldMaxBoss,
+	FieldMaxEmployees,
+	FieldMaxBranches,
+	FieldMaxBosses,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -60,12 +60,12 @@ var (
 	SubscriptionValidator func(string) error
 	// DefaultPrice holds the default value on creation for the "price" field.
 	DefaultPrice float64
-	// DefaultMaxUsers holds the default value on creation for the "max_users" field.
-	DefaultMaxUsers int32
-	// DefaultMaxBranch holds the default value on creation for the "max_branch" field.
-	DefaultMaxBranch int32
-	// DefaultMaxBoss holds the default value on creation for the "max_boss" field.
-	DefaultMaxBoss int32
+	// DefaultMaxEmployees holds the default value on creation for the "max_employees" field.
+	DefaultMaxEmployees int32
+	// DefaultMaxBranches holds the default value on creation for the "max_branches" field.
+	DefaultMaxBranches int32
+	// DefaultMaxBosses holds the default value on creation for the "max_bosses" field.
+	DefaultMaxBosses int32
 )
 
 // OrderOption defines the ordering options for the Plan queries.
@@ -86,19 +86,19 @@ func ByPrice(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPrice, opts...).ToFunc()
 }
 
-// ByMaxUsers orders the results by the max_users field.
-func ByMaxUsers(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldMaxUsers, opts...).ToFunc()
+// ByMaxEmployees orders the results by the max_employees field.
+func ByMaxEmployees(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMaxEmployees, opts...).ToFunc()
 }
 
-// ByMaxBranch orders the results by the max_branch field.
-func ByMaxBranch(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldMaxBranch, opts...).ToFunc()
+// ByMaxBranches orders the results by the max_branches field.
+func ByMaxBranches(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMaxBranches, opts...).ToFunc()
 }
 
-// ByMaxBoss orders the results by the max_boss field.
-func ByMaxBoss(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldMaxBoss, opts...).ToFunc()
+// ByMaxBosses orders the results by the max_bosses field.
+func ByMaxBosses(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMaxBosses, opts...).ToFunc()
 }
 
 // ByTenantsCount orders the results by tenants count.

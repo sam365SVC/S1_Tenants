@@ -40,44 +40,44 @@ func (_c *PlanCreate) SetNillablePrice(v *float64) *PlanCreate {
 	return _c
 }
 
-// SetMaxUsers sets the "max_users" field.
-func (_c *PlanCreate) SetMaxUsers(v int32) *PlanCreate {
-	_c.mutation.SetMaxUsers(v)
+// SetMaxEmployees sets the "max_employees" field.
+func (_c *PlanCreate) SetMaxEmployees(v int32) *PlanCreate {
+	_c.mutation.SetMaxEmployees(v)
 	return _c
 }
 
-// SetNillableMaxUsers sets the "max_users" field if the given value is not nil.
-func (_c *PlanCreate) SetNillableMaxUsers(v *int32) *PlanCreate {
+// SetNillableMaxEmployees sets the "max_employees" field if the given value is not nil.
+func (_c *PlanCreate) SetNillableMaxEmployees(v *int32) *PlanCreate {
 	if v != nil {
-		_c.SetMaxUsers(*v)
+		_c.SetMaxEmployees(*v)
 	}
 	return _c
 }
 
-// SetMaxBranch sets the "max_branch" field.
-func (_c *PlanCreate) SetMaxBranch(v int32) *PlanCreate {
-	_c.mutation.SetMaxBranch(v)
+// SetMaxBranches sets the "max_branches" field.
+func (_c *PlanCreate) SetMaxBranches(v int32) *PlanCreate {
+	_c.mutation.SetMaxBranches(v)
 	return _c
 }
 
-// SetNillableMaxBranch sets the "max_branch" field if the given value is not nil.
-func (_c *PlanCreate) SetNillableMaxBranch(v *int32) *PlanCreate {
+// SetNillableMaxBranches sets the "max_branches" field if the given value is not nil.
+func (_c *PlanCreate) SetNillableMaxBranches(v *int32) *PlanCreate {
 	if v != nil {
-		_c.SetMaxBranch(*v)
+		_c.SetMaxBranches(*v)
 	}
 	return _c
 }
 
-// SetMaxBoss sets the "max_boss" field.
-func (_c *PlanCreate) SetMaxBoss(v int32) *PlanCreate {
-	_c.mutation.SetMaxBoss(v)
+// SetMaxBosses sets the "max_bosses" field.
+func (_c *PlanCreate) SetMaxBosses(v int32) *PlanCreate {
+	_c.mutation.SetMaxBosses(v)
 	return _c
 }
 
-// SetNillableMaxBoss sets the "max_boss" field if the given value is not nil.
-func (_c *PlanCreate) SetNillableMaxBoss(v *int32) *PlanCreate {
+// SetNillableMaxBosses sets the "max_bosses" field if the given value is not nil.
+func (_c *PlanCreate) SetNillableMaxBosses(v *int32) *PlanCreate {
 	if v != nil {
-		_c.SetMaxBoss(*v)
+		_c.SetMaxBosses(*v)
 	}
 	return _c
 }
@@ -136,17 +136,17 @@ func (_c *PlanCreate) defaults() {
 		v := plan.DefaultPrice
 		_c.mutation.SetPrice(v)
 	}
-	if _, ok := _c.mutation.MaxUsers(); !ok {
-		v := plan.DefaultMaxUsers
-		_c.mutation.SetMaxUsers(v)
+	if _, ok := _c.mutation.MaxEmployees(); !ok {
+		v := plan.DefaultMaxEmployees
+		_c.mutation.SetMaxEmployees(v)
 	}
-	if _, ok := _c.mutation.MaxBranch(); !ok {
-		v := plan.DefaultMaxBranch
-		_c.mutation.SetMaxBranch(v)
+	if _, ok := _c.mutation.MaxBranches(); !ok {
+		v := plan.DefaultMaxBranches
+		_c.mutation.SetMaxBranches(v)
 	}
-	if _, ok := _c.mutation.MaxBoss(); !ok {
-		v := plan.DefaultMaxBoss
-		_c.mutation.SetMaxBoss(v)
+	if _, ok := _c.mutation.MaxBosses(); !ok {
+		v := plan.DefaultMaxBosses
+		_c.mutation.SetMaxBosses(v)
 	}
 }
 
@@ -163,14 +163,14 @@ func (_c *PlanCreate) check() error {
 	if _, ok := _c.mutation.Price(); !ok {
 		return &ValidationError{Name: "price", err: errors.New(`ent: missing required field "Plan.price"`)}
 	}
-	if _, ok := _c.mutation.MaxUsers(); !ok {
-		return &ValidationError{Name: "max_users", err: errors.New(`ent: missing required field "Plan.max_users"`)}
+	if _, ok := _c.mutation.MaxEmployees(); !ok {
+		return &ValidationError{Name: "max_employees", err: errors.New(`ent: missing required field "Plan.max_employees"`)}
 	}
-	if _, ok := _c.mutation.MaxBranch(); !ok {
-		return &ValidationError{Name: "max_branch", err: errors.New(`ent: missing required field "Plan.max_branch"`)}
+	if _, ok := _c.mutation.MaxBranches(); !ok {
+		return &ValidationError{Name: "max_branches", err: errors.New(`ent: missing required field "Plan.max_branches"`)}
 	}
-	if _, ok := _c.mutation.MaxBoss(); !ok {
-		return &ValidationError{Name: "max_boss", err: errors.New(`ent: missing required field "Plan.max_boss"`)}
+	if _, ok := _c.mutation.MaxBosses(); !ok {
+		return &ValidationError{Name: "max_bosses", err: errors.New(`ent: missing required field "Plan.max_bosses"`)}
 	}
 	return nil
 }
@@ -206,17 +206,17 @@ func (_c *PlanCreate) createSpec() (*Plan, *sqlgraph.CreateSpec) {
 		_spec.SetField(plan.FieldPrice, field.TypeFloat64, value)
 		_node.Price = value
 	}
-	if value, ok := _c.mutation.MaxUsers(); ok {
-		_spec.SetField(plan.FieldMaxUsers, field.TypeInt32, value)
-		_node.MaxUsers = value
+	if value, ok := _c.mutation.MaxEmployees(); ok {
+		_spec.SetField(plan.FieldMaxEmployees, field.TypeInt32, value)
+		_node.MaxEmployees = value
 	}
-	if value, ok := _c.mutation.MaxBranch(); ok {
-		_spec.SetField(plan.FieldMaxBranch, field.TypeInt32, value)
-		_node.MaxBranch = value
+	if value, ok := _c.mutation.MaxBranches(); ok {
+		_spec.SetField(plan.FieldMaxBranches, field.TypeInt32, value)
+		_node.MaxBranches = value
 	}
-	if value, ok := _c.mutation.MaxBoss(); ok {
-		_spec.SetField(plan.FieldMaxBoss, field.TypeInt32, value)
-		_node.MaxBoss = value
+	if value, ok := _c.mutation.MaxBosses(); ok {
+		_spec.SetField(plan.FieldMaxBosses, field.TypeInt32, value)
+		_node.MaxBosses = value
 	}
 	if nodes := _c.mutation.TenantsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

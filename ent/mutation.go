@@ -3518,25 +3518,25 @@ func (m *InvitationEmployeeMutation) ResetEdge(name string) error {
 // PlanMutation represents an operation that mutates the Plan nodes in the graph.
 type PlanMutation struct {
 	config
-	op             Op
-	typ            string
-	id             *int
-	subscription   *string
-	price          *float64
-	addprice       *float64
-	max_users      *int32
-	addmax_users   *int32
-	max_branch     *int32
-	addmax_branch  *int32
-	max_boss       *int32
-	addmax_boss    *int32
-	clearedFields  map[string]struct{}
-	tenants        map[int]struct{}
-	removedtenants map[int]struct{}
-	clearedtenants bool
-	done           bool
-	oldValue       func(context.Context) (*Plan, error)
-	predicates     []predicate.Plan
+	op               Op
+	typ              string
+	id               *int
+	subscription     *string
+	price            *float64
+	addprice         *float64
+	max_employees    *int32
+	addmax_employees *int32
+	max_branches     *int32
+	addmax_branches  *int32
+	max_bosses       *int32
+	addmax_bosses    *int32
+	clearedFields    map[string]struct{}
+	tenants          map[int]struct{}
+	removedtenants   map[int]struct{}
+	clearedtenants   bool
+	done             bool
+	oldValue         func(context.Context) (*Plan, error)
+	predicates       []predicate.Plan
 }
 
 var _ ent.Mutation = (*PlanMutation)(nil)
@@ -3729,172 +3729,172 @@ func (m *PlanMutation) ResetPrice() {
 	m.addprice = nil
 }
 
-// SetMaxUsers sets the "max_users" field.
-func (m *PlanMutation) SetMaxUsers(i int32) {
-	m.max_users = &i
-	m.addmax_users = nil
+// SetMaxEmployees sets the "max_employees" field.
+func (m *PlanMutation) SetMaxEmployees(i int32) {
+	m.max_employees = &i
+	m.addmax_employees = nil
 }
 
-// MaxUsers returns the value of the "max_users" field in the mutation.
-func (m *PlanMutation) MaxUsers() (r int32, exists bool) {
-	v := m.max_users
+// MaxEmployees returns the value of the "max_employees" field in the mutation.
+func (m *PlanMutation) MaxEmployees() (r int32, exists bool) {
+	v := m.max_employees
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldMaxUsers returns the old "max_users" field's value of the Plan entity.
+// OldMaxEmployees returns the old "max_employees" field's value of the Plan entity.
 // If the Plan object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PlanMutation) OldMaxUsers(ctx context.Context) (v int32, err error) {
+func (m *PlanMutation) OldMaxEmployees(ctx context.Context) (v int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldMaxUsers is only allowed on UpdateOne operations")
+		return v, errors.New("OldMaxEmployees is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldMaxUsers requires an ID field in the mutation")
+		return v, errors.New("OldMaxEmployees requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldMaxUsers: %w", err)
+		return v, fmt.Errorf("querying old value for OldMaxEmployees: %w", err)
 	}
-	return oldValue.MaxUsers, nil
+	return oldValue.MaxEmployees, nil
 }
 
-// AddMaxUsers adds i to the "max_users" field.
-func (m *PlanMutation) AddMaxUsers(i int32) {
-	if m.addmax_users != nil {
-		*m.addmax_users += i
+// AddMaxEmployees adds i to the "max_employees" field.
+func (m *PlanMutation) AddMaxEmployees(i int32) {
+	if m.addmax_employees != nil {
+		*m.addmax_employees += i
 	} else {
-		m.addmax_users = &i
+		m.addmax_employees = &i
 	}
 }
 
-// AddedMaxUsers returns the value that was added to the "max_users" field in this mutation.
-func (m *PlanMutation) AddedMaxUsers() (r int32, exists bool) {
-	v := m.addmax_users
+// AddedMaxEmployees returns the value that was added to the "max_employees" field in this mutation.
+func (m *PlanMutation) AddedMaxEmployees() (r int32, exists bool) {
+	v := m.addmax_employees
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetMaxUsers resets all changes to the "max_users" field.
-func (m *PlanMutation) ResetMaxUsers() {
-	m.max_users = nil
-	m.addmax_users = nil
+// ResetMaxEmployees resets all changes to the "max_employees" field.
+func (m *PlanMutation) ResetMaxEmployees() {
+	m.max_employees = nil
+	m.addmax_employees = nil
 }
 
-// SetMaxBranch sets the "max_branch" field.
-func (m *PlanMutation) SetMaxBranch(i int32) {
-	m.max_branch = &i
-	m.addmax_branch = nil
+// SetMaxBranches sets the "max_branches" field.
+func (m *PlanMutation) SetMaxBranches(i int32) {
+	m.max_branches = &i
+	m.addmax_branches = nil
 }
 
-// MaxBranch returns the value of the "max_branch" field in the mutation.
-func (m *PlanMutation) MaxBranch() (r int32, exists bool) {
-	v := m.max_branch
+// MaxBranches returns the value of the "max_branches" field in the mutation.
+func (m *PlanMutation) MaxBranches() (r int32, exists bool) {
+	v := m.max_branches
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldMaxBranch returns the old "max_branch" field's value of the Plan entity.
+// OldMaxBranches returns the old "max_branches" field's value of the Plan entity.
 // If the Plan object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PlanMutation) OldMaxBranch(ctx context.Context) (v int32, err error) {
+func (m *PlanMutation) OldMaxBranches(ctx context.Context) (v int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldMaxBranch is only allowed on UpdateOne operations")
+		return v, errors.New("OldMaxBranches is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldMaxBranch requires an ID field in the mutation")
+		return v, errors.New("OldMaxBranches requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldMaxBranch: %w", err)
+		return v, fmt.Errorf("querying old value for OldMaxBranches: %w", err)
 	}
-	return oldValue.MaxBranch, nil
+	return oldValue.MaxBranches, nil
 }
 
-// AddMaxBranch adds i to the "max_branch" field.
-func (m *PlanMutation) AddMaxBranch(i int32) {
-	if m.addmax_branch != nil {
-		*m.addmax_branch += i
+// AddMaxBranches adds i to the "max_branches" field.
+func (m *PlanMutation) AddMaxBranches(i int32) {
+	if m.addmax_branches != nil {
+		*m.addmax_branches += i
 	} else {
-		m.addmax_branch = &i
+		m.addmax_branches = &i
 	}
 }
 
-// AddedMaxBranch returns the value that was added to the "max_branch" field in this mutation.
-func (m *PlanMutation) AddedMaxBranch() (r int32, exists bool) {
-	v := m.addmax_branch
+// AddedMaxBranches returns the value that was added to the "max_branches" field in this mutation.
+func (m *PlanMutation) AddedMaxBranches() (r int32, exists bool) {
+	v := m.addmax_branches
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetMaxBranch resets all changes to the "max_branch" field.
-func (m *PlanMutation) ResetMaxBranch() {
-	m.max_branch = nil
-	m.addmax_branch = nil
+// ResetMaxBranches resets all changes to the "max_branches" field.
+func (m *PlanMutation) ResetMaxBranches() {
+	m.max_branches = nil
+	m.addmax_branches = nil
 }
 
-// SetMaxBoss sets the "max_boss" field.
-func (m *PlanMutation) SetMaxBoss(i int32) {
-	m.max_boss = &i
-	m.addmax_boss = nil
+// SetMaxBosses sets the "max_bosses" field.
+func (m *PlanMutation) SetMaxBosses(i int32) {
+	m.max_bosses = &i
+	m.addmax_bosses = nil
 }
 
-// MaxBoss returns the value of the "max_boss" field in the mutation.
-func (m *PlanMutation) MaxBoss() (r int32, exists bool) {
-	v := m.max_boss
+// MaxBosses returns the value of the "max_bosses" field in the mutation.
+func (m *PlanMutation) MaxBosses() (r int32, exists bool) {
+	v := m.max_bosses
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldMaxBoss returns the old "max_boss" field's value of the Plan entity.
+// OldMaxBosses returns the old "max_bosses" field's value of the Plan entity.
 // If the Plan object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PlanMutation) OldMaxBoss(ctx context.Context) (v int32, err error) {
+func (m *PlanMutation) OldMaxBosses(ctx context.Context) (v int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldMaxBoss is only allowed on UpdateOne operations")
+		return v, errors.New("OldMaxBosses is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldMaxBoss requires an ID field in the mutation")
+		return v, errors.New("OldMaxBosses requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldMaxBoss: %w", err)
+		return v, fmt.Errorf("querying old value for OldMaxBosses: %w", err)
 	}
-	return oldValue.MaxBoss, nil
+	return oldValue.MaxBosses, nil
 }
 
-// AddMaxBoss adds i to the "max_boss" field.
-func (m *PlanMutation) AddMaxBoss(i int32) {
-	if m.addmax_boss != nil {
-		*m.addmax_boss += i
+// AddMaxBosses adds i to the "max_bosses" field.
+func (m *PlanMutation) AddMaxBosses(i int32) {
+	if m.addmax_bosses != nil {
+		*m.addmax_bosses += i
 	} else {
-		m.addmax_boss = &i
+		m.addmax_bosses = &i
 	}
 }
 
-// AddedMaxBoss returns the value that was added to the "max_boss" field in this mutation.
-func (m *PlanMutation) AddedMaxBoss() (r int32, exists bool) {
-	v := m.addmax_boss
+// AddedMaxBosses returns the value that was added to the "max_bosses" field in this mutation.
+func (m *PlanMutation) AddedMaxBosses() (r int32, exists bool) {
+	v := m.addmax_bosses
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetMaxBoss resets all changes to the "max_boss" field.
-func (m *PlanMutation) ResetMaxBoss() {
-	m.max_boss = nil
-	m.addmax_boss = nil
+// ResetMaxBosses resets all changes to the "max_bosses" field.
+func (m *PlanMutation) ResetMaxBosses() {
+	m.max_bosses = nil
+	m.addmax_bosses = nil
 }
 
 // AddTenantIDs adds the "tenants" edge to the Tenant entity by ids.
@@ -3992,14 +3992,14 @@ func (m *PlanMutation) Fields() []string {
 	if m.price != nil {
 		fields = append(fields, plan.FieldPrice)
 	}
-	if m.max_users != nil {
-		fields = append(fields, plan.FieldMaxUsers)
+	if m.max_employees != nil {
+		fields = append(fields, plan.FieldMaxEmployees)
 	}
-	if m.max_branch != nil {
-		fields = append(fields, plan.FieldMaxBranch)
+	if m.max_branches != nil {
+		fields = append(fields, plan.FieldMaxBranches)
 	}
-	if m.max_boss != nil {
-		fields = append(fields, plan.FieldMaxBoss)
+	if m.max_bosses != nil {
+		fields = append(fields, plan.FieldMaxBosses)
 	}
 	return fields
 }
@@ -4013,12 +4013,12 @@ func (m *PlanMutation) Field(name string) (ent.Value, bool) {
 		return m.Subscription()
 	case plan.FieldPrice:
 		return m.Price()
-	case plan.FieldMaxUsers:
-		return m.MaxUsers()
-	case plan.FieldMaxBranch:
-		return m.MaxBranch()
-	case plan.FieldMaxBoss:
-		return m.MaxBoss()
+	case plan.FieldMaxEmployees:
+		return m.MaxEmployees()
+	case plan.FieldMaxBranches:
+		return m.MaxBranches()
+	case plan.FieldMaxBosses:
+		return m.MaxBosses()
 	}
 	return nil, false
 }
@@ -4032,12 +4032,12 @@ func (m *PlanMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldSubscription(ctx)
 	case plan.FieldPrice:
 		return m.OldPrice(ctx)
-	case plan.FieldMaxUsers:
-		return m.OldMaxUsers(ctx)
-	case plan.FieldMaxBranch:
-		return m.OldMaxBranch(ctx)
-	case plan.FieldMaxBoss:
-		return m.OldMaxBoss(ctx)
+	case plan.FieldMaxEmployees:
+		return m.OldMaxEmployees(ctx)
+	case plan.FieldMaxBranches:
+		return m.OldMaxBranches(ctx)
+	case plan.FieldMaxBosses:
+		return m.OldMaxBosses(ctx)
 	}
 	return nil, fmt.Errorf("unknown Plan field %s", name)
 }
@@ -4061,26 +4061,26 @@ func (m *PlanMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetPrice(v)
 		return nil
-	case plan.FieldMaxUsers:
+	case plan.FieldMaxEmployees:
 		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetMaxUsers(v)
+		m.SetMaxEmployees(v)
 		return nil
-	case plan.FieldMaxBranch:
+	case plan.FieldMaxBranches:
 		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetMaxBranch(v)
+		m.SetMaxBranches(v)
 		return nil
-	case plan.FieldMaxBoss:
+	case plan.FieldMaxBosses:
 		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetMaxBoss(v)
+		m.SetMaxBosses(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Plan field %s", name)
@@ -4093,14 +4093,14 @@ func (m *PlanMutation) AddedFields() []string {
 	if m.addprice != nil {
 		fields = append(fields, plan.FieldPrice)
 	}
-	if m.addmax_users != nil {
-		fields = append(fields, plan.FieldMaxUsers)
+	if m.addmax_employees != nil {
+		fields = append(fields, plan.FieldMaxEmployees)
 	}
-	if m.addmax_branch != nil {
-		fields = append(fields, plan.FieldMaxBranch)
+	if m.addmax_branches != nil {
+		fields = append(fields, plan.FieldMaxBranches)
 	}
-	if m.addmax_boss != nil {
-		fields = append(fields, plan.FieldMaxBoss)
+	if m.addmax_bosses != nil {
+		fields = append(fields, plan.FieldMaxBosses)
 	}
 	return fields
 }
@@ -4112,12 +4112,12 @@ func (m *PlanMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case plan.FieldPrice:
 		return m.AddedPrice()
-	case plan.FieldMaxUsers:
-		return m.AddedMaxUsers()
-	case plan.FieldMaxBranch:
-		return m.AddedMaxBranch()
-	case plan.FieldMaxBoss:
-		return m.AddedMaxBoss()
+	case plan.FieldMaxEmployees:
+		return m.AddedMaxEmployees()
+	case plan.FieldMaxBranches:
+		return m.AddedMaxBranches()
+	case plan.FieldMaxBosses:
+		return m.AddedMaxBosses()
 	}
 	return nil, false
 }
@@ -4134,26 +4134,26 @@ func (m *PlanMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddPrice(v)
 		return nil
-	case plan.FieldMaxUsers:
+	case plan.FieldMaxEmployees:
 		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddMaxUsers(v)
+		m.AddMaxEmployees(v)
 		return nil
-	case plan.FieldMaxBranch:
+	case plan.FieldMaxBranches:
 		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddMaxBranch(v)
+		m.AddMaxBranches(v)
 		return nil
-	case plan.FieldMaxBoss:
+	case plan.FieldMaxBosses:
 		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddMaxBoss(v)
+		m.AddMaxBosses(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Plan numeric field %s", name)
@@ -4188,14 +4188,14 @@ func (m *PlanMutation) ResetField(name string) error {
 	case plan.FieldPrice:
 		m.ResetPrice()
 		return nil
-	case plan.FieldMaxUsers:
-		m.ResetMaxUsers()
+	case plan.FieldMaxEmployees:
+		m.ResetMaxEmployees()
 		return nil
-	case plan.FieldMaxBranch:
-		m.ResetMaxBranch()
+	case plan.FieldMaxBranches:
+		m.ResetMaxBranches()
 		return nil
-	case plan.FieldMaxBoss:
-		m.ResetMaxBoss()
+	case plan.FieldMaxBosses:
+		m.ResetMaxBosses()
 		return nil
 	}
 	return fmt.Errorf("unknown Plan field %s", name)

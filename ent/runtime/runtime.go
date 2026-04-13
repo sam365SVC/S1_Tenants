@@ -225,18 +225,18 @@ func init() {
 	planDescPrice := planFields[1].Descriptor()
 	// plan.DefaultPrice holds the default value on creation for the price field.
 	plan.DefaultPrice = planDescPrice.Default.(float64)
-	// planDescMaxUsers is the schema descriptor for max_users field.
-	planDescMaxUsers := planFields[2].Descriptor()
-	// plan.DefaultMaxUsers holds the default value on creation for the max_users field.
-	plan.DefaultMaxUsers = planDescMaxUsers.Default.(int32)
-	// planDescMaxBranch is the schema descriptor for max_branch field.
-	planDescMaxBranch := planFields[3].Descriptor()
-	// plan.DefaultMaxBranch holds the default value on creation for the max_branch field.
-	plan.DefaultMaxBranch = planDescMaxBranch.Default.(int32)
-	// planDescMaxBoss is the schema descriptor for max_boss field.
-	planDescMaxBoss := planFields[4].Descriptor()
-	// plan.DefaultMaxBoss holds the default value on creation for the max_boss field.
-	plan.DefaultMaxBoss = planDescMaxBoss.Default.(int32)
+	// planDescMaxEmployees is the schema descriptor for max_employees field.
+	planDescMaxEmployees := planFields[2].Descriptor()
+	// plan.DefaultMaxEmployees holds the default value on creation for the max_employees field.
+	plan.DefaultMaxEmployees = planDescMaxEmployees.Default.(int32)
+	// planDescMaxBranches is the schema descriptor for max_branches field.
+	planDescMaxBranches := planFields[3].Descriptor()
+	// plan.DefaultMaxBranches holds the default value on creation for the max_branches field.
+	plan.DefaultMaxBranches = planDescMaxBranches.Default.(int32)
+	// planDescMaxBosses is the schema descriptor for max_bosses field.
+	planDescMaxBosses := planFields[4].Descriptor()
+	// plan.DefaultMaxBosses holds the default value on creation for the max_bosses field.
+	plan.DefaultMaxBosses = planDescMaxBosses.Default.(int32)
 	tenantFields := schemas.Tenant{}.Fields()
 	_ = tenantFields
 	// tenantDescName is the schema descriptor for name field.

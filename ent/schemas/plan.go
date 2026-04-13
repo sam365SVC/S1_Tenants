@@ -11,21 +11,21 @@ type Plan struct {
 	ent.Schema
 }
 
-func (Plan) Fields()[]ent.Field{
+func (Plan) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("subscription").MaxLen(20),
 		field.Float("price").
 			SchemaType(map[string]string{
-				dialect.Postgres:"decimal(7,2)",
+				dialect.Postgres: "decimal(7,2)",
 			}).
 			Default(0.00),
-		field.Int32("max_users").Default(5),
-		field.Int32("max_branch").Default(2),
-		field.Int32("max_boss").Default(1),
+		field.Int32("max_employees").Default(5),
+		field.Int32("max_branches").Default(2),
+		field.Int32("max_bosses").Default(1),
 	}
 }
-func (Plan)Edges()[]ent.Edge  {
+func (Plan) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("tenants",Tenant.Type),
+		edge.To("tenants", Tenant.Type),
 	}
 }

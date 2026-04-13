@@ -20,12 +20,12 @@ type Plan struct {
 	Subscription string `json:"subscription,omitempty"`
 	// Price holds the value of the "price" field.
 	Price float64 `json:"price,omitempty"`
-	// MaxUsers holds the value of the "max_users" field.
-	MaxUsers int32 `json:"max_users,omitempty"`
-	// MaxBranch holds the value of the "max_branch" field.
-	MaxBranch int32 `json:"max_branch,omitempty"`
-	// MaxBoss holds the value of the "max_boss" field.
-	MaxBoss int32 `json:"max_boss,omitempty"`
+	// MaxEmployees holds the value of the "max_employees" field.
+	MaxEmployees int32 `json:"max_employees,omitempty"`
+	// MaxBranches holds the value of the "max_branches" field.
+	MaxBranches int32 `json:"max_branches,omitempty"`
+	// MaxBosses holds the value of the "max_bosses" field.
+	MaxBosses int32 `json:"max_bosses,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PlanQuery when eager-loading is set.
 	Edges        PlanEdges `json:"edges"`
@@ -57,7 +57,7 @@ func (*Plan) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case plan.FieldPrice:
 			values[i] = new(sql.NullFloat64)
-		case plan.FieldID, plan.FieldMaxUsers, plan.FieldMaxBranch, plan.FieldMaxBoss:
+		case plan.FieldID, plan.FieldMaxEmployees, plan.FieldMaxBranches, plan.FieldMaxBosses:
 			values[i] = new(sql.NullInt64)
 		case plan.FieldSubscription:
 			values[i] = new(sql.NullString)
@@ -94,23 +94,23 @@ func (_m *Plan) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Price = value.Float64
 			}
-		case plan.FieldMaxUsers:
+		case plan.FieldMaxEmployees:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field max_users", values[i])
+				return fmt.Errorf("unexpected type %T for field max_employees", values[i])
 			} else if value.Valid {
-				_m.MaxUsers = int32(value.Int64)
+				_m.MaxEmployees = int32(value.Int64)
 			}
-		case plan.FieldMaxBranch:
+		case plan.FieldMaxBranches:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field max_branch", values[i])
+				return fmt.Errorf("unexpected type %T for field max_branches", values[i])
 			} else if value.Valid {
-				_m.MaxBranch = int32(value.Int64)
+				_m.MaxBranches = int32(value.Int64)
 			}
-		case plan.FieldMaxBoss:
+		case plan.FieldMaxBosses:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field max_boss", values[i])
+				return fmt.Errorf("unexpected type %T for field max_bosses", values[i])
 			} else if value.Valid {
-				_m.MaxBoss = int32(value.Int64)
+				_m.MaxBosses = int32(value.Int64)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -159,14 +159,14 @@ func (_m *Plan) String() string {
 	builder.WriteString("price=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Price))
 	builder.WriteString(", ")
-	builder.WriteString("max_users=")
-	builder.WriteString(fmt.Sprintf("%v", _m.MaxUsers))
+	builder.WriteString("max_employees=")
+	builder.WriteString(fmt.Sprintf("%v", _m.MaxEmployees))
 	builder.WriteString(", ")
-	builder.WriteString("max_branch=")
-	builder.WriteString(fmt.Sprintf("%v", _m.MaxBranch))
+	builder.WriteString("max_branches=")
+	builder.WriteString(fmt.Sprintf("%v", _m.MaxBranches))
 	builder.WriteString(", ")
-	builder.WriteString("max_boss=")
-	builder.WriteString(fmt.Sprintf("%v", _m.MaxBoss))
+	builder.WriteString("max_bosses=")
+	builder.WriteString(fmt.Sprintf("%v", _m.MaxBosses))
 	builder.WriteByte(')')
 	return builder.String()
 }

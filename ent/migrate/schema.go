@@ -145,9 +145,9 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "subscription", Type: field.TypeString, Size: 20},
 		{Name: "price", Type: field.TypeFloat64, Default: 0, SchemaType: map[string]string{"postgres": "decimal(7,2)"}},
-		{Name: "max_users", Type: field.TypeInt32, Default: 5},
-		{Name: "max_branch", Type: field.TypeInt32, Default: 2},
-		{Name: "max_boss", Type: field.TypeInt32, Default: 1},
+		{Name: "max_employees", Type: field.TypeInt32, Default: 5},
+		{Name: "max_branches", Type: field.TypeInt32, Default: 2},
+		{Name: "max_bosses", Type: field.TypeInt32, Default: 1},
 	}
 	// PlansTable holds the schema information for the "plans" table.
 	PlansTable = &schema.Table{

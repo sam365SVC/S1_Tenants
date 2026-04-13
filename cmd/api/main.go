@@ -41,10 +41,10 @@ func main() {
 		log.Fatalf("Error al crear schema de DB: %v", err)
 	}
 	if err := client.Schema.Create(
-			context.Background(),
-			schema.WithDropColumn(true), // <-- Esto le da permiso de BORRAR columnas
-    		schema.WithDropIndex(true));err!=nil{
-				  // <-- Esto le da permiso de BORRAR índices); err != nil {
+		context.Background(),
+		schema.WithDropColumn(true), // <-- Esto le da permiso de BORRAR columnas
+		schema.WithDropIndex(true)); err != nil {
+		// <-- Esto le da permiso de BORRAR índices); err != nil {
 		log.Fatalf("Error al crear Schemas de DB: %v", err)
 	}
 	defer client.Close()
@@ -55,14 +55,16 @@ func main() {
 	SLogin := services.NewLoginServices(client)
 	SInvitation := services.NewInvitationServices(client)
 	SUser := services.NewUserServices(client)
-	SOrganization:=services.NewOrganizationServices(client)
+	SPlan := services.NewPlanServices(client)
+	SOrganization := services.NewOrganizationServices(client)
 	// create handler
 	HLogin := handler.NewAuthHandler(SLogin, validation.Validator)
 	HInvitation := handler.NewInvitationHandler(SInvitation, validation.Validator)
 	HUser := handler.NewUserHandler(SUser, validation.Validator)
-	HOrganization:=handler.NewOrganizationHandler(SOrganization,validation.Validator)
+	HPlan := handler.NewPlanHandler(SPlan, validation.Validator)
+	HOrganization := handler.NewOrganizationHandler(SOrganization, validation.Validator)
 	// validation jwt
-	jwtAuth:=security.JWTMiddleware(os.Getenv("JWT_KEY"))
+	jwtAuth := security.JWTMiddleware(os.Getenv("JWT_KEY"))
 	// create group api
 	api := app.Group("/tenant/v1")
 	// create rest
@@ -70,18 +72,22 @@ func main() {
 	{
 		RInvitation.POST("", HInvitation.InvitationUserOrAdmin)
 	}
-	RInvitationDeveloper:=RInvitation.Group("/developer",jwtAuth,security.RequireRoles("DEVELOPER"))
+	RInvitationDeveloper := RInvitation.Group("/developer", jwtAuth, security.RequireRoles("DEVELOPER"))
 	{
-		RInvitationDeveloper.POST("",HInvitation.InvitationDeveloper)
+		RInvitationDeveloper.POST("", HInvitation.InvitationDeveloper)
 	}
 
 	RUser := api.Group("/user")
 	{
 		RUser.POST("", HUser.CreateUser)
 	}
-	ROrganization:=api.Group("/organization",jwtAuth,security.RequireRoles("ADMIN"))
+	ROrganization := api.Group("/organization", jwtAuth, security.RequireRoles("ADMIN"))
 	{
-		ROrganization.POST("",HOrganization.CreateOrganization)
+		ROrganization.POST("", HOrganization.CreateOrganization)
+	}
+	RPlan := api.Group("/plan", jwtAuth, security.RequireRoles("DEVELOPER"))
+	{
+		RPlan.POST("", HPlan.CreatePlan)
 	}
 
 	RLogin := api.Group("/login")

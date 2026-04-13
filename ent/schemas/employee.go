@@ -60,24 +60,18 @@ func (Employee) Hooks() []ent.Hook {
 
 				// Lógica para obtener los valores actuales (nuevos o viejos)
 				if existD {
-					department = departmentVal.(string)
-				} else {
-					// Si es Update y no viene 'area', buscamos el valor que ya tenía
-					if getter, ok := m.(interface {
-						OldDepartment(context.Context) (string, error)
-					}); ok {
-						department, _ = getter.OldDepartment(ctx)
+					department = fmt.Sprint(departmentVal)
+				} else if !m.Op().Is(ent.OpCreate) {
+					if oldDept, err := m.OldField(ctx, "department"); err == nil {
+						department = fmt.Sprint(oldDept)
 					}
 				}
 
 				if existP {
 					position = posVal.(string)
-				} else {
-					// Si es Update y no viene 'position', buscamos el valor que ya tenía
-					if getter, ok := m.(interface {
-						OldPosition(context.Context) (string, error)
-					}); ok {
-						position, _ = getter.OldPosition(ctx)
+				} else if !m.Op().Is(ent.OpCreate) {
+					if oldPos, err := m.OldField(ctx, "position"); err == nil {
+						position = fmt.Sprint(oldPos)
 					}
 				}
 

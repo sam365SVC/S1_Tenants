@@ -63,66 +63,66 @@ func (_u *PlanUpdate) AddPrice(v float64) *PlanUpdate {
 	return _u
 }
 
-// SetMaxUsers sets the "max_users" field.
-func (_u *PlanUpdate) SetMaxUsers(v int32) *PlanUpdate {
-	_u.mutation.ResetMaxUsers()
-	_u.mutation.SetMaxUsers(v)
+// SetMaxEmployees sets the "max_employees" field.
+func (_u *PlanUpdate) SetMaxEmployees(v int32) *PlanUpdate {
+	_u.mutation.ResetMaxEmployees()
+	_u.mutation.SetMaxEmployees(v)
 	return _u
 }
 
-// SetNillableMaxUsers sets the "max_users" field if the given value is not nil.
-func (_u *PlanUpdate) SetNillableMaxUsers(v *int32) *PlanUpdate {
+// SetNillableMaxEmployees sets the "max_employees" field if the given value is not nil.
+func (_u *PlanUpdate) SetNillableMaxEmployees(v *int32) *PlanUpdate {
 	if v != nil {
-		_u.SetMaxUsers(*v)
+		_u.SetMaxEmployees(*v)
 	}
 	return _u
 }
 
-// AddMaxUsers adds value to the "max_users" field.
-func (_u *PlanUpdate) AddMaxUsers(v int32) *PlanUpdate {
-	_u.mutation.AddMaxUsers(v)
+// AddMaxEmployees adds value to the "max_employees" field.
+func (_u *PlanUpdate) AddMaxEmployees(v int32) *PlanUpdate {
+	_u.mutation.AddMaxEmployees(v)
 	return _u
 }
 
-// SetMaxBranch sets the "max_branch" field.
-func (_u *PlanUpdate) SetMaxBranch(v int32) *PlanUpdate {
-	_u.mutation.ResetMaxBranch()
-	_u.mutation.SetMaxBranch(v)
+// SetMaxBranches sets the "max_branches" field.
+func (_u *PlanUpdate) SetMaxBranches(v int32) *PlanUpdate {
+	_u.mutation.ResetMaxBranches()
+	_u.mutation.SetMaxBranches(v)
 	return _u
 }
 
-// SetNillableMaxBranch sets the "max_branch" field if the given value is not nil.
-func (_u *PlanUpdate) SetNillableMaxBranch(v *int32) *PlanUpdate {
+// SetNillableMaxBranches sets the "max_branches" field if the given value is not nil.
+func (_u *PlanUpdate) SetNillableMaxBranches(v *int32) *PlanUpdate {
 	if v != nil {
-		_u.SetMaxBranch(*v)
+		_u.SetMaxBranches(*v)
 	}
 	return _u
 }
 
-// AddMaxBranch adds value to the "max_branch" field.
-func (_u *PlanUpdate) AddMaxBranch(v int32) *PlanUpdate {
-	_u.mutation.AddMaxBranch(v)
+// AddMaxBranches adds value to the "max_branches" field.
+func (_u *PlanUpdate) AddMaxBranches(v int32) *PlanUpdate {
+	_u.mutation.AddMaxBranches(v)
 	return _u
 }
 
-// SetMaxBoss sets the "max_boss" field.
-func (_u *PlanUpdate) SetMaxBoss(v int32) *PlanUpdate {
-	_u.mutation.ResetMaxBoss()
-	_u.mutation.SetMaxBoss(v)
+// SetMaxBosses sets the "max_bosses" field.
+func (_u *PlanUpdate) SetMaxBosses(v int32) *PlanUpdate {
+	_u.mutation.ResetMaxBosses()
+	_u.mutation.SetMaxBosses(v)
 	return _u
 }
 
-// SetNillableMaxBoss sets the "max_boss" field if the given value is not nil.
-func (_u *PlanUpdate) SetNillableMaxBoss(v *int32) *PlanUpdate {
+// SetNillableMaxBosses sets the "max_bosses" field if the given value is not nil.
+func (_u *PlanUpdate) SetNillableMaxBosses(v *int32) *PlanUpdate {
 	if v != nil {
-		_u.SetMaxBoss(*v)
+		_u.SetMaxBosses(*v)
 	}
 	return _u
 }
 
-// AddMaxBoss adds value to the "max_boss" field.
-func (_u *PlanUpdate) AddMaxBoss(v int32) *PlanUpdate {
-	_u.mutation.AddMaxBoss(v)
+// AddMaxBosses adds value to the "max_bosses" field.
+func (_u *PlanUpdate) AddMaxBosses(v int32) *PlanUpdate {
+	_u.mutation.AddMaxBosses(v)
 	return _u
 }
 
@@ -225,23 +225,23 @@ func (_u *PlanUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if value, ok := _u.mutation.AddedPrice(); ok {
 		_spec.AddField(plan.FieldPrice, field.TypeFloat64, value)
 	}
-	if value, ok := _u.mutation.MaxUsers(); ok {
-		_spec.SetField(plan.FieldMaxUsers, field.TypeInt32, value)
+	if value, ok := _u.mutation.MaxEmployees(); ok {
+		_spec.SetField(plan.FieldMaxEmployees, field.TypeInt32, value)
 	}
-	if value, ok := _u.mutation.AddedMaxUsers(); ok {
-		_spec.AddField(plan.FieldMaxUsers, field.TypeInt32, value)
+	if value, ok := _u.mutation.AddedMaxEmployees(); ok {
+		_spec.AddField(plan.FieldMaxEmployees, field.TypeInt32, value)
 	}
-	if value, ok := _u.mutation.MaxBranch(); ok {
-		_spec.SetField(plan.FieldMaxBranch, field.TypeInt32, value)
+	if value, ok := _u.mutation.MaxBranches(); ok {
+		_spec.SetField(plan.FieldMaxBranches, field.TypeInt32, value)
 	}
-	if value, ok := _u.mutation.AddedMaxBranch(); ok {
-		_spec.AddField(plan.FieldMaxBranch, field.TypeInt32, value)
+	if value, ok := _u.mutation.AddedMaxBranches(); ok {
+		_spec.AddField(plan.FieldMaxBranches, field.TypeInt32, value)
 	}
-	if value, ok := _u.mutation.MaxBoss(); ok {
-		_spec.SetField(plan.FieldMaxBoss, field.TypeInt32, value)
+	if value, ok := _u.mutation.MaxBosses(); ok {
+		_spec.SetField(plan.FieldMaxBosses, field.TypeInt32, value)
 	}
-	if value, ok := _u.mutation.AddedMaxBoss(); ok {
-		_spec.AddField(plan.FieldMaxBoss, field.TypeInt32, value)
+	if value, ok := _u.mutation.AddedMaxBosses(); ok {
+		_spec.AddField(plan.FieldMaxBosses, field.TypeInt32, value)
 	}
 	if _u.mutation.TenantsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -343,66 +343,66 @@ func (_u *PlanUpdateOne) AddPrice(v float64) *PlanUpdateOne {
 	return _u
 }
 
-// SetMaxUsers sets the "max_users" field.
-func (_u *PlanUpdateOne) SetMaxUsers(v int32) *PlanUpdateOne {
-	_u.mutation.ResetMaxUsers()
-	_u.mutation.SetMaxUsers(v)
+// SetMaxEmployees sets the "max_employees" field.
+func (_u *PlanUpdateOne) SetMaxEmployees(v int32) *PlanUpdateOne {
+	_u.mutation.ResetMaxEmployees()
+	_u.mutation.SetMaxEmployees(v)
 	return _u
 }
 
-// SetNillableMaxUsers sets the "max_users" field if the given value is not nil.
-func (_u *PlanUpdateOne) SetNillableMaxUsers(v *int32) *PlanUpdateOne {
+// SetNillableMaxEmployees sets the "max_employees" field if the given value is not nil.
+func (_u *PlanUpdateOne) SetNillableMaxEmployees(v *int32) *PlanUpdateOne {
 	if v != nil {
-		_u.SetMaxUsers(*v)
+		_u.SetMaxEmployees(*v)
 	}
 	return _u
 }
 
-// AddMaxUsers adds value to the "max_users" field.
-func (_u *PlanUpdateOne) AddMaxUsers(v int32) *PlanUpdateOne {
-	_u.mutation.AddMaxUsers(v)
+// AddMaxEmployees adds value to the "max_employees" field.
+func (_u *PlanUpdateOne) AddMaxEmployees(v int32) *PlanUpdateOne {
+	_u.mutation.AddMaxEmployees(v)
 	return _u
 }
 
-// SetMaxBranch sets the "max_branch" field.
-func (_u *PlanUpdateOne) SetMaxBranch(v int32) *PlanUpdateOne {
-	_u.mutation.ResetMaxBranch()
-	_u.mutation.SetMaxBranch(v)
+// SetMaxBranches sets the "max_branches" field.
+func (_u *PlanUpdateOne) SetMaxBranches(v int32) *PlanUpdateOne {
+	_u.mutation.ResetMaxBranches()
+	_u.mutation.SetMaxBranches(v)
 	return _u
 }
 
-// SetNillableMaxBranch sets the "max_branch" field if the given value is not nil.
-func (_u *PlanUpdateOne) SetNillableMaxBranch(v *int32) *PlanUpdateOne {
+// SetNillableMaxBranches sets the "max_branches" field if the given value is not nil.
+func (_u *PlanUpdateOne) SetNillableMaxBranches(v *int32) *PlanUpdateOne {
 	if v != nil {
-		_u.SetMaxBranch(*v)
+		_u.SetMaxBranches(*v)
 	}
 	return _u
 }
 
-// AddMaxBranch adds value to the "max_branch" field.
-func (_u *PlanUpdateOne) AddMaxBranch(v int32) *PlanUpdateOne {
-	_u.mutation.AddMaxBranch(v)
+// AddMaxBranches adds value to the "max_branches" field.
+func (_u *PlanUpdateOne) AddMaxBranches(v int32) *PlanUpdateOne {
+	_u.mutation.AddMaxBranches(v)
 	return _u
 }
 
-// SetMaxBoss sets the "max_boss" field.
-func (_u *PlanUpdateOne) SetMaxBoss(v int32) *PlanUpdateOne {
-	_u.mutation.ResetMaxBoss()
-	_u.mutation.SetMaxBoss(v)
+// SetMaxBosses sets the "max_bosses" field.
+func (_u *PlanUpdateOne) SetMaxBosses(v int32) *PlanUpdateOne {
+	_u.mutation.ResetMaxBosses()
+	_u.mutation.SetMaxBosses(v)
 	return _u
 }
 
-// SetNillableMaxBoss sets the "max_boss" field if the given value is not nil.
-func (_u *PlanUpdateOne) SetNillableMaxBoss(v *int32) *PlanUpdateOne {
+// SetNillableMaxBosses sets the "max_bosses" field if the given value is not nil.
+func (_u *PlanUpdateOne) SetNillableMaxBosses(v *int32) *PlanUpdateOne {
 	if v != nil {
-		_u.SetMaxBoss(*v)
+		_u.SetMaxBosses(*v)
 	}
 	return _u
 }
 
-// AddMaxBoss adds value to the "max_boss" field.
-func (_u *PlanUpdateOne) AddMaxBoss(v int32) *PlanUpdateOne {
-	_u.mutation.AddMaxBoss(v)
+// AddMaxBosses adds value to the "max_bosses" field.
+func (_u *PlanUpdateOne) AddMaxBosses(v int32) *PlanUpdateOne {
+	_u.mutation.AddMaxBosses(v)
 	return _u
 }
 
@@ -535,23 +535,23 @@ func (_u *PlanUpdateOne) sqlSave(ctx context.Context) (_node *Plan, err error) {
 	if value, ok := _u.mutation.AddedPrice(); ok {
 		_spec.AddField(plan.FieldPrice, field.TypeFloat64, value)
 	}
-	if value, ok := _u.mutation.MaxUsers(); ok {
-		_spec.SetField(plan.FieldMaxUsers, field.TypeInt32, value)
+	if value, ok := _u.mutation.MaxEmployees(); ok {
+		_spec.SetField(plan.FieldMaxEmployees, field.TypeInt32, value)
 	}
-	if value, ok := _u.mutation.AddedMaxUsers(); ok {
-		_spec.AddField(plan.FieldMaxUsers, field.TypeInt32, value)
+	if value, ok := _u.mutation.AddedMaxEmployees(); ok {
+		_spec.AddField(plan.FieldMaxEmployees, field.TypeInt32, value)
 	}
-	if value, ok := _u.mutation.MaxBranch(); ok {
-		_spec.SetField(plan.FieldMaxBranch, field.TypeInt32, value)
+	if value, ok := _u.mutation.MaxBranches(); ok {
+		_spec.SetField(plan.FieldMaxBranches, field.TypeInt32, value)
 	}
-	if value, ok := _u.mutation.AddedMaxBranch(); ok {
-		_spec.AddField(plan.FieldMaxBranch, field.TypeInt32, value)
+	if value, ok := _u.mutation.AddedMaxBranches(); ok {
+		_spec.AddField(plan.FieldMaxBranches, field.TypeInt32, value)
 	}
-	if value, ok := _u.mutation.MaxBoss(); ok {
-		_spec.SetField(plan.FieldMaxBoss, field.TypeInt32, value)
+	if value, ok := _u.mutation.MaxBosses(); ok {
+		_spec.SetField(plan.FieldMaxBosses, field.TypeInt32, value)
 	}
-	if value, ok := _u.mutation.AddedMaxBoss(); ok {
-		_spec.AddField(plan.FieldMaxBoss, field.TypeInt32, value)
+	if value, ok := _u.mutation.AddedMaxBosses(); ok {
+		_spec.AddField(plan.FieldMaxBosses, field.TypeInt32, value)
 	}
 	if _u.mutation.TenantsCleared() {
 		edge := &sqlgraph.EdgeSpec{
