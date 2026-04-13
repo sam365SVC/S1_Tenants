@@ -31,16 +31,16 @@ func (_u *EmployeeUpdate) Where(ps ...predicate.Employee) *EmployeeUpdate {
 	return _u
 }
 
-// SetArea sets the "area" field.
-func (_u *EmployeeUpdate) SetArea(v employee.Area) *EmployeeUpdate {
-	_u.mutation.SetArea(v)
+// SetDepartment sets the "department" field.
+func (_u *EmployeeUpdate) SetDepartment(v employee.Department) *EmployeeUpdate {
+	_u.mutation.SetDepartment(v)
 	return _u
 }
 
-// SetNillableArea sets the "area" field if the given value is not nil.
-func (_u *EmployeeUpdate) SetNillableArea(v *employee.Area) *EmployeeUpdate {
+// SetNillableDepartment sets the "department" field if the given value is not nil.
+func (_u *EmployeeUpdate) SetNillableDepartment(v *employee.Department) *EmployeeUpdate {
 	if v != nil {
-		_u.SetArea(*v)
+		_u.SetDepartment(*v)
 	}
 	return _u
 }
@@ -145,23 +145,23 @@ func (_u *EmployeeUpdate) SetTenant(v *Tenant) *EmployeeUpdate {
 	return _u.SetTenantID(v.ID)
 }
 
-// SetBranchID sets the "branch" edge to the Branch entity by ID.
-func (_u *EmployeeUpdate) SetBranchID(id int) *EmployeeUpdate {
-	_u.mutation.SetBranchID(id)
+// SetBranchesID sets the "branches" edge to the Branch entity by ID.
+func (_u *EmployeeUpdate) SetBranchesID(id int) *EmployeeUpdate {
+	_u.mutation.SetBranchesID(id)
 	return _u
 }
 
-// SetNillableBranchID sets the "branch" edge to the Branch entity by ID if the given value is not nil.
-func (_u *EmployeeUpdate) SetNillableBranchID(id *int) *EmployeeUpdate {
+// SetNillableBranchesID sets the "branches" edge to the Branch entity by ID if the given value is not nil.
+func (_u *EmployeeUpdate) SetNillableBranchesID(id *int) *EmployeeUpdate {
 	if id != nil {
-		_u = _u.SetBranchID(*id)
+		_u = _u.SetBranchesID(*id)
 	}
 	return _u
 }
 
-// SetBranch sets the "branch" edge to the Branch entity.
-func (_u *EmployeeUpdate) SetBranch(v *Branch) *EmployeeUpdate {
-	return _u.SetBranchID(v.ID)
+// SetBranches sets the "branches" edge to the Branch entity.
+func (_u *EmployeeUpdate) SetBranches(v *Branch) *EmployeeUpdate {
+	return _u.SetBranchesID(v.ID)
 }
 
 // Mutation returns the EmployeeMutation object of the builder.
@@ -181,9 +181,9 @@ func (_u *EmployeeUpdate) ClearTenant() *EmployeeUpdate {
 	return _u
 }
 
-// ClearBranch clears the "branch" edge to the Branch entity.
-func (_u *EmployeeUpdate) ClearBranch() *EmployeeUpdate {
-	_u.mutation.ClearBranch()
+// ClearBranches clears the "branches" edge to the Branch entity.
+func (_u *EmployeeUpdate) ClearBranches() *EmployeeUpdate {
+	_u.mutation.ClearBranches()
 	return _u
 }
 
@@ -216,9 +216,9 @@ func (_u *EmployeeUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *EmployeeUpdate) check() error {
-	if v, ok := _u.mutation.Area(); ok {
-		if err := employee.AreaValidator(v); err != nil {
-			return &ValidationError{Name: "area", err: fmt.Errorf(`ent: validator failed for field "Employee.area": %w`, err)}
+	if v, ok := _u.mutation.Department(); ok {
+		if err := employee.DepartmentValidator(v); err != nil {
+			return &ValidationError{Name: "department", err: fmt.Errorf(`ent: validator failed for field "Employee.department": %w`, err)}
 		}
 	}
 	if v, ok := _u.mutation.Position(); ok {
@@ -241,8 +241,8 @@ func (_u *EmployeeUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			}
 		}
 	}
-	if value, ok := _u.mutation.Area(); ok {
-		_spec.SetField(employee.FieldArea, field.TypeEnum, value)
+	if value, ok := _u.mutation.Department(); ok {
+		_spec.SetField(employee.FieldDepartment, field.TypeEnum, value)
 	}
 	if value, ok := _u.mutation.Position(); ok {
 		_spec.SetField(employee.FieldPosition, field.TypeString, value)
@@ -317,12 +317,12 @@ func (_u *EmployeeUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if _u.mutation.BranchCleared() {
+	if _u.mutation.BranchesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.BranchTable,
-			Columns: []string{employee.BranchColumn},
+			Table:   employee.BranchesTable,
+			Columns: []string{employee.BranchesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(branch.FieldID, field.TypeInt),
@@ -330,12 +330,12 @@ func (_u *EmployeeUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := _u.mutation.BranchIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.BranchesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.BranchTable,
-			Columns: []string{employee.BranchColumn},
+			Table:   employee.BranchesTable,
+			Columns: []string{employee.BranchesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(branch.FieldID, field.TypeInt),
@@ -366,16 +366,16 @@ type EmployeeUpdateOne struct {
 	mutation *EmployeeMutation
 }
 
-// SetArea sets the "area" field.
-func (_u *EmployeeUpdateOne) SetArea(v employee.Area) *EmployeeUpdateOne {
-	_u.mutation.SetArea(v)
+// SetDepartment sets the "department" field.
+func (_u *EmployeeUpdateOne) SetDepartment(v employee.Department) *EmployeeUpdateOne {
+	_u.mutation.SetDepartment(v)
 	return _u
 }
 
-// SetNillableArea sets the "area" field if the given value is not nil.
-func (_u *EmployeeUpdateOne) SetNillableArea(v *employee.Area) *EmployeeUpdateOne {
+// SetNillableDepartment sets the "department" field if the given value is not nil.
+func (_u *EmployeeUpdateOne) SetNillableDepartment(v *employee.Department) *EmployeeUpdateOne {
 	if v != nil {
-		_u.SetArea(*v)
+		_u.SetDepartment(*v)
 	}
 	return _u
 }
@@ -480,23 +480,23 @@ func (_u *EmployeeUpdateOne) SetTenant(v *Tenant) *EmployeeUpdateOne {
 	return _u.SetTenantID(v.ID)
 }
 
-// SetBranchID sets the "branch" edge to the Branch entity by ID.
-func (_u *EmployeeUpdateOne) SetBranchID(id int) *EmployeeUpdateOne {
-	_u.mutation.SetBranchID(id)
+// SetBranchesID sets the "branches" edge to the Branch entity by ID.
+func (_u *EmployeeUpdateOne) SetBranchesID(id int) *EmployeeUpdateOne {
+	_u.mutation.SetBranchesID(id)
 	return _u
 }
 
-// SetNillableBranchID sets the "branch" edge to the Branch entity by ID if the given value is not nil.
-func (_u *EmployeeUpdateOne) SetNillableBranchID(id *int) *EmployeeUpdateOne {
+// SetNillableBranchesID sets the "branches" edge to the Branch entity by ID if the given value is not nil.
+func (_u *EmployeeUpdateOne) SetNillableBranchesID(id *int) *EmployeeUpdateOne {
 	if id != nil {
-		_u = _u.SetBranchID(*id)
+		_u = _u.SetBranchesID(*id)
 	}
 	return _u
 }
 
-// SetBranch sets the "branch" edge to the Branch entity.
-func (_u *EmployeeUpdateOne) SetBranch(v *Branch) *EmployeeUpdateOne {
-	return _u.SetBranchID(v.ID)
+// SetBranches sets the "branches" edge to the Branch entity.
+func (_u *EmployeeUpdateOne) SetBranches(v *Branch) *EmployeeUpdateOne {
+	return _u.SetBranchesID(v.ID)
 }
 
 // Mutation returns the EmployeeMutation object of the builder.
@@ -516,9 +516,9 @@ func (_u *EmployeeUpdateOne) ClearTenant() *EmployeeUpdateOne {
 	return _u
 }
 
-// ClearBranch clears the "branch" edge to the Branch entity.
-func (_u *EmployeeUpdateOne) ClearBranch() *EmployeeUpdateOne {
-	_u.mutation.ClearBranch()
+// ClearBranches clears the "branches" edge to the Branch entity.
+func (_u *EmployeeUpdateOne) ClearBranches() *EmployeeUpdateOne {
+	_u.mutation.ClearBranches()
 	return _u
 }
 
@@ -564,9 +564,9 @@ func (_u *EmployeeUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *EmployeeUpdateOne) check() error {
-	if v, ok := _u.mutation.Area(); ok {
-		if err := employee.AreaValidator(v); err != nil {
-			return &ValidationError{Name: "area", err: fmt.Errorf(`ent: validator failed for field "Employee.area": %w`, err)}
+	if v, ok := _u.mutation.Department(); ok {
+		if err := employee.DepartmentValidator(v); err != nil {
+			return &ValidationError{Name: "department", err: fmt.Errorf(`ent: validator failed for field "Employee.department": %w`, err)}
 		}
 	}
 	if v, ok := _u.mutation.Position(); ok {
@@ -606,8 +606,8 @@ func (_u *EmployeeUpdateOne) sqlSave(ctx context.Context) (_node *Employee, err 
 			}
 		}
 	}
-	if value, ok := _u.mutation.Area(); ok {
-		_spec.SetField(employee.FieldArea, field.TypeEnum, value)
+	if value, ok := _u.mutation.Department(); ok {
+		_spec.SetField(employee.FieldDepartment, field.TypeEnum, value)
 	}
 	if value, ok := _u.mutation.Position(); ok {
 		_spec.SetField(employee.FieldPosition, field.TypeString, value)
@@ -682,12 +682,12 @@ func (_u *EmployeeUpdateOne) sqlSave(ctx context.Context) (_node *Employee, err 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if _u.mutation.BranchCleared() {
+	if _u.mutation.BranchesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.BranchTable,
-			Columns: []string{employee.BranchColumn},
+			Table:   employee.BranchesTable,
+			Columns: []string{employee.BranchesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(branch.FieldID, field.TypeInt),
@@ -695,12 +695,12 @@ func (_u *EmployeeUpdateOne) sqlSave(ctx context.Context) (_node *Employee, err 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := _u.mutation.BranchIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.BranchesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.BranchTable,
-			Columns: []string{employee.BranchColumn},
+			Table:   employee.BranchesTable,
+			Columns: []string{employee.BranchesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(branch.FieldID, field.TypeInt),

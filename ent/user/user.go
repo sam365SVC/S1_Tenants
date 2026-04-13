@@ -24,6 +24,8 @@ const (
 	FieldDateBirth = "date_birth"
 	// EdgeEmails holds the string denoting the emails edge name in mutations.
 	EdgeEmails = "emails"
+	// EdgeOrganization holds the string denoting the organization edge name in mutations.
+	EdgeOrganization = "organization"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 	// EmailsTable is the table that holds the emails relation/edge.
@@ -33,6 +35,13 @@ const (
 	EmailsInverseTable = "emails"
 	// EmailsColumn is the table column denoting the emails relation/edge.
 	EmailsColumn = "user_emails"
+	// OrganizationTable is the table that holds the organization relation/edge.
+	OrganizationTable = "tenants"
+	// OrganizationInverseTable is the table name for the Tenant entity.
+	// It exists in this package in order to avoid circular dependency with the "tenant" package.
+	OrganizationInverseTable = "tenants"
+	// OrganizationColumn is the table column denoting the organization relation/edge.
+	OrganizationColumn = "user_organization"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -112,10 +121,24 @@ func ByEmails(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newEmailsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByOrganizationField orders the results by organization field.
+func ByOrganizationField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOrganizationStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newEmailsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EmailsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, EmailsTable, EmailsColumn),
+	)
+}
+func newOrganizationStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OrganizationInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, OrganizationTable, OrganizationColumn),
 	)
 }

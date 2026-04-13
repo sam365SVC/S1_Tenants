@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"saas_identidad/ent/plan"
 	"saas_identidad/ent/tenant"
+	"saas_identidad/ent/user"
 	"strings"
 	"time"
 
@@ -24,22 +25,38 @@ type Tenant struct {
 	EndSuscription time.Time `json:"end_suscription,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TenantQuery when eager-loading is set.
-	Edges        TenantEdges `json:"edges"`
-	plan_tenants *int
-	selectValues sql.SelectValues
+	Edges             TenantEdges `json:"edges"`
+	plan_tenants      *int
+	user_organization *int
+	selectValues      sql.SelectValues
 }
 
 // TenantEdges holds the relations/edges for other nodes in the graph.
 type TenantEdges struct {
+	// Owner holds the value of the owner edge.
+	Owner *User `json:"owner,omitempty"`
 	// Plan holds the value of the plan edge.
 	Plan *Plan `json:"plan,omitempty"`
+	// InvitationEmployees holds the value of the invitation_employees edge.
+	InvitationEmployees []*InvitationEmployee `json:"invitation_employees,omitempty"`
 	// Employees holds the value of the employees edge.
 	Employees []*Employee `json:"employees,omitempty"`
-	// Branchs holds the value of the branchs edge.
-	Branchs []*Branch `json:"branchs,omitempty"`
+	// Branches holds the value of the branches edge.
+	Branches []*Branch `json:"branches,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [5]bool
+}
+
+// OwnerOrErr returns the Owner value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e TenantEdges) OwnerOrErr() (*User, error) {
+	if e.Owner != nil {
+		return e.Owner, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: user.Label}
+	}
+	return nil, &NotLoadedError{edge: "owner"}
 }
 
 // PlanOrErr returns the Plan value or an error if the edge
@@ -47,28 +64,37 @@ type TenantEdges struct {
 func (e TenantEdges) PlanOrErr() (*Plan, error) {
 	if e.Plan != nil {
 		return e.Plan, nil
-	} else if e.loadedTypes[0] {
+	} else if e.loadedTypes[1] {
 		return nil, &NotFoundError{label: plan.Label}
 	}
 	return nil, &NotLoadedError{edge: "plan"}
 }
 
+// InvitationEmployeesOrErr returns the InvitationEmployees value or an error if the edge
+// was not loaded in eager-loading.
+func (e TenantEdges) InvitationEmployeesOrErr() ([]*InvitationEmployee, error) {
+	if e.loadedTypes[2] {
+		return e.InvitationEmployees, nil
+	}
+	return nil, &NotLoadedError{edge: "invitation_employees"}
+}
+
 // EmployeesOrErr returns the Employees value or an error if the edge
 // was not loaded in eager-loading.
 func (e TenantEdges) EmployeesOrErr() ([]*Employee, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[3] {
 		return e.Employees, nil
 	}
 	return nil, &NotLoadedError{edge: "employees"}
 }
 
-// BranchsOrErr returns the Branchs value or an error if the edge
+// BranchesOrErr returns the Branches value or an error if the edge
 // was not loaded in eager-loading.
-func (e TenantEdges) BranchsOrErr() ([]*Branch, error) {
-	if e.loadedTypes[2] {
-		return e.Branchs, nil
+func (e TenantEdges) BranchesOrErr() ([]*Branch, error) {
+	if e.loadedTypes[4] {
+		return e.Branches, nil
 	}
-	return nil, &NotLoadedError{edge: "branchs"}
+	return nil, &NotLoadedError{edge: "branches"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -83,6 +109,8 @@ func (*Tenant) scanValues(columns []string) ([]any, error) {
 		case tenant.FieldEndSuscription:
 			values[i] = new(sql.NullTime)
 		case tenant.ForeignKeys[0]: // plan_tenants
+			values[i] = new(sql.NullInt64)
+		case tenant.ForeignKeys[1]: // user_organization
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -124,6 +152,13 @@ func (_m *Tenant) assignValues(columns []string, values []any) error {
 				_m.plan_tenants = new(int)
 				*_m.plan_tenants = int(value.Int64)
 			}
+		case tenant.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field user_organization", value)
+			} else if value.Valid {
+				_m.user_organization = new(int)
+				*_m.user_organization = int(value.Int64)
+			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -137,9 +172,19 @@ func (_m *Tenant) Value(name string) (ent.Value, error) {
 	return _m.selectValues.Get(name)
 }
 
+// QueryOwner queries the "owner" edge of the Tenant entity.
+func (_m *Tenant) QueryOwner() *UserQuery {
+	return NewTenantClient(_m.config).QueryOwner(_m)
+}
+
 // QueryPlan queries the "plan" edge of the Tenant entity.
 func (_m *Tenant) QueryPlan() *PlanQuery {
 	return NewTenantClient(_m.config).QueryPlan(_m)
+}
+
+// QueryInvitationEmployees queries the "invitation_employees" edge of the Tenant entity.
+func (_m *Tenant) QueryInvitationEmployees() *InvitationEmployeeQuery {
+	return NewTenantClient(_m.config).QueryInvitationEmployees(_m)
 }
 
 // QueryEmployees queries the "employees" edge of the Tenant entity.
@@ -147,9 +192,9 @@ func (_m *Tenant) QueryEmployees() *EmployeeQuery {
 	return NewTenantClient(_m.config).QueryEmployees(_m)
 }
 
-// QueryBranchs queries the "branchs" edge of the Tenant entity.
-func (_m *Tenant) QueryBranchs() *BranchQuery {
-	return NewTenantClient(_m.config).QueryBranchs(_m)
+// QueryBranches queries the "branches" edge of the Tenant entity.
+func (_m *Tenant) QueryBranches() *BranchQuery {
+	return NewTenantClient(_m.config).QueryBranches(_m)
 }
 
 // Update returns a builder for updating this Tenant.

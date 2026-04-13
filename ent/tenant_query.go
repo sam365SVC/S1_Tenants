@@ -9,9 +9,11 @@ import (
 	"math"
 	"saas_identidad/ent/branch"
 	"saas_identidad/ent/employee"
+	"saas_identidad/ent/invitationemployee"
 	"saas_identidad/ent/plan"
 	"saas_identidad/ent/predicate"
 	"saas_identidad/ent/tenant"
+	"saas_identidad/ent/user"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -22,14 +24,16 @@ import (
 // TenantQuery is the builder for querying Tenant entities.
 type TenantQuery struct {
 	config
-	ctx           *QueryContext
-	order         []tenant.OrderOption
-	inters        []Interceptor
-	predicates    []predicate.Tenant
-	withPlan      *PlanQuery
-	withEmployees *EmployeeQuery
-	withBranchs   *BranchQuery
-	withFKs       bool
+	ctx                     *QueryContext
+	order                   []tenant.OrderOption
+	inters                  []Interceptor
+	predicates              []predicate.Tenant
+	withOwner               *UserQuery
+	withPlan                *PlanQuery
+	withInvitationEmployees *InvitationEmployeeQuery
+	withEmployees           *EmployeeQuery
+	withBranches            *BranchQuery
+	withFKs                 bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -66,6 +70,28 @@ func (_q *TenantQuery) Order(o ...tenant.OrderOption) *TenantQuery {
 	return _q
 }
 
+// QueryOwner chains the current query on the "owner" edge.
+func (_q *TenantQuery) QueryOwner() *UserQuery {
+	query := (&UserClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(tenant.Table, tenant.FieldID, selector),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, tenant.OwnerTable, tenant.OwnerColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryPlan chains the current query on the "plan" edge.
 func (_q *TenantQuery) QueryPlan() *PlanQuery {
 	query := (&PlanClient{config: _q.config}).Query()
@@ -81,6 +107,28 @@ func (_q *TenantQuery) QueryPlan() *PlanQuery {
 			sqlgraph.From(tenant.Table, tenant.FieldID, selector),
 			sqlgraph.To(plan.Table, plan.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, tenant.PlanTable, tenant.PlanColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryInvitationEmployees chains the current query on the "invitation_employees" edge.
+func (_q *TenantQuery) QueryInvitationEmployees() *InvitationEmployeeQuery {
+	query := (&InvitationEmployeeClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(tenant.Table, tenant.FieldID, selector),
+			sqlgraph.To(invitationemployee.Table, invitationemployee.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, tenant.InvitationEmployeesTable, tenant.InvitationEmployeesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -110,8 +158,8 @@ func (_q *TenantQuery) QueryEmployees() *EmployeeQuery {
 	return query
 }
 
-// QueryBranchs chains the current query on the "branchs" edge.
-func (_q *TenantQuery) QueryBranchs() *BranchQuery {
+// QueryBranches chains the current query on the "branches" edge.
+func (_q *TenantQuery) QueryBranches() *BranchQuery {
 	query := (&BranchClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := _q.prepareQuery(ctx); err != nil {
@@ -124,7 +172,7 @@ func (_q *TenantQuery) QueryBranchs() *BranchQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(tenant.Table, tenant.FieldID, selector),
 			sqlgraph.To(branch.Table, branch.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, tenant.BranchsTable, tenant.BranchsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, tenant.BranchesTable, tenant.BranchesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -319,18 +367,31 @@ func (_q *TenantQuery) Clone() *TenantQuery {
 		return nil
 	}
 	return &TenantQuery{
-		config:        _q.config,
-		ctx:           _q.ctx.Clone(),
-		order:         append([]tenant.OrderOption{}, _q.order...),
-		inters:        append([]Interceptor{}, _q.inters...),
-		predicates:    append([]predicate.Tenant{}, _q.predicates...),
-		withPlan:      _q.withPlan.Clone(),
-		withEmployees: _q.withEmployees.Clone(),
-		withBranchs:   _q.withBranchs.Clone(),
+		config:                  _q.config,
+		ctx:                     _q.ctx.Clone(),
+		order:                   append([]tenant.OrderOption{}, _q.order...),
+		inters:                  append([]Interceptor{}, _q.inters...),
+		predicates:              append([]predicate.Tenant{}, _q.predicates...),
+		withOwner:               _q.withOwner.Clone(),
+		withPlan:                _q.withPlan.Clone(),
+		withInvitationEmployees: _q.withInvitationEmployees.Clone(),
+		withEmployees:           _q.withEmployees.Clone(),
+		withBranches:            _q.withBranches.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
 	}
+}
+
+// WithOwner tells the query-builder to eager-load the nodes that are connected to
+// the "owner" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *TenantQuery) WithOwner(opts ...func(*UserQuery)) *TenantQuery {
+	query := (&UserClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withOwner = query
+	return _q
 }
 
 // WithPlan tells the query-builder to eager-load the nodes that are connected to
@@ -341,6 +402,17 @@ func (_q *TenantQuery) WithPlan(opts ...func(*PlanQuery)) *TenantQuery {
 		opt(query)
 	}
 	_q.withPlan = query
+	return _q
+}
+
+// WithInvitationEmployees tells the query-builder to eager-load the nodes that are connected to
+// the "invitation_employees" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *TenantQuery) WithInvitationEmployees(opts ...func(*InvitationEmployeeQuery)) *TenantQuery {
+	query := (&InvitationEmployeeClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withInvitationEmployees = query
 	return _q
 }
 
@@ -355,14 +427,14 @@ func (_q *TenantQuery) WithEmployees(opts ...func(*EmployeeQuery)) *TenantQuery 
 	return _q
 }
 
-// WithBranchs tells the query-builder to eager-load the nodes that are connected to
-// the "branchs" edge. The optional arguments are used to configure the query builder of the edge.
-func (_q *TenantQuery) WithBranchs(opts ...func(*BranchQuery)) *TenantQuery {
+// WithBranches tells the query-builder to eager-load the nodes that are connected to
+// the "branches" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *TenantQuery) WithBranches(opts ...func(*BranchQuery)) *TenantQuery {
 	query := (&BranchClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	_q.withBranchs = query
+	_q.withBranches = query
 	return _q
 }
 
@@ -445,13 +517,15 @@ func (_q *TenantQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tenan
 		nodes       = []*Tenant{}
 		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [5]bool{
+			_q.withOwner != nil,
 			_q.withPlan != nil,
+			_q.withInvitationEmployees != nil,
 			_q.withEmployees != nil,
-			_q.withBranchs != nil,
+			_q.withBranches != nil,
 		}
 	)
-	if _q.withPlan != nil {
+	if _q.withOwner != nil || _q.withPlan != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -475,9 +549,24 @@ func (_q *TenantQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tenan
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := _q.withOwner; query != nil {
+		if err := _q.loadOwner(ctx, query, nodes, nil,
+			func(n *Tenant, e *User) { n.Edges.Owner = e }); err != nil {
+			return nil, err
+		}
+	}
 	if query := _q.withPlan; query != nil {
 		if err := _q.loadPlan(ctx, query, nodes, nil,
 			func(n *Tenant, e *Plan) { n.Edges.Plan = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withInvitationEmployees; query != nil {
+		if err := _q.loadInvitationEmployees(ctx, query, nodes,
+			func(n *Tenant) { n.Edges.InvitationEmployees = []*InvitationEmployee{} },
+			func(n *Tenant, e *InvitationEmployee) {
+				n.Edges.InvitationEmployees = append(n.Edges.InvitationEmployees, e)
+			}); err != nil {
 			return nil, err
 		}
 	}
@@ -488,16 +577,48 @@ func (_q *TenantQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tenan
 			return nil, err
 		}
 	}
-	if query := _q.withBranchs; query != nil {
-		if err := _q.loadBranchs(ctx, query, nodes,
-			func(n *Tenant) { n.Edges.Branchs = []*Branch{} },
-			func(n *Tenant, e *Branch) { n.Edges.Branchs = append(n.Edges.Branchs, e) }); err != nil {
+	if query := _q.withBranches; query != nil {
+		if err := _q.loadBranches(ctx, query, nodes,
+			func(n *Tenant) { n.Edges.Branches = []*Branch{} },
+			func(n *Tenant, e *Branch) { n.Edges.Branches = append(n.Edges.Branches, e) }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
+func (_q *TenantQuery) loadOwner(ctx context.Context, query *UserQuery, nodes []*Tenant, init func(*Tenant), assign func(*Tenant, *User)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Tenant)
+	for i := range nodes {
+		if nodes[i].user_organization == nil {
+			continue
+		}
+		fk := *nodes[i].user_organization
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(user.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "user_organization" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 func (_q *TenantQuery) loadPlan(ctx context.Context, query *PlanQuery, nodes []*Tenant, init func(*Tenant), assign func(*Tenant, *Plan)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Tenant)
@@ -527,6 +648,37 @@ func (_q *TenantQuery) loadPlan(ctx context.Context, query *PlanQuery, nodes []*
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
+	}
+	return nil
+}
+func (_q *TenantQuery) loadInvitationEmployees(ctx context.Context, query *InvitationEmployeeQuery, nodes []*Tenant, init func(*Tenant), assign func(*Tenant, *InvitationEmployee)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Tenant)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.InvitationEmployee(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(tenant.InvitationEmployeesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.tenant_invitation_employees
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "tenant_invitation_employees" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "tenant_invitation_employees" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }
@@ -561,7 +713,7 @@ func (_q *TenantQuery) loadEmployees(ctx context.Context, query *EmployeeQuery, 
 	}
 	return nil
 }
-func (_q *TenantQuery) loadBranchs(ctx context.Context, query *BranchQuery, nodes []*Tenant, init func(*Tenant), assign func(*Tenant, *Branch)) error {
+func (_q *TenantQuery) loadBranches(ctx context.Context, query *BranchQuery, nodes []*Tenant, init func(*Tenant), assign func(*Tenant, *Branch)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Tenant)
 	for i := range nodes {
@@ -573,20 +725,20 @@ func (_q *TenantQuery) loadBranchs(ctx context.Context, query *BranchQuery, node
 	}
 	query.withFKs = true
 	query.Where(predicate.Branch(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(tenant.BranchsColumn), fks...))
+		s.Where(sql.InValues(s.C(tenant.BranchesColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.tenant_branchs
+		fk := n.tenant_branches
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "tenant_branchs" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "tenant_branches" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "tenant_branchs" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "tenant_branches" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

@@ -38,9 +38,9 @@ type Branch struct {
 	CreateAt time.Time `json:"create_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the BranchQuery when eager-loading is set.
-	Edges          BranchEdges `json:"edges"`
-	tenant_branchs *int
-	selectValues   sql.SelectValues
+	Edges           BranchEdges `json:"edges"`
+	tenant_branches *int
+	selectValues    sql.SelectValues
 }
 
 // BranchEdges holds the relations/edges for other nodes in the graph.
@@ -87,7 +87,7 @@ func (*Branch) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case branch.FieldCreateAt:
 			values[i] = new(sql.NullTime)
-		case branch.ForeignKeys[0]: // tenant_branchs
+		case branch.ForeignKeys[0]: // tenant_branches
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -166,10 +166,10 @@ func (_m *Branch) assignValues(columns []string, values []any) error {
 			}
 		case branch.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field tenant_branchs", value)
+				return fmt.Errorf("unexpected type %T for edge-field tenant_branches", value)
 			} else if value.Valid {
-				_m.tenant_branchs = new(int)
-				*_m.tenant_branchs = int(value.Int64)
+				_m.tenant_branches = new(int)
+				*_m.tenant_branches = int(value.Int64)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

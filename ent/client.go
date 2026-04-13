@@ -15,6 +15,7 @@ import (
 	"saas_identidad/ent/email"
 	"saas_identidad/ent/employee"
 	"saas_identidad/ent/invitation"
+	"saas_identidad/ent/invitationemployee"
 	"saas_identidad/ent/plan"
 	"saas_identidad/ent/tenant"
 	"saas_identidad/ent/user"
@@ -38,6 +39,8 @@ type Client struct {
 	Employee *EmployeeClient
 	// Invitation is the client for interacting with the Invitation builders.
 	Invitation *InvitationClient
+	// InvitationEmployee is the client for interacting with the InvitationEmployee builders.
+	InvitationEmployee *InvitationEmployeeClient
 	// Plan is the client for interacting with the Plan builders.
 	Plan *PlanClient
 	// Tenant is the client for interacting with the Tenant builders.
@@ -59,6 +62,7 @@ func (c *Client) init() {
 	c.Email = NewEmailClient(c.config)
 	c.Employee = NewEmployeeClient(c.config)
 	c.Invitation = NewInvitationClient(c.config)
+	c.InvitationEmployee = NewInvitationEmployeeClient(c.config)
 	c.Plan = NewPlanClient(c.config)
 	c.Tenant = NewTenantClient(c.config)
 	c.User = NewUserClient(c.config)
@@ -152,15 +156,16 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:        ctx,
-		config:     cfg,
-		Branch:     NewBranchClient(cfg),
-		Email:      NewEmailClient(cfg),
-		Employee:   NewEmployeeClient(cfg),
-		Invitation: NewInvitationClient(cfg),
-		Plan:       NewPlanClient(cfg),
-		Tenant:     NewTenantClient(cfg),
-		User:       NewUserClient(cfg),
+		ctx:                ctx,
+		config:             cfg,
+		Branch:             NewBranchClient(cfg),
+		Email:              NewEmailClient(cfg),
+		Employee:           NewEmployeeClient(cfg),
+		Invitation:         NewInvitationClient(cfg),
+		InvitationEmployee: NewInvitationEmployeeClient(cfg),
+		Plan:               NewPlanClient(cfg),
+		Tenant:             NewTenantClient(cfg),
+		User:               NewUserClient(cfg),
 	}, nil
 }
 
@@ -178,15 +183,16 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:        ctx,
-		config:     cfg,
-		Branch:     NewBranchClient(cfg),
-		Email:      NewEmailClient(cfg),
-		Employee:   NewEmployeeClient(cfg),
-		Invitation: NewInvitationClient(cfg),
-		Plan:       NewPlanClient(cfg),
-		Tenant:     NewTenantClient(cfg),
-		User:       NewUserClient(cfg),
+		ctx:                ctx,
+		config:             cfg,
+		Branch:             NewBranchClient(cfg),
+		Email:              NewEmailClient(cfg),
+		Employee:           NewEmployeeClient(cfg),
+		Invitation:         NewInvitationClient(cfg),
+		InvitationEmployee: NewInvitationEmployeeClient(cfg),
+		Plan:               NewPlanClient(cfg),
+		Tenant:             NewTenantClient(cfg),
+		User:               NewUserClient(cfg),
 	}, nil
 }
 
@@ -216,7 +222,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Branch, c.Email, c.Employee, c.Invitation, c.Plan, c.Tenant, c.User,
+		c.Branch, c.Email, c.Employee, c.Invitation, c.InvitationEmployee, c.Plan,
+		c.Tenant, c.User,
 	} {
 		n.Use(hooks...)
 	}
@@ -226,7 +233,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Branch, c.Email, c.Employee, c.Invitation, c.Plan, c.Tenant, c.User,
+		c.Branch, c.Email, c.Employee, c.Invitation, c.InvitationEmployee, c.Plan,
+		c.Tenant, c.User,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -243,6 +251,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Employee.mutate(ctx, m)
 	case *InvitationMutation:
 		return c.Invitation.mutate(ctx, m)
+	case *InvitationEmployeeMutation:
+		return c.InvitationEmployee.mutate(ctx, m)
 	case *PlanMutation:
 		return c.Plan.mutate(ctx, m)
 	case *TenantMutation:
@@ -724,15 +734,15 @@ func (c *EmployeeClient) QueryTenant(_m *Employee) *TenantQuery {
 	return query
 }
 
-// QueryBranch queries the branch edge of a Employee.
-func (c *EmployeeClient) QueryBranch(_m *Employee) *BranchQuery {
+// QueryBranches queries the branches edge of a Employee.
+func (c *EmployeeClient) QueryBranches(_m *Employee) *BranchQuery {
 	query := (&BranchClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(employee.Table, employee.FieldID, id),
 			sqlgraph.To(branch.Table, branch.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, employee.BranchTable, employee.BranchColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, employee.BranchesTable, employee.BranchesColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -874,6 +884,22 @@ func (c *InvitationClient) GetX(ctx context.Context, id int) *Invitation {
 	return obj
 }
 
+// QueryInvitationEmployee queries the invitation_employee edge of a Invitation.
+func (c *InvitationClient) QueryInvitationEmployee(_m *Invitation) *InvitationEmployeeQuery {
+	query := (&InvitationEmployeeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(invitation.Table, invitation.FieldID, id),
+			sqlgraph.To(invitationemployee.Table, invitationemployee.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, invitation.InvitationEmployeeTable, invitation.InvitationEmployeeColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *InvitationClient) Hooks() []Hook {
 	return c.hooks.Invitation
@@ -896,6 +922,171 @@ func (c *InvitationClient) mutate(ctx context.Context, m *InvitationMutation) (V
 		return (&InvitationDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Invitation mutation op: %q", m.Op())
+	}
+}
+
+// InvitationEmployeeClient is a client for the InvitationEmployee schema.
+type InvitationEmployeeClient struct {
+	config
+}
+
+// NewInvitationEmployeeClient returns a client for the InvitationEmployee from the given config.
+func NewInvitationEmployeeClient(c config) *InvitationEmployeeClient {
+	return &InvitationEmployeeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `invitationemployee.Hooks(f(g(h())))`.
+func (c *InvitationEmployeeClient) Use(hooks ...Hook) {
+	c.hooks.InvitationEmployee = append(c.hooks.InvitationEmployee, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `invitationemployee.Intercept(f(g(h())))`.
+func (c *InvitationEmployeeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.InvitationEmployee = append(c.inters.InvitationEmployee, interceptors...)
+}
+
+// Create returns a builder for creating a InvitationEmployee entity.
+func (c *InvitationEmployeeClient) Create() *InvitationEmployeeCreate {
+	mutation := newInvitationEmployeeMutation(c.config, OpCreate)
+	return &InvitationEmployeeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of InvitationEmployee entities.
+func (c *InvitationEmployeeClient) CreateBulk(builders ...*InvitationEmployeeCreate) *InvitationEmployeeCreateBulk {
+	return &InvitationEmployeeCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *InvitationEmployeeClient) MapCreateBulk(slice any, setFunc func(*InvitationEmployeeCreate, int)) *InvitationEmployeeCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &InvitationEmployeeCreateBulk{err: fmt.Errorf("calling to InvitationEmployeeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*InvitationEmployeeCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &InvitationEmployeeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for InvitationEmployee.
+func (c *InvitationEmployeeClient) Update() *InvitationEmployeeUpdate {
+	mutation := newInvitationEmployeeMutation(c.config, OpUpdate)
+	return &InvitationEmployeeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *InvitationEmployeeClient) UpdateOne(_m *InvitationEmployee) *InvitationEmployeeUpdateOne {
+	mutation := newInvitationEmployeeMutation(c.config, OpUpdateOne, withInvitationEmployee(_m))
+	return &InvitationEmployeeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *InvitationEmployeeClient) UpdateOneID(id int) *InvitationEmployeeUpdateOne {
+	mutation := newInvitationEmployeeMutation(c.config, OpUpdateOne, withInvitationEmployeeID(id))
+	return &InvitationEmployeeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for InvitationEmployee.
+func (c *InvitationEmployeeClient) Delete() *InvitationEmployeeDelete {
+	mutation := newInvitationEmployeeMutation(c.config, OpDelete)
+	return &InvitationEmployeeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *InvitationEmployeeClient) DeleteOne(_m *InvitationEmployee) *InvitationEmployeeDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *InvitationEmployeeClient) DeleteOneID(id int) *InvitationEmployeeDeleteOne {
+	builder := c.Delete().Where(invitationemployee.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &InvitationEmployeeDeleteOne{builder}
+}
+
+// Query returns a query builder for InvitationEmployee.
+func (c *InvitationEmployeeClient) Query() *InvitationEmployeeQuery {
+	return &InvitationEmployeeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeInvitationEmployee},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a InvitationEmployee entity by its id.
+func (c *InvitationEmployeeClient) Get(ctx context.Context, id int) (*InvitationEmployee, error) {
+	return c.Query().Where(invitationemployee.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *InvitationEmployeeClient) GetX(ctx context.Context, id int) *InvitationEmployee {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryInvitation queries the invitation edge of a InvitationEmployee.
+func (c *InvitationEmployeeClient) QueryInvitation(_m *InvitationEmployee) *InvitationQuery {
+	query := (&InvitationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(invitationemployee.Table, invitationemployee.FieldID, id),
+			sqlgraph.To(invitation.Table, invitation.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, invitationemployee.InvitationTable, invitationemployee.InvitationColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTenant queries the tenant edge of a InvitationEmployee.
+func (c *InvitationEmployeeClient) QueryTenant(_m *InvitationEmployee) *TenantQuery {
+	query := (&TenantClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(invitationemployee.Table, invitationemployee.FieldID, id),
+			sqlgraph.To(tenant.Table, tenant.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, invitationemployee.TenantTable, invitationemployee.TenantColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *InvitationEmployeeClient) Hooks() []Hook {
+	return c.hooks.InvitationEmployee
+}
+
+// Interceptors returns the client interceptors.
+func (c *InvitationEmployeeClient) Interceptors() []Interceptor {
+	return c.inters.InvitationEmployee
+}
+
+func (c *InvitationEmployeeClient) mutate(ctx context.Context, m *InvitationEmployeeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&InvitationEmployeeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&InvitationEmployeeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&InvitationEmployeeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&InvitationEmployeeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown InvitationEmployee mutation op: %q", m.Op())
 	}
 }
 
@@ -1156,6 +1347,22 @@ func (c *TenantClient) GetX(ctx context.Context, id int) *Tenant {
 	return obj
 }
 
+// QueryOwner queries the owner edge of a Tenant.
+func (c *TenantClient) QueryOwner(_m *Tenant) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(tenant.Table, tenant.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, tenant.OwnerTable, tenant.OwnerColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryPlan queries the plan edge of a Tenant.
 func (c *TenantClient) QueryPlan(_m *Tenant) *PlanQuery {
 	query := (&PlanClient{config: c.config}).Query()
@@ -1165,6 +1372,22 @@ func (c *TenantClient) QueryPlan(_m *Tenant) *PlanQuery {
 			sqlgraph.From(tenant.Table, tenant.FieldID, id),
 			sqlgraph.To(plan.Table, plan.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, tenant.PlanTable, tenant.PlanColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryInvitationEmployees queries the invitation_employees edge of a Tenant.
+func (c *TenantClient) QueryInvitationEmployees(_m *Tenant) *InvitationEmployeeQuery {
+	query := (&InvitationEmployeeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(tenant.Table, tenant.FieldID, id),
+			sqlgraph.To(invitationemployee.Table, invitationemployee.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, tenant.InvitationEmployeesTable, tenant.InvitationEmployeesColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -1188,15 +1411,15 @@ func (c *TenantClient) QueryEmployees(_m *Tenant) *EmployeeQuery {
 	return query
 }
 
-// QueryBranchs queries the branchs edge of a Tenant.
-func (c *TenantClient) QueryBranchs(_m *Tenant) *BranchQuery {
+// QueryBranches queries the branches edge of a Tenant.
+func (c *TenantClient) QueryBranches(_m *Tenant) *BranchQuery {
 	query := (&BranchClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(tenant.Table, tenant.FieldID, id),
 			sqlgraph.To(branch.Table, branch.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, tenant.BranchsTable, tenant.BranchsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, tenant.BranchesTable, tenant.BranchesColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -1353,6 +1576,22 @@ func (c *UserClient) QueryEmails(_m *User) *EmailQuery {
 	return query
 }
 
+// QueryOrganization queries the organization edge of a User.
+func (c *UserClient) QueryOrganization(_m *User) *TenantQuery {
+	query := (&TenantClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(tenant.Table, tenant.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, user.OrganizationTable, user.OrganizationColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
 	return c.hooks.User
@@ -1381,9 +1620,11 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Branch, Email, Employee, Invitation, Plan, Tenant, User []ent.Hook
+		Branch, Email, Employee, Invitation, InvitationEmployee, Plan, Tenant,
+		User []ent.Hook
 	}
 	inters struct {
-		Branch, Email, Employee, Invitation, Plan, Tenant, User []ent.Interceptor
+		Branch, Email, Employee, Invitation, InvitationEmployee, Plan, Tenant,
+		User []ent.Interceptor
 	}
 )

@@ -56,6 +56,18 @@ func (f InvitationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, 
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.InvitationMutation", m)
 }
 
+// The InvitationEmployeeFunc type is an adapter to allow the use of ordinary
+// function as InvitationEmployee mutator.
+type InvitationEmployeeFunc func(context.Context, *ent.InvitationEmployeeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f InvitationEmployeeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.InvitationEmployeeMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.InvitationEmployeeMutation", m)
+}
+
 // The PlanFunc type is an adapter to allow the use of ordinary
 // function as Plan mutator.
 type PlanFunc func(context.Context, *ent.PlanMutation) (ent.Value, error)

@@ -97,7 +97,6 @@ func (h *UserHandler) CreateUser(c echo.Context) error {
 			})
 		}
 	}
-
 	return c.JSON(status, echo.Map{
 		"message": "user created with exit",
 	})

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 func defaultExpireAt() time.Time {
@@ -20,5 +21,10 @@ func (Invitation) Fields() []ent.Field {
 		field.Enum("account").Values("DEVELOPER","USER","ADMIN"),
 		field.Time("expire_at").
 			Default(defaultExpireAt()),
+	}
+}
+func (Invitation) Edges()[]ent.Edge {
+	return []ent.Edge{
+		edge.To("invitation_employee",InvitationEmployee.Type).Unique(),
 	}
 }

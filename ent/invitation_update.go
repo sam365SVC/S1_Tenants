@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"saas_identidad/ent/invitation"
+	"saas_identidad/ent/invitationemployee"
 	"saas_identidad/ent/predicate"
 	"time"
 
@@ -84,9 +85,34 @@ func (_u *InvitationUpdate) SetNillableExpireAt(v *time.Time) *InvitationUpdate 
 	return _u
 }
 
+// SetInvitationEmployeeID sets the "invitation_employee" edge to the InvitationEmployee entity by ID.
+func (_u *InvitationUpdate) SetInvitationEmployeeID(id int) *InvitationUpdate {
+	_u.mutation.SetInvitationEmployeeID(id)
+	return _u
+}
+
+// SetNillableInvitationEmployeeID sets the "invitation_employee" edge to the InvitationEmployee entity by ID if the given value is not nil.
+func (_u *InvitationUpdate) SetNillableInvitationEmployeeID(id *int) *InvitationUpdate {
+	if id != nil {
+		_u = _u.SetInvitationEmployeeID(*id)
+	}
+	return _u
+}
+
+// SetInvitationEmployee sets the "invitation_employee" edge to the InvitationEmployee entity.
+func (_u *InvitationUpdate) SetInvitationEmployee(v *InvitationEmployee) *InvitationUpdate {
+	return _u.SetInvitationEmployeeID(v.ID)
+}
+
 // Mutation returns the InvitationMutation object of the builder.
 func (_u *InvitationUpdate) Mutation() *InvitationMutation {
 	return _u.mutation
+}
+
+// ClearInvitationEmployee clears the "invitation_employee" edge to the InvitationEmployee entity.
+func (_u *InvitationUpdate) ClearInvitationEmployee() *InvitationUpdate {
+	_u.mutation.ClearInvitationEmployee()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -159,6 +185,35 @@ func (_u *InvitationUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 	}
 	if value, ok := _u.mutation.ExpireAt(); ok {
 		_spec.SetField(invitation.FieldExpireAt, field.TypeTime, value)
+	}
+	if _u.mutation.InvitationEmployeeCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   invitation.InvitationEmployeeTable,
+			Columns: []string{invitation.InvitationEmployeeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitationemployee.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.InvitationEmployeeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   invitation.InvitationEmployeeTable,
+			Columns: []string{invitation.InvitationEmployeeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitationemployee.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -236,9 +291,34 @@ func (_u *InvitationUpdateOne) SetNillableExpireAt(v *time.Time) *InvitationUpda
 	return _u
 }
 
+// SetInvitationEmployeeID sets the "invitation_employee" edge to the InvitationEmployee entity by ID.
+func (_u *InvitationUpdateOne) SetInvitationEmployeeID(id int) *InvitationUpdateOne {
+	_u.mutation.SetInvitationEmployeeID(id)
+	return _u
+}
+
+// SetNillableInvitationEmployeeID sets the "invitation_employee" edge to the InvitationEmployee entity by ID if the given value is not nil.
+func (_u *InvitationUpdateOne) SetNillableInvitationEmployeeID(id *int) *InvitationUpdateOne {
+	if id != nil {
+		_u = _u.SetInvitationEmployeeID(*id)
+	}
+	return _u
+}
+
+// SetInvitationEmployee sets the "invitation_employee" edge to the InvitationEmployee entity.
+func (_u *InvitationUpdateOne) SetInvitationEmployee(v *InvitationEmployee) *InvitationUpdateOne {
+	return _u.SetInvitationEmployeeID(v.ID)
+}
+
 // Mutation returns the InvitationMutation object of the builder.
 func (_u *InvitationUpdateOne) Mutation() *InvitationMutation {
 	return _u.mutation
+}
+
+// ClearInvitationEmployee clears the "invitation_employee" edge to the InvitationEmployee entity.
+func (_u *InvitationUpdateOne) ClearInvitationEmployee() *InvitationUpdateOne {
+	_u.mutation.ClearInvitationEmployee()
+	return _u
 }
 
 // Where appends a list predicates to the InvitationUpdate builder.
@@ -341,6 +421,35 @@ func (_u *InvitationUpdateOne) sqlSave(ctx context.Context) (_node *Invitation, 
 	}
 	if value, ok := _u.mutation.ExpireAt(); ok {
 		_spec.SetField(invitation.FieldExpireAt, field.TypeTime, value)
+	}
+	if _u.mutation.InvitationEmployeeCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   invitation.InvitationEmployeeTable,
+			Columns: []string{invitation.InvitationEmployeeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitationemployee.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.InvitationEmployeeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   invitation.InvitationEmployeeTable,
+			Columns: []string{invitation.InvitationEmployeeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitationemployee.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Invitation{config: _u.config}
 	_spec.Assign = _node.assignValues

@@ -20,8 +20,8 @@ type Employee struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// Area holds the value of the "area" field.
-	Area employee.Area `json:"area,omitempty"`
+	// Department holds the value of the "department" field.
+	Department employee.Department `json:"department,omitempty"`
 	// Position holds the value of the "position" field.
 	Position string `json:"position,omitempty"`
 	// Active holds the value of the "active" field.
@@ -45,8 +45,8 @@ type EmployeeEdges struct {
 	Emails *Email `json:"emails,omitempty"`
 	// Tenant holds the value of the tenant edge.
 	Tenant *Tenant `json:"tenant,omitempty"`
-	// Branch holds the value of the branch edge.
-	Branch *Branch `json:"branch,omitempty"`
+	// Branches holds the value of the branches edge.
+	Branches *Branch `json:"branches,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [3]bool
@@ -74,15 +74,15 @@ func (e EmployeeEdges) TenantOrErr() (*Tenant, error) {
 	return nil, &NotLoadedError{edge: "tenant"}
 }
 
-// BranchOrErr returns the Branch value or an error if the edge
+// BranchesOrErr returns the Branches value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e EmployeeEdges) BranchOrErr() (*Branch, error) {
-	if e.Branch != nil {
-		return e.Branch, nil
+func (e EmployeeEdges) BranchesOrErr() (*Branch, error) {
+	if e.Branches != nil {
+		return e.Branches, nil
 	} else if e.loadedTypes[2] {
 		return nil, &NotFoundError{label: branch.Label}
 	}
-	return nil, &NotLoadedError{edge: "branch"}
+	return nil, &NotLoadedError{edge: "branches"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -94,7 +94,7 @@ func (*Employee) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case employee.FieldID:
 			values[i] = new(sql.NullInt64)
-		case employee.FieldArea, employee.FieldPosition:
+		case employee.FieldDepartment, employee.FieldPosition:
 			values[i] = new(sql.NullString)
 		case employee.FieldJoinAt, employee.FieldLeftAt:
 			values[i] = new(sql.NullTime)
@@ -125,11 +125,11 @@ func (_m *Employee) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			_m.ID = int(value.Int64)
-		case employee.FieldArea:
+		case employee.FieldDepartment:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field area", values[i])
+				return fmt.Errorf("unexpected type %T for field department", values[i])
 			} else if value.Valid {
-				_m.Area = employee.Area(value.String)
+				_m.Department = employee.Department(value.String)
 			}
 		case employee.FieldPosition:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -200,9 +200,9 @@ func (_m *Employee) QueryTenant() *TenantQuery {
 	return NewEmployeeClient(_m.config).QueryTenant(_m)
 }
 
-// QueryBranch queries the "branch" edge of the Employee entity.
-func (_m *Employee) QueryBranch() *BranchQuery {
-	return NewEmployeeClient(_m.config).QueryBranch(_m)
+// QueryBranches queries the "branches" edge of the Employee entity.
+func (_m *Employee) QueryBranches() *BranchQuery {
+	return NewEmployeeClient(_m.config).QueryBranches(_m)
 }
 
 // Update returns a builder for updating this Employee.
@@ -228,8 +228,8 @@ func (_m *Employee) String() string {
 	var builder strings.Builder
 	builder.WriteString("Employee(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
-	builder.WriteString("area=")
-	builder.WriteString(fmt.Sprintf("%v", _m.Area))
+	builder.WriteString("department=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Department))
 	builder.WriteString(", ")
 	builder.WriteString("position=")
 	builder.WriteString(_m.Position)

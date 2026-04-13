@@ -45,7 +45,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "tenant" package.
 	TenantInverseTable = "tenants"
 	// TenantColumn is the table column denoting the tenant relation/edge.
-	TenantColumn = "tenant_branchs"
+	TenantColumn = "tenant_branches"
 	// EmployeesTable is the table that holds the employees relation/edge.
 	EmployeesTable = "employees"
 	// EmployeesInverseTable is the table name for the Employee entity.
@@ -72,7 +72,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "branches"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"tenant_branchs",
+	"tenant_branches",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

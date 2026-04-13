@@ -30,5 +30,6 @@ func (User) Fields() []ent.Field {
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("emails", Email.Type),
+		edge.To("organization",Tenant.Type).Unique(),
 	}
 }

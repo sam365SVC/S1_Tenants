@@ -16,14 +16,25 @@ const (
 	FieldName = "name"
 	// FieldEndSuscription holds the string denoting the end_suscription field in the database.
 	FieldEndSuscription = "end_suscription"
+	// EdgeOwner holds the string denoting the owner edge name in mutations.
+	EdgeOwner = "owner"
 	// EdgePlan holds the string denoting the plan edge name in mutations.
 	EdgePlan = "plan"
+	// EdgeInvitationEmployees holds the string denoting the invitation_employees edge name in mutations.
+	EdgeInvitationEmployees = "invitation_employees"
 	// EdgeEmployees holds the string denoting the employees edge name in mutations.
 	EdgeEmployees = "employees"
-	// EdgeBranchs holds the string denoting the branchs edge name in mutations.
-	EdgeBranchs = "branchs"
+	// EdgeBranches holds the string denoting the branches edge name in mutations.
+	EdgeBranches = "branches"
 	// Table holds the table name of the tenant in the database.
 	Table = "tenants"
+	// OwnerTable is the table that holds the owner relation/edge.
+	OwnerTable = "tenants"
+	// OwnerInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	OwnerInverseTable = "users"
+	// OwnerColumn is the table column denoting the owner relation/edge.
+	OwnerColumn = "user_organization"
 	// PlanTable is the table that holds the plan relation/edge.
 	PlanTable = "tenants"
 	// PlanInverseTable is the table name for the Plan entity.
@@ -31,6 +42,13 @@ const (
 	PlanInverseTable = "plans"
 	// PlanColumn is the table column denoting the plan relation/edge.
 	PlanColumn = "plan_tenants"
+	// InvitationEmployeesTable is the table that holds the invitation_employees relation/edge.
+	InvitationEmployeesTable = "invitation_employees"
+	// InvitationEmployeesInverseTable is the table name for the InvitationEmployee entity.
+	// It exists in this package in order to avoid circular dependency with the "invitationemployee" package.
+	InvitationEmployeesInverseTable = "invitation_employees"
+	// InvitationEmployeesColumn is the table column denoting the invitation_employees relation/edge.
+	InvitationEmployeesColumn = "tenant_invitation_employees"
 	// EmployeesTable is the table that holds the employees relation/edge.
 	EmployeesTable = "employees"
 	// EmployeesInverseTable is the table name for the Employee entity.
@@ -38,13 +56,13 @@ const (
 	EmployeesInverseTable = "employees"
 	// EmployeesColumn is the table column denoting the employees relation/edge.
 	EmployeesColumn = "tenant_employees"
-	// BranchsTable is the table that holds the branchs relation/edge.
-	BranchsTable = "branches"
-	// BranchsInverseTable is the table name for the Branch entity.
+	// BranchesTable is the table that holds the branches relation/edge.
+	BranchesTable = "branches"
+	// BranchesInverseTable is the table name for the Branch entity.
 	// It exists in this package in order to avoid circular dependency with the "branch" package.
-	BranchsInverseTable = "branches"
-	// BranchsColumn is the table column denoting the branchs relation/edge.
-	BranchsColumn = "tenant_branchs"
+	BranchesInverseTable = "branches"
+	// BranchesColumn is the table column denoting the branches relation/edge.
+	BranchesColumn = "tenant_branches"
 )
 
 // Columns holds all SQL columns for tenant fields.
@@ -58,6 +76,7 @@ var Columns = []string{
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"plan_tenants",
+	"user_organization",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -98,10 +117,31 @@ func ByEndSuscription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEndSuscription, opts...).ToFunc()
 }
 
+// ByOwnerField orders the results by owner field.
+func ByOwnerField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOwnerStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // ByPlanField orders the results by plan field.
 func ByPlanField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newPlanStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByInvitationEmployeesCount orders the results by invitation_employees count.
+func ByInvitationEmployeesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newInvitationEmployeesStep(), opts...)
+	}
+}
+
+// ByInvitationEmployees orders the results by invitation_employees terms.
+func ByInvitationEmployees(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newInvitationEmployeesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -119,24 +159,38 @@ func ByEmployees(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByBranchsCount orders the results by branchs count.
-func ByBranchsCount(opts ...sql.OrderTermOption) OrderOption {
+// ByBranchesCount orders the results by branches count.
+func ByBranchesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newBranchsStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newBranchesStep(), opts...)
 	}
 }
 
-// ByBranchs orders the results by branchs terms.
-func ByBranchs(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByBranches orders the results by branches terms.
+func ByBranches(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newBranchsStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newBranchesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
+}
+func newOwnerStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OwnerInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, true, OwnerTable, OwnerColumn),
+	)
 }
 func newPlanStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(PlanInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, PlanTable, PlanColumn),
+	)
+}
+func newInvitationEmployeesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(InvitationEmployeesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, InvitationEmployeesTable, InvitationEmployeesColumn),
 	)
 }
 func newEmployeesStep() *sqlgraph.Step {
@@ -146,10 +200,10 @@ func newEmployeesStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, EmployeesTable, EmployeesColumn),
 	)
 }
-func newBranchsStep() *sqlgraph.Step {
+func newBranchesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(BranchsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, BranchsTable, BranchsColumn),
+		sqlgraph.To(BranchesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, BranchesTable, BranchesColumn),
 	)
 }

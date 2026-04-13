@@ -75,24 +75,24 @@ func LeftAt(v time.Time) predicate.Employee {
 	return predicate.Employee(sql.FieldEQ(FieldLeftAt, v))
 }
 
-// AreaEQ applies the EQ predicate on the "area" field.
-func AreaEQ(v Area) predicate.Employee {
-	return predicate.Employee(sql.FieldEQ(FieldArea, v))
+// DepartmentEQ applies the EQ predicate on the "department" field.
+func DepartmentEQ(v Department) predicate.Employee {
+	return predicate.Employee(sql.FieldEQ(FieldDepartment, v))
 }
 
-// AreaNEQ applies the NEQ predicate on the "area" field.
-func AreaNEQ(v Area) predicate.Employee {
-	return predicate.Employee(sql.FieldNEQ(FieldArea, v))
+// DepartmentNEQ applies the NEQ predicate on the "department" field.
+func DepartmentNEQ(v Department) predicate.Employee {
+	return predicate.Employee(sql.FieldNEQ(FieldDepartment, v))
 }
 
-// AreaIn applies the In predicate on the "area" field.
-func AreaIn(vs ...Area) predicate.Employee {
-	return predicate.Employee(sql.FieldIn(FieldArea, vs...))
+// DepartmentIn applies the In predicate on the "department" field.
+func DepartmentIn(vs ...Department) predicate.Employee {
+	return predicate.Employee(sql.FieldIn(FieldDepartment, vs...))
 }
 
-// AreaNotIn applies the NotIn predicate on the "area" field.
-func AreaNotIn(vs ...Area) predicate.Employee {
-	return predicate.Employee(sql.FieldNotIn(FieldArea, vs...))
+// DepartmentNotIn applies the NotIn predicate on the "department" field.
+func DepartmentNotIn(vs ...Department) predicate.Employee {
+	return predicate.Employee(sql.FieldNotIn(FieldDepartment, vs...))
 }
 
 // PositionEQ applies the EQ predicate on the "position" field.
@@ -306,21 +306,21 @@ func HasTenantWith(preds ...predicate.Tenant) predicate.Employee {
 	})
 }
 
-// HasBranch applies the HasEdge predicate on the "branch" edge.
-func HasBranch() predicate.Employee {
+// HasBranches applies the HasEdge predicate on the "branches" edge.
+func HasBranches() predicate.Employee {
 	return predicate.Employee(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, BranchTable, BranchColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, BranchesTable, BranchesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasBranchWith applies the HasEdge predicate on the "branch" edge with a given conditions (other predicates).
-func HasBranchWith(preds ...predicate.Branch) predicate.Employee {
+// HasBranchesWith applies the HasEdge predicate on the "branches" edge with a given conditions (other predicates).
+func HasBranchesWith(preds ...predicate.Branch) predicate.Employee {
 	return predicate.Employee(func(s *sql.Selector) {
-		step := newBranchStep()
+		step := newBranchesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

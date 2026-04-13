@@ -20,6 +20,8 @@ type Tx struct {
 	Employee *EmployeeClient
 	// Invitation is the client for interacting with the Invitation builders.
 	Invitation *InvitationClient
+	// InvitationEmployee is the client for interacting with the InvitationEmployee builders.
+	InvitationEmployee *InvitationEmployeeClient
 	// Plan is the client for interacting with the Plan builders.
 	Plan *PlanClient
 	// Tenant is the client for interacting with the Tenant builders.
@@ -161,6 +163,7 @@ func (tx *Tx) init() {
 	tx.Email = NewEmailClient(tx.config)
 	tx.Employee = NewEmployeeClient(tx.config)
 	tx.Invitation = NewInvitationClient(tx.config)
+	tx.InvitationEmployee = NewInvitationEmployeeClient(tx.config)
 	tx.Plan = NewPlanClient(tx.config)
 	tx.Tenant = NewTenantClient(tx.config)
 	tx.User = NewUserClient(tx.config)

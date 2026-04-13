@@ -7,6 +7,7 @@ import (
 	"saas_identidad/ent/email"
 	"saas_identidad/ent/employee"
 	"saas_identidad/ent/invitation"
+	"saas_identidad/ent/invitationemployee"
 	"saas_identidad/ent/plan"
 	"saas_identidad/ent/schemas"
 	"saas_identidad/ent/tenant"
@@ -204,6 +205,16 @@ func init() {
 	invitationDescExpireAt := invitationFields[3].Descriptor()
 	// invitation.DefaultExpireAt holds the default value on creation for the expire_at field.
 	invitation.DefaultExpireAt = invitationDescExpireAt.Default.(time.Time)
+	invitationemployeeFields := schemas.InvitationEmployee{}.Fields()
+	_ = invitationemployeeFields
+	// invitationemployeeDescDepartment is the schema descriptor for department field.
+	invitationemployeeDescDepartment := invitationemployeeFields[0].Descriptor()
+	// invitationemployee.DepartmentValidator is a validator for the "department" field. It is called by the builders before save.
+	invitationemployee.DepartmentValidator = invitationemployeeDescDepartment.Validators[0].(func(string) error)
+	// invitationemployeeDescPosition is the schema descriptor for position field.
+	invitationemployeeDescPosition := invitationemployeeFields[1].Descriptor()
+	// invitationemployee.PositionValidator is a validator for the "position" field. It is called by the builders before save.
+	invitationemployee.PositionValidator = invitationemployeeDescPosition.Validators[0].(func(string) error)
 	planFields := schemas.Plan{}.Fields()
 	_ = planFields
 	// planDescSubscription is the schema descriptor for subscription field.

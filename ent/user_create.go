@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"saas_identidad/ent/email"
+	"saas_identidad/ent/tenant"
 	"saas_identidad/ent/user"
 	"time"
 
@@ -72,6 +73,25 @@ func (_c *UserCreate) AddEmails(v ...*Email) *UserCreate {
 		ids[i] = v[i].ID
 	}
 	return _c.AddEmailIDs(ids...)
+}
+
+// SetOrganizationID sets the "organization" edge to the Tenant entity by ID.
+func (_c *UserCreate) SetOrganizationID(id int) *UserCreate {
+	_c.mutation.SetOrganizationID(id)
+	return _c
+}
+
+// SetNillableOrganizationID sets the "organization" edge to the Tenant entity by ID if the given value is not nil.
+func (_c *UserCreate) SetNillableOrganizationID(id *int) *UserCreate {
+	if id != nil {
+		_c = _c.SetOrganizationID(*id)
+	}
+	return _c
+}
+
+// SetOrganization sets the "organization" edge to the Tenant entity.
+func (_c *UserCreate) SetOrganization(v *Tenant) *UserCreate {
+	return _c.SetOrganizationID(v.ID)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -195,6 +215,22 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.OrganizationIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   user.OrganizationTable,
+			Columns: []string{user.OrganizationColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tenant.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

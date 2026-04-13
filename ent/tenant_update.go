@@ -8,9 +8,11 @@ import (
 	"fmt"
 	"saas_identidad/ent/branch"
 	"saas_identidad/ent/employee"
+	"saas_identidad/ent/invitationemployee"
 	"saas_identidad/ent/plan"
 	"saas_identidad/ent/predicate"
 	"saas_identidad/ent/tenant"
+	"saas_identidad/ent/user"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -65,6 +67,17 @@ func (_u *TenantUpdate) ClearEndSuscription() *TenantUpdate {
 	return _u
 }
 
+// SetOwnerID sets the "owner" edge to the User entity by ID.
+func (_u *TenantUpdate) SetOwnerID(id int) *TenantUpdate {
+	_u.mutation.SetOwnerID(id)
+	return _u
+}
+
+// SetOwner sets the "owner" edge to the User entity.
+func (_u *TenantUpdate) SetOwner(v *User) *TenantUpdate {
+	return _u.SetOwnerID(v.ID)
+}
+
 // SetPlanID sets the "plan" edge to the Plan entity by ID.
 func (_u *TenantUpdate) SetPlanID(id int) *TenantUpdate {
 	_u.mutation.SetPlanID(id)
@@ -84,6 +97,21 @@ func (_u *TenantUpdate) SetPlan(v *Plan) *TenantUpdate {
 	return _u.SetPlanID(v.ID)
 }
 
+// AddInvitationEmployeeIDs adds the "invitation_employees" edge to the InvitationEmployee entity by IDs.
+func (_u *TenantUpdate) AddInvitationEmployeeIDs(ids ...int) *TenantUpdate {
+	_u.mutation.AddInvitationEmployeeIDs(ids...)
+	return _u
+}
+
+// AddInvitationEmployees adds the "invitation_employees" edges to the InvitationEmployee entity.
+func (_u *TenantUpdate) AddInvitationEmployees(v ...*InvitationEmployee) *TenantUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddInvitationEmployeeIDs(ids...)
+}
+
 // AddEmployeeIDs adds the "employees" edge to the Employee entity by IDs.
 func (_u *TenantUpdate) AddEmployeeIDs(ids ...int) *TenantUpdate {
 	_u.mutation.AddEmployeeIDs(ids...)
@@ -99,14 +127,14 @@ func (_u *TenantUpdate) AddEmployees(v ...*Employee) *TenantUpdate {
 	return _u.AddEmployeeIDs(ids...)
 }
 
-// AddBranchIDs adds the "branchs" edge to the Branch entity by IDs.
+// AddBranchIDs adds the "branches" edge to the Branch entity by IDs.
 func (_u *TenantUpdate) AddBranchIDs(ids ...int) *TenantUpdate {
 	_u.mutation.AddBranchIDs(ids...)
 	return _u
 }
 
-// AddBranchs adds the "branchs" edges to the Branch entity.
-func (_u *TenantUpdate) AddBranchs(v ...*Branch) *TenantUpdate {
+// AddBranches adds the "branches" edges to the Branch entity.
+func (_u *TenantUpdate) AddBranches(v ...*Branch) *TenantUpdate {
 	ids := make([]int, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
@@ -119,10 +147,37 @@ func (_u *TenantUpdate) Mutation() *TenantMutation {
 	return _u.mutation
 }
 
+// ClearOwner clears the "owner" edge to the User entity.
+func (_u *TenantUpdate) ClearOwner() *TenantUpdate {
+	_u.mutation.ClearOwner()
+	return _u
+}
+
 // ClearPlan clears the "plan" edge to the Plan entity.
 func (_u *TenantUpdate) ClearPlan() *TenantUpdate {
 	_u.mutation.ClearPlan()
 	return _u
+}
+
+// ClearInvitationEmployees clears all "invitation_employees" edges to the InvitationEmployee entity.
+func (_u *TenantUpdate) ClearInvitationEmployees() *TenantUpdate {
+	_u.mutation.ClearInvitationEmployees()
+	return _u
+}
+
+// RemoveInvitationEmployeeIDs removes the "invitation_employees" edge to InvitationEmployee entities by IDs.
+func (_u *TenantUpdate) RemoveInvitationEmployeeIDs(ids ...int) *TenantUpdate {
+	_u.mutation.RemoveInvitationEmployeeIDs(ids...)
+	return _u
+}
+
+// RemoveInvitationEmployees removes "invitation_employees" edges to InvitationEmployee entities.
+func (_u *TenantUpdate) RemoveInvitationEmployees(v ...*InvitationEmployee) *TenantUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveInvitationEmployeeIDs(ids...)
 }
 
 // ClearEmployees clears all "employees" edges to the Employee entity.
@@ -146,20 +201,20 @@ func (_u *TenantUpdate) RemoveEmployees(v ...*Employee) *TenantUpdate {
 	return _u.RemoveEmployeeIDs(ids...)
 }
 
-// ClearBranchs clears all "branchs" edges to the Branch entity.
-func (_u *TenantUpdate) ClearBranchs() *TenantUpdate {
-	_u.mutation.ClearBranchs()
+// ClearBranches clears all "branches" edges to the Branch entity.
+func (_u *TenantUpdate) ClearBranches() *TenantUpdate {
+	_u.mutation.ClearBranches()
 	return _u
 }
 
-// RemoveBranchIDs removes the "branchs" edge to Branch entities by IDs.
+// RemoveBranchIDs removes the "branches" edge to Branch entities by IDs.
 func (_u *TenantUpdate) RemoveBranchIDs(ids ...int) *TenantUpdate {
 	_u.mutation.RemoveBranchIDs(ids...)
 	return _u
 }
 
-// RemoveBranchs removes "branchs" edges to Branch entities.
-func (_u *TenantUpdate) RemoveBranchs(v ...*Branch) *TenantUpdate {
+// RemoveBranches removes "branches" edges to Branch entities.
+func (_u *TenantUpdate) RemoveBranches(v ...*Branch) *TenantUpdate {
 	ids := make([]int, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
@@ -201,6 +256,9 @@ func (_u *TenantUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Tenant.name": %w`, err)}
 		}
 	}
+	if _u.mutation.OwnerCleared() && len(_u.mutation.OwnerIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "Tenant.owner"`)
+	}
 	return nil
 }
 
@@ -225,6 +283,35 @@ func (_u *TenantUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if _u.mutation.EndSuscriptionCleared() {
 		_spec.ClearField(tenant.FieldEndSuscription, field.TypeTime)
 	}
+	if _u.mutation.OwnerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   tenant.OwnerTable,
+			Columns: []string{tenant.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.OwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   tenant.OwnerTable,
+			Columns: []string{tenant.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _u.mutation.PlanCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -247,6 +334,51 @@ func (_u *TenantUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(plan.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.InvitationEmployeesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   tenant.InvitationEmployeesTable,
+			Columns: []string{tenant.InvitationEmployeesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitationemployee.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedInvitationEmployeesIDs(); len(nodes) > 0 && !_u.mutation.InvitationEmployeesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   tenant.InvitationEmployeesTable,
+			Columns: []string{tenant.InvitationEmployeesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitationemployee.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.InvitationEmployeesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   tenant.InvitationEmployeesTable,
+			Columns: []string{tenant.InvitationEmployeesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitationemployee.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -299,12 +431,12 @@ func (_u *TenantUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if _u.mutation.BranchsCleared() {
+	if _u.mutation.BranchesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   tenant.BranchsTable,
-			Columns: []string{tenant.BranchsColumn},
+			Table:   tenant.BranchesTable,
+			Columns: []string{tenant.BranchesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(branch.FieldID, field.TypeInt),
@@ -312,12 +444,12 @@ func (_u *TenantUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := _u.mutation.RemovedBranchsIDs(); len(nodes) > 0 && !_u.mutation.BranchsCleared() {
+	if nodes := _u.mutation.RemovedBranchesIDs(); len(nodes) > 0 && !_u.mutation.BranchesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   tenant.BranchsTable,
-			Columns: []string{tenant.BranchsColumn},
+			Table:   tenant.BranchesTable,
+			Columns: []string{tenant.BranchesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(branch.FieldID, field.TypeInt),
@@ -328,12 +460,12 @@ func (_u *TenantUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := _u.mutation.BranchsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.BranchesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   tenant.BranchsTable,
-			Columns: []string{tenant.BranchsColumn},
+			Table:   tenant.BranchesTable,
+			Columns: []string{tenant.BranchesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(branch.FieldID, field.TypeInt),
@@ -398,6 +530,17 @@ func (_u *TenantUpdateOne) ClearEndSuscription() *TenantUpdateOne {
 	return _u
 }
 
+// SetOwnerID sets the "owner" edge to the User entity by ID.
+func (_u *TenantUpdateOne) SetOwnerID(id int) *TenantUpdateOne {
+	_u.mutation.SetOwnerID(id)
+	return _u
+}
+
+// SetOwner sets the "owner" edge to the User entity.
+func (_u *TenantUpdateOne) SetOwner(v *User) *TenantUpdateOne {
+	return _u.SetOwnerID(v.ID)
+}
+
 // SetPlanID sets the "plan" edge to the Plan entity by ID.
 func (_u *TenantUpdateOne) SetPlanID(id int) *TenantUpdateOne {
 	_u.mutation.SetPlanID(id)
@@ -417,6 +560,21 @@ func (_u *TenantUpdateOne) SetPlan(v *Plan) *TenantUpdateOne {
 	return _u.SetPlanID(v.ID)
 }
 
+// AddInvitationEmployeeIDs adds the "invitation_employees" edge to the InvitationEmployee entity by IDs.
+func (_u *TenantUpdateOne) AddInvitationEmployeeIDs(ids ...int) *TenantUpdateOne {
+	_u.mutation.AddInvitationEmployeeIDs(ids...)
+	return _u
+}
+
+// AddInvitationEmployees adds the "invitation_employees" edges to the InvitationEmployee entity.
+func (_u *TenantUpdateOne) AddInvitationEmployees(v ...*InvitationEmployee) *TenantUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddInvitationEmployeeIDs(ids...)
+}
+
 // AddEmployeeIDs adds the "employees" edge to the Employee entity by IDs.
 func (_u *TenantUpdateOne) AddEmployeeIDs(ids ...int) *TenantUpdateOne {
 	_u.mutation.AddEmployeeIDs(ids...)
@@ -432,14 +590,14 @@ func (_u *TenantUpdateOne) AddEmployees(v ...*Employee) *TenantUpdateOne {
 	return _u.AddEmployeeIDs(ids...)
 }
 
-// AddBranchIDs adds the "branchs" edge to the Branch entity by IDs.
+// AddBranchIDs adds the "branches" edge to the Branch entity by IDs.
 func (_u *TenantUpdateOne) AddBranchIDs(ids ...int) *TenantUpdateOne {
 	_u.mutation.AddBranchIDs(ids...)
 	return _u
 }
 
-// AddBranchs adds the "branchs" edges to the Branch entity.
-func (_u *TenantUpdateOne) AddBranchs(v ...*Branch) *TenantUpdateOne {
+// AddBranches adds the "branches" edges to the Branch entity.
+func (_u *TenantUpdateOne) AddBranches(v ...*Branch) *TenantUpdateOne {
 	ids := make([]int, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
@@ -452,10 +610,37 @@ func (_u *TenantUpdateOne) Mutation() *TenantMutation {
 	return _u.mutation
 }
 
+// ClearOwner clears the "owner" edge to the User entity.
+func (_u *TenantUpdateOne) ClearOwner() *TenantUpdateOne {
+	_u.mutation.ClearOwner()
+	return _u
+}
+
 // ClearPlan clears the "plan" edge to the Plan entity.
 func (_u *TenantUpdateOne) ClearPlan() *TenantUpdateOne {
 	_u.mutation.ClearPlan()
 	return _u
+}
+
+// ClearInvitationEmployees clears all "invitation_employees" edges to the InvitationEmployee entity.
+func (_u *TenantUpdateOne) ClearInvitationEmployees() *TenantUpdateOne {
+	_u.mutation.ClearInvitationEmployees()
+	return _u
+}
+
+// RemoveInvitationEmployeeIDs removes the "invitation_employees" edge to InvitationEmployee entities by IDs.
+func (_u *TenantUpdateOne) RemoveInvitationEmployeeIDs(ids ...int) *TenantUpdateOne {
+	_u.mutation.RemoveInvitationEmployeeIDs(ids...)
+	return _u
+}
+
+// RemoveInvitationEmployees removes "invitation_employees" edges to InvitationEmployee entities.
+func (_u *TenantUpdateOne) RemoveInvitationEmployees(v ...*InvitationEmployee) *TenantUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveInvitationEmployeeIDs(ids...)
 }
 
 // ClearEmployees clears all "employees" edges to the Employee entity.
@@ -479,20 +664,20 @@ func (_u *TenantUpdateOne) RemoveEmployees(v ...*Employee) *TenantUpdateOne {
 	return _u.RemoveEmployeeIDs(ids...)
 }
 
-// ClearBranchs clears all "branchs" edges to the Branch entity.
-func (_u *TenantUpdateOne) ClearBranchs() *TenantUpdateOne {
-	_u.mutation.ClearBranchs()
+// ClearBranches clears all "branches" edges to the Branch entity.
+func (_u *TenantUpdateOne) ClearBranches() *TenantUpdateOne {
+	_u.mutation.ClearBranches()
 	return _u
 }
 
-// RemoveBranchIDs removes the "branchs" edge to Branch entities by IDs.
+// RemoveBranchIDs removes the "branches" edge to Branch entities by IDs.
 func (_u *TenantUpdateOne) RemoveBranchIDs(ids ...int) *TenantUpdateOne {
 	_u.mutation.RemoveBranchIDs(ids...)
 	return _u
 }
 
-// RemoveBranchs removes "branchs" edges to Branch entities.
-func (_u *TenantUpdateOne) RemoveBranchs(v ...*Branch) *TenantUpdateOne {
+// RemoveBranches removes "branches" edges to Branch entities.
+func (_u *TenantUpdateOne) RemoveBranches(v ...*Branch) *TenantUpdateOne {
 	ids := make([]int, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
@@ -547,6 +732,9 @@ func (_u *TenantUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Tenant.name": %w`, err)}
 		}
 	}
+	if _u.mutation.OwnerCleared() && len(_u.mutation.OwnerIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "Tenant.owner"`)
+	}
 	return nil
 }
 
@@ -588,6 +776,35 @@ func (_u *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err erro
 	if _u.mutation.EndSuscriptionCleared() {
 		_spec.ClearField(tenant.FieldEndSuscription, field.TypeTime)
 	}
+	if _u.mutation.OwnerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   tenant.OwnerTable,
+			Columns: []string{tenant.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.OwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   tenant.OwnerTable,
+			Columns: []string{tenant.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _u.mutation.PlanCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -610,6 +827,51 @@ func (_u *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err erro
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(plan.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.InvitationEmployeesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   tenant.InvitationEmployeesTable,
+			Columns: []string{tenant.InvitationEmployeesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitationemployee.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedInvitationEmployeesIDs(); len(nodes) > 0 && !_u.mutation.InvitationEmployeesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   tenant.InvitationEmployeesTable,
+			Columns: []string{tenant.InvitationEmployeesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitationemployee.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.InvitationEmployeesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   tenant.InvitationEmployeesTable,
+			Columns: []string{tenant.InvitationEmployeesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitationemployee.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -662,12 +924,12 @@ func (_u *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err erro
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if _u.mutation.BranchsCleared() {
+	if _u.mutation.BranchesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   tenant.BranchsTable,
-			Columns: []string{tenant.BranchsColumn},
+			Table:   tenant.BranchesTable,
+			Columns: []string{tenant.BranchesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(branch.FieldID, field.TypeInt),
@@ -675,12 +937,12 @@ func (_u *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err erro
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := _u.mutation.RemovedBranchsIDs(); len(nodes) > 0 && !_u.mutation.BranchsCleared() {
+	if nodes := _u.mutation.RemovedBranchesIDs(); len(nodes) > 0 && !_u.mutation.BranchesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   tenant.BranchsTable,
-			Columns: []string{tenant.BranchsColumn},
+			Table:   tenant.BranchesTable,
+			Columns: []string{tenant.BranchesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(branch.FieldID, field.TypeInt),
@@ -691,12 +953,12 @@ func (_u *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err erro
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := _u.mutation.BranchsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.BranchesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   tenant.BranchsTable,
-			Columns: []string{tenant.BranchsColumn},
+			Table:   tenant.BranchesTable,
+			Columns: []string{tenant.BranchesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(branch.FieldID, field.TypeInt),

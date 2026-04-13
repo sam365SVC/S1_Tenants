@@ -4,6 +4,7 @@ package ent
 
 import (
 	"fmt"
+	"saas_identidad/ent/tenant"
 	"saas_identidad/ent/user"
 	"strings"
 	"time"
@@ -37,9 +38,11 @@ type User struct {
 type UserEdges struct {
 	// Emails holds the value of the emails edge.
 	Emails []*Email `json:"emails,omitempty"`
+	// Organization holds the value of the organization edge.
+	Organization *Tenant `json:"organization,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // EmailsOrErr returns the Emails value or an error if the edge
@@ -49,6 +52,17 @@ func (e UserEdges) EmailsOrErr() ([]*Email, error) {
 		return e.Emails, nil
 	}
 	return nil, &NotLoadedError{edge: "emails"}
+}
+
+// OrganizationOrErr returns the Organization value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e UserEdges) OrganizationOrErr() (*Tenant, error) {
+	if e.Organization != nil {
+		return e.Organization, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: tenant.Label}
+	}
+	return nil, &NotLoadedError{edge: "organization"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -129,6 +143,11 @@ func (_m *User) Value(name string) (ent.Value, error) {
 // QueryEmails queries the "emails" edge of the User entity.
 func (_m *User) QueryEmails() *EmailQuery {
 	return NewUserClient(_m.config).QueryEmails(_m)
+}
+
+// QueryOrganization queries the "organization" edge of the User entity.
+func (_m *User) QueryOrganization() *TenantQuery {
+	return NewUserClient(_m.config).QueryOrganization(_m)
 }
 
 // Update returns a builder for updating this User.

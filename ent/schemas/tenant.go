@@ -21,8 +21,10 @@ func (Tenant) Fields()[]ent.Field{
 }
 func (Tenant)Edges()[]ent.Edge  {
 	return []ent.Edge{
+		edge.From("owner",User.Type).Ref("organization").Unique().Required(),
 		edge.From("plan",Plan.Type).Ref("tenants").Unique(),
+		edge.To("invitation_employees",InvitationEmployee.Type),
 		edge.To("employees",Employee.Type),
-		edge.To("branchs",Branch.Type),
+		edge.To("branches",Branch.Type),
 	}
 }

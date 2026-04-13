@@ -10,6 +10,7 @@ import (
 	"saas_identidad/ent/email"
 	"saas_identidad/ent/employee"
 	"saas_identidad/ent/invitation"
+	"saas_identidad/ent/invitationemployee"
 	"saas_identidad/ent/plan"
 	"saas_identidad/ent/predicate"
 	"saas_identidad/ent/tenant"
@@ -30,13 +31,14 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeBranch     = "Branch"
-	TypeEmail      = "Email"
-	TypeEmployee   = "Employee"
-	TypeInvitation = "Invitation"
-	TypePlan       = "Plan"
-	TypeTenant     = "Tenant"
-	TypeUser       = "User"
+	TypeBranch             = "Branch"
+	TypeEmail              = "Email"
+	TypeEmployee           = "Employee"
+	TypeInvitation         = "Invitation"
+	TypeInvitationEmployee = "InvitationEmployee"
+	TypePlan               = "Plan"
+	TypeTenant             = "Tenant"
+	TypeUser               = "User"
 )
 
 // BranchMutation represents an operation that mutates the Branch nodes in the graph.
@@ -1706,24 +1708,24 @@ func (m *EmailMutation) ResetEdge(name string) error {
 // EmployeeMutation represents an operation that mutates the Employee nodes in the graph.
 type EmployeeMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	area          *employee.Area
-	position      *string
-	active        *bool
-	join_at       *time.Time
-	left_at       *time.Time
-	clearedFields map[string]struct{}
-	emails        *int
-	clearedemails bool
-	tenant        *int
-	clearedtenant bool
-	branch        *int
-	clearedbranch bool
-	done          bool
-	oldValue      func(context.Context) (*Employee, error)
-	predicates    []predicate.Employee
+	op              Op
+	typ             string
+	id              *int
+	department      *employee.Department
+	position        *string
+	active          *bool
+	join_at         *time.Time
+	left_at         *time.Time
+	clearedFields   map[string]struct{}
+	emails          *int
+	clearedemails   bool
+	tenant          *int
+	clearedtenant   bool
+	branches        *int
+	clearedbranches bool
+	done            bool
+	oldValue        func(context.Context) (*Employee, error)
+	predicates      []predicate.Employee
 }
 
 var _ ent.Mutation = (*EmployeeMutation)(nil)
@@ -1824,40 +1826,40 @@ func (m *EmployeeMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
-// SetArea sets the "area" field.
-func (m *EmployeeMutation) SetArea(e employee.Area) {
-	m.area = &e
+// SetDepartment sets the "department" field.
+func (m *EmployeeMutation) SetDepartment(e employee.Department) {
+	m.department = &e
 }
 
-// Area returns the value of the "area" field in the mutation.
-func (m *EmployeeMutation) Area() (r employee.Area, exists bool) {
-	v := m.area
+// Department returns the value of the "department" field in the mutation.
+func (m *EmployeeMutation) Department() (r employee.Department, exists bool) {
+	v := m.department
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldArea returns the old "area" field's value of the Employee entity.
+// OldDepartment returns the old "department" field's value of the Employee entity.
 // If the Employee object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EmployeeMutation) OldArea(ctx context.Context) (v employee.Area, err error) {
+func (m *EmployeeMutation) OldDepartment(ctx context.Context) (v employee.Department, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldArea is only allowed on UpdateOne operations")
+		return v, errors.New("OldDepartment is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldArea requires an ID field in the mutation")
+		return v, errors.New("OldDepartment requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldArea: %w", err)
+		return v, fmt.Errorf("querying old value for OldDepartment: %w", err)
 	}
-	return oldValue.Area, nil
+	return oldValue.Department, nil
 }
 
-// ResetArea resets all changes to the "area" field.
-func (m *EmployeeMutation) ResetArea() {
-	m.area = nil
+// ResetDepartment resets all changes to the "department" field.
+func (m *EmployeeMutation) ResetDepartment() {
+	m.department = nil
 }
 
 // SetPosition sets the "position" field.
@@ -2095,43 +2097,43 @@ func (m *EmployeeMutation) ResetTenant() {
 	m.clearedtenant = false
 }
 
-// SetBranchID sets the "branch" edge to the Branch entity by id.
-func (m *EmployeeMutation) SetBranchID(id int) {
-	m.branch = &id
+// SetBranchesID sets the "branches" edge to the Branch entity by id.
+func (m *EmployeeMutation) SetBranchesID(id int) {
+	m.branches = &id
 }
 
-// ClearBranch clears the "branch" edge to the Branch entity.
-func (m *EmployeeMutation) ClearBranch() {
-	m.clearedbranch = true
+// ClearBranches clears the "branches" edge to the Branch entity.
+func (m *EmployeeMutation) ClearBranches() {
+	m.clearedbranches = true
 }
 
-// BranchCleared reports if the "branch" edge to the Branch entity was cleared.
-func (m *EmployeeMutation) BranchCleared() bool {
-	return m.clearedbranch
+// BranchesCleared reports if the "branches" edge to the Branch entity was cleared.
+func (m *EmployeeMutation) BranchesCleared() bool {
+	return m.clearedbranches
 }
 
-// BranchID returns the "branch" edge ID in the mutation.
-func (m *EmployeeMutation) BranchID() (id int, exists bool) {
-	if m.branch != nil {
-		return *m.branch, true
+// BranchesID returns the "branches" edge ID in the mutation.
+func (m *EmployeeMutation) BranchesID() (id int, exists bool) {
+	if m.branches != nil {
+		return *m.branches, true
 	}
 	return
 }
 
-// BranchIDs returns the "branch" edge IDs in the mutation.
+// BranchesIDs returns the "branches" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// BranchID instead. It exists only for internal usage by the builders.
-func (m *EmployeeMutation) BranchIDs() (ids []int) {
-	if id := m.branch; id != nil {
+// BranchesID instead. It exists only for internal usage by the builders.
+func (m *EmployeeMutation) BranchesIDs() (ids []int) {
+	if id := m.branches; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetBranch resets all changes to the "branch" edge.
-func (m *EmployeeMutation) ResetBranch() {
-	m.branch = nil
-	m.clearedbranch = false
+// ResetBranches resets all changes to the "branches" edge.
+func (m *EmployeeMutation) ResetBranches() {
+	m.branches = nil
+	m.clearedbranches = false
 }
 
 // Where appends a list predicates to the EmployeeMutation builder.
@@ -2169,8 +2171,8 @@ func (m *EmployeeMutation) Type() string {
 // AddedFields().
 func (m *EmployeeMutation) Fields() []string {
 	fields := make([]string, 0, 5)
-	if m.area != nil {
-		fields = append(fields, employee.FieldArea)
+	if m.department != nil {
+		fields = append(fields, employee.FieldDepartment)
 	}
 	if m.position != nil {
 		fields = append(fields, employee.FieldPosition)
@@ -2192,8 +2194,8 @@ func (m *EmployeeMutation) Fields() []string {
 // schema.
 func (m *EmployeeMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case employee.FieldArea:
-		return m.Area()
+	case employee.FieldDepartment:
+		return m.Department()
 	case employee.FieldPosition:
 		return m.Position()
 	case employee.FieldActive:
@@ -2211,8 +2213,8 @@ func (m *EmployeeMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *EmployeeMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case employee.FieldArea:
-		return m.OldArea(ctx)
+	case employee.FieldDepartment:
+		return m.OldDepartment(ctx)
 	case employee.FieldPosition:
 		return m.OldPosition(ctx)
 	case employee.FieldActive:
@@ -2230,12 +2232,12 @@ func (m *EmployeeMutation) OldField(ctx context.Context, name string) (ent.Value
 // type.
 func (m *EmployeeMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case employee.FieldArea:
-		v, ok := value.(employee.Area)
+	case employee.FieldDepartment:
+		v, ok := value.(employee.Department)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetArea(v)
+		m.SetDepartment(v)
 		return nil
 	case employee.FieldPosition:
 		v, ok := value.(string)
@@ -2323,8 +2325,8 @@ func (m *EmployeeMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *EmployeeMutation) ResetField(name string) error {
 	switch name {
-	case employee.FieldArea:
-		m.ResetArea()
+	case employee.FieldDepartment:
+		m.ResetDepartment()
 		return nil
 	case employee.FieldPosition:
 		m.ResetPosition()
@@ -2351,8 +2353,8 @@ func (m *EmployeeMutation) AddedEdges() []string {
 	if m.tenant != nil {
 		edges = append(edges, employee.EdgeTenant)
 	}
-	if m.branch != nil {
-		edges = append(edges, employee.EdgeBranch)
+	if m.branches != nil {
+		edges = append(edges, employee.EdgeBranches)
 	}
 	return edges
 }
@@ -2369,8 +2371,8 @@ func (m *EmployeeMutation) AddedIDs(name string) []ent.Value {
 		if id := m.tenant; id != nil {
 			return []ent.Value{*id}
 		}
-	case employee.EdgeBranch:
-		if id := m.branch; id != nil {
+	case employee.EdgeBranches:
+		if id := m.branches; id != nil {
 			return []ent.Value{*id}
 		}
 	}
@@ -2398,8 +2400,8 @@ func (m *EmployeeMutation) ClearedEdges() []string {
 	if m.clearedtenant {
 		edges = append(edges, employee.EdgeTenant)
 	}
-	if m.clearedbranch {
-		edges = append(edges, employee.EdgeBranch)
+	if m.clearedbranches {
+		edges = append(edges, employee.EdgeBranches)
 	}
 	return edges
 }
@@ -2412,8 +2414,8 @@ func (m *EmployeeMutation) EdgeCleared(name string) bool {
 		return m.clearedemails
 	case employee.EdgeTenant:
 		return m.clearedtenant
-	case employee.EdgeBranch:
-		return m.clearedbranch
+	case employee.EdgeBranches:
+		return m.clearedbranches
 	}
 	return false
 }
@@ -2428,8 +2430,8 @@ func (m *EmployeeMutation) ClearEdge(name string) error {
 	case employee.EdgeTenant:
 		m.ClearTenant()
 		return nil
-	case employee.EdgeBranch:
-		m.ClearBranch()
+	case employee.EdgeBranches:
+		m.ClearBranches()
 		return nil
 	}
 	return fmt.Errorf("unknown Employee unique edge %s", name)
@@ -2445,8 +2447,8 @@ func (m *EmployeeMutation) ResetEdge(name string) error {
 	case employee.EdgeTenant:
 		m.ResetTenant()
 		return nil
-	case employee.EdgeBranch:
-		m.ResetBranch()
+	case employee.EdgeBranches:
+		m.ResetBranches()
 		return nil
 	}
 	return fmt.Errorf("unknown Employee edge %s", name)
@@ -2455,17 +2457,19 @@ func (m *EmployeeMutation) ResetEdge(name string) error {
 // InvitationMutation represents an operation that mutates the Invitation nodes in the graph.
 type InvitationMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	email         *string
-	token         *string
-	account       *invitation.Account
-	expire_at     *time.Time
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*Invitation, error)
-	predicates    []predicate.Invitation
+	op                         Op
+	typ                        string
+	id                         *int
+	email                      *string
+	token                      *string
+	account                    *invitation.Account
+	expire_at                  *time.Time
+	clearedFields              map[string]struct{}
+	invitation_employee        *int
+	clearedinvitation_employee bool
+	done                       bool
+	oldValue                   func(context.Context) (*Invitation, error)
+	predicates                 []predicate.Invitation
 }
 
 var _ ent.Mutation = (*InvitationMutation)(nil)
@@ -2710,6 +2714,45 @@ func (m *InvitationMutation) ResetExpireAt() {
 	m.expire_at = nil
 }
 
+// SetInvitationEmployeeID sets the "invitation_employee" edge to the InvitationEmployee entity by id.
+func (m *InvitationMutation) SetInvitationEmployeeID(id int) {
+	m.invitation_employee = &id
+}
+
+// ClearInvitationEmployee clears the "invitation_employee" edge to the InvitationEmployee entity.
+func (m *InvitationMutation) ClearInvitationEmployee() {
+	m.clearedinvitation_employee = true
+}
+
+// InvitationEmployeeCleared reports if the "invitation_employee" edge to the InvitationEmployee entity was cleared.
+func (m *InvitationMutation) InvitationEmployeeCleared() bool {
+	return m.clearedinvitation_employee
+}
+
+// InvitationEmployeeID returns the "invitation_employee" edge ID in the mutation.
+func (m *InvitationMutation) InvitationEmployeeID() (id int, exists bool) {
+	if m.invitation_employee != nil {
+		return *m.invitation_employee, true
+	}
+	return
+}
+
+// InvitationEmployeeIDs returns the "invitation_employee" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// InvitationEmployeeID instead. It exists only for internal usage by the builders.
+func (m *InvitationMutation) InvitationEmployeeIDs() (ids []int) {
+	if id := m.invitation_employee; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetInvitationEmployee resets all changes to the "invitation_employee" edge.
+func (m *InvitationMutation) ResetInvitationEmployee() {
+	m.invitation_employee = nil
+	m.clearedinvitation_employee = false
+}
+
 // Where appends a list predicates to the InvitationMutation builder.
 func (m *InvitationMutation) Where(ps ...predicate.Invitation) {
 	m.predicates = append(m.predicates, ps...)
@@ -2894,19 +2937,28 @@ func (m *InvitationMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *InvitationMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.invitation_employee != nil {
+		edges = append(edges, invitation.EdgeInvitationEmployee)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *InvitationMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case invitation.EdgeInvitationEmployee:
+		if id := m.invitation_employee; id != nil {
+			return []ent.Value{*id}
+		}
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *InvitationMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
 	return edges
 }
 
@@ -2918,26 +2970,549 @@ func (m *InvitationMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *InvitationMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedinvitation_employee {
+		edges = append(edges, invitation.EdgeInvitationEmployee)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *InvitationMutation) EdgeCleared(name string) bool {
+	switch name {
+	case invitation.EdgeInvitationEmployee:
+		return m.clearedinvitation_employee
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *InvitationMutation) ClearEdge(name string) error {
+	switch name {
+	case invitation.EdgeInvitationEmployee:
+		m.ClearInvitationEmployee()
+		return nil
+	}
 	return fmt.Errorf("unknown Invitation unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *InvitationMutation) ResetEdge(name string) error {
+	switch name {
+	case invitation.EdgeInvitationEmployee:
+		m.ResetInvitationEmployee()
+		return nil
+	}
 	return fmt.Errorf("unknown Invitation edge %s", name)
+}
+
+// InvitationEmployeeMutation represents an operation that mutates the InvitationEmployee nodes in the graph.
+type InvitationEmployeeMutation struct {
+	config
+	op                Op
+	typ               string
+	id                *int
+	department        *string
+	position          *string
+	clearedFields     map[string]struct{}
+	invitation        *int
+	clearedinvitation bool
+	tenant            *int
+	clearedtenant     bool
+	done              bool
+	oldValue          func(context.Context) (*InvitationEmployee, error)
+	predicates        []predicate.InvitationEmployee
+}
+
+var _ ent.Mutation = (*InvitationEmployeeMutation)(nil)
+
+// invitationemployeeOption allows management of the mutation configuration using functional options.
+type invitationemployeeOption func(*InvitationEmployeeMutation)
+
+// newInvitationEmployeeMutation creates new mutation for the InvitationEmployee entity.
+func newInvitationEmployeeMutation(c config, op Op, opts ...invitationemployeeOption) *InvitationEmployeeMutation {
+	m := &InvitationEmployeeMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeInvitationEmployee,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withInvitationEmployeeID sets the ID field of the mutation.
+func withInvitationEmployeeID(id int) invitationemployeeOption {
+	return func(m *InvitationEmployeeMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *InvitationEmployee
+		)
+		m.oldValue = func(ctx context.Context) (*InvitationEmployee, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().InvitationEmployee.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withInvitationEmployee sets the old InvitationEmployee of the mutation.
+func withInvitationEmployee(node *InvitationEmployee) invitationemployeeOption {
+	return func(m *InvitationEmployeeMutation) {
+		m.oldValue = func(context.Context) (*InvitationEmployee, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m InvitationEmployeeMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m InvitationEmployeeMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *InvitationEmployeeMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *InvitationEmployeeMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().InvitationEmployee.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetDepartment sets the "department" field.
+func (m *InvitationEmployeeMutation) SetDepartment(s string) {
+	m.department = &s
+}
+
+// Department returns the value of the "department" field in the mutation.
+func (m *InvitationEmployeeMutation) Department() (r string, exists bool) {
+	v := m.department
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDepartment returns the old "department" field's value of the InvitationEmployee entity.
+// If the InvitationEmployee object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *InvitationEmployeeMutation) OldDepartment(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDepartment is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDepartment requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDepartment: %w", err)
+	}
+	return oldValue.Department, nil
+}
+
+// ResetDepartment resets all changes to the "department" field.
+func (m *InvitationEmployeeMutation) ResetDepartment() {
+	m.department = nil
+}
+
+// SetPosition sets the "position" field.
+func (m *InvitationEmployeeMutation) SetPosition(s string) {
+	m.position = &s
+}
+
+// Position returns the value of the "position" field in the mutation.
+func (m *InvitationEmployeeMutation) Position() (r string, exists bool) {
+	v := m.position
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPosition returns the old "position" field's value of the InvitationEmployee entity.
+// If the InvitationEmployee object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *InvitationEmployeeMutation) OldPosition(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPosition is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPosition requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPosition: %w", err)
+	}
+	return oldValue.Position, nil
+}
+
+// ResetPosition resets all changes to the "position" field.
+func (m *InvitationEmployeeMutation) ResetPosition() {
+	m.position = nil
+}
+
+// SetInvitationID sets the "invitation" edge to the Invitation entity by id.
+func (m *InvitationEmployeeMutation) SetInvitationID(id int) {
+	m.invitation = &id
+}
+
+// ClearInvitation clears the "invitation" edge to the Invitation entity.
+func (m *InvitationEmployeeMutation) ClearInvitation() {
+	m.clearedinvitation = true
+}
+
+// InvitationCleared reports if the "invitation" edge to the Invitation entity was cleared.
+func (m *InvitationEmployeeMutation) InvitationCleared() bool {
+	return m.clearedinvitation
+}
+
+// InvitationID returns the "invitation" edge ID in the mutation.
+func (m *InvitationEmployeeMutation) InvitationID() (id int, exists bool) {
+	if m.invitation != nil {
+		return *m.invitation, true
+	}
+	return
+}
+
+// InvitationIDs returns the "invitation" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// InvitationID instead. It exists only for internal usage by the builders.
+func (m *InvitationEmployeeMutation) InvitationIDs() (ids []int) {
+	if id := m.invitation; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetInvitation resets all changes to the "invitation" edge.
+func (m *InvitationEmployeeMutation) ResetInvitation() {
+	m.invitation = nil
+	m.clearedinvitation = false
+}
+
+// SetTenantID sets the "tenant" edge to the Tenant entity by id.
+func (m *InvitationEmployeeMutation) SetTenantID(id int) {
+	m.tenant = &id
+}
+
+// ClearTenant clears the "tenant" edge to the Tenant entity.
+func (m *InvitationEmployeeMutation) ClearTenant() {
+	m.clearedtenant = true
+}
+
+// TenantCleared reports if the "tenant" edge to the Tenant entity was cleared.
+func (m *InvitationEmployeeMutation) TenantCleared() bool {
+	return m.clearedtenant
+}
+
+// TenantID returns the "tenant" edge ID in the mutation.
+func (m *InvitationEmployeeMutation) TenantID() (id int, exists bool) {
+	if m.tenant != nil {
+		return *m.tenant, true
+	}
+	return
+}
+
+// TenantIDs returns the "tenant" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// TenantID instead. It exists only for internal usage by the builders.
+func (m *InvitationEmployeeMutation) TenantIDs() (ids []int) {
+	if id := m.tenant; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetTenant resets all changes to the "tenant" edge.
+func (m *InvitationEmployeeMutation) ResetTenant() {
+	m.tenant = nil
+	m.clearedtenant = false
+}
+
+// Where appends a list predicates to the InvitationEmployeeMutation builder.
+func (m *InvitationEmployeeMutation) Where(ps ...predicate.InvitationEmployee) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the InvitationEmployeeMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *InvitationEmployeeMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.InvitationEmployee, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *InvitationEmployeeMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *InvitationEmployeeMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (InvitationEmployee).
+func (m *InvitationEmployeeMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *InvitationEmployeeMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m.department != nil {
+		fields = append(fields, invitationemployee.FieldDepartment)
+	}
+	if m.position != nil {
+		fields = append(fields, invitationemployee.FieldPosition)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *InvitationEmployeeMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case invitationemployee.FieldDepartment:
+		return m.Department()
+	case invitationemployee.FieldPosition:
+		return m.Position()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *InvitationEmployeeMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case invitationemployee.FieldDepartment:
+		return m.OldDepartment(ctx)
+	case invitationemployee.FieldPosition:
+		return m.OldPosition(ctx)
+	}
+	return nil, fmt.Errorf("unknown InvitationEmployee field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *InvitationEmployeeMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case invitationemployee.FieldDepartment:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDepartment(v)
+		return nil
+	case invitationemployee.FieldPosition:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPosition(v)
+		return nil
+	}
+	return fmt.Errorf("unknown InvitationEmployee field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *InvitationEmployeeMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *InvitationEmployeeMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *InvitationEmployeeMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown InvitationEmployee numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *InvitationEmployeeMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *InvitationEmployeeMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *InvitationEmployeeMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown InvitationEmployee nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *InvitationEmployeeMutation) ResetField(name string) error {
+	switch name {
+	case invitationemployee.FieldDepartment:
+		m.ResetDepartment()
+		return nil
+	case invitationemployee.FieldPosition:
+		m.ResetPosition()
+		return nil
+	}
+	return fmt.Errorf("unknown InvitationEmployee field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *InvitationEmployeeMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.invitation != nil {
+		edges = append(edges, invitationemployee.EdgeInvitation)
+	}
+	if m.tenant != nil {
+		edges = append(edges, invitationemployee.EdgeTenant)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *InvitationEmployeeMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case invitationemployee.EdgeInvitation:
+		if id := m.invitation; id != nil {
+			return []ent.Value{*id}
+		}
+	case invitationemployee.EdgeTenant:
+		if id := m.tenant; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *InvitationEmployeeMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *InvitationEmployeeMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *InvitationEmployeeMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedinvitation {
+		edges = append(edges, invitationemployee.EdgeInvitation)
+	}
+	if m.clearedtenant {
+		edges = append(edges, invitationemployee.EdgeTenant)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *InvitationEmployeeMutation) EdgeCleared(name string) bool {
+	switch name {
+	case invitationemployee.EdgeInvitation:
+		return m.clearedinvitation
+	case invitationemployee.EdgeTenant:
+		return m.clearedtenant
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *InvitationEmployeeMutation) ClearEdge(name string) error {
+	switch name {
+	case invitationemployee.EdgeInvitation:
+		m.ClearInvitation()
+		return nil
+	case invitationemployee.EdgeTenant:
+		m.ClearTenant()
+		return nil
+	}
+	return fmt.Errorf("unknown InvitationEmployee unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *InvitationEmployeeMutation) ResetEdge(name string) error {
+	switch name {
+	case invitationemployee.EdgeInvitation:
+		m.ResetInvitation()
+		return nil
+	case invitationemployee.EdgeTenant:
+		m.ResetTenant()
+		return nil
+	}
+	return fmt.Errorf("unknown InvitationEmployee edge %s", name)
 }
 
 // PlanMutation represents an operation that mutates the Plan nodes in the graph.
@@ -3713,23 +4288,28 @@ func (m *PlanMutation) ResetEdge(name string) error {
 // TenantMutation represents an operation that mutates the Tenant nodes in the graph.
 type TenantMutation struct {
 	config
-	op               Op
-	typ              string
-	id               *int
-	name             *string
-	end_suscription  *time.Time
-	clearedFields    map[string]struct{}
-	plan             *int
-	clearedplan      bool
-	employees        map[int]struct{}
-	removedemployees map[int]struct{}
-	clearedemployees bool
-	branchs          map[int]struct{}
-	removedbranchs   map[int]struct{}
-	clearedbranchs   bool
-	done             bool
-	oldValue         func(context.Context) (*Tenant, error)
-	predicates       []predicate.Tenant
+	op                          Op
+	typ                         string
+	id                          *int
+	name                        *string
+	end_suscription             *time.Time
+	clearedFields               map[string]struct{}
+	owner                       *int
+	clearedowner                bool
+	plan                        *int
+	clearedplan                 bool
+	invitation_employees        map[int]struct{}
+	removedinvitation_employees map[int]struct{}
+	clearedinvitation_employees bool
+	employees                   map[int]struct{}
+	removedemployees            map[int]struct{}
+	clearedemployees            bool
+	branches                    map[int]struct{}
+	removedbranches             map[int]struct{}
+	clearedbranches             bool
+	done                        bool
+	oldValue                    func(context.Context) (*Tenant, error)
+	predicates                  []predicate.Tenant
 }
 
 var _ ent.Mutation = (*TenantMutation)(nil)
@@ -3915,6 +4495,45 @@ func (m *TenantMutation) ResetEndSuscription() {
 	delete(m.clearedFields, tenant.FieldEndSuscription)
 }
 
+// SetOwnerID sets the "owner" edge to the User entity by id.
+func (m *TenantMutation) SetOwnerID(id int) {
+	m.owner = &id
+}
+
+// ClearOwner clears the "owner" edge to the User entity.
+func (m *TenantMutation) ClearOwner() {
+	m.clearedowner = true
+}
+
+// OwnerCleared reports if the "owner" edge to the User entity was cleared.
+func (m *TenantMutation) OwnerCleared() bool {
+	return m.clearedowner
+}
+
+// OwnerID returns the "owner" edge ID in the mutation.
+func (m *TenantMutation) OwnerID() (id int, exists bool) {
+	if m.owner != nil {
+		return *m.owner, true
+	}
+	return
+}
+
+// OwnerIDs returns the "owner" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// OwnerID instead. It exists only for internal usage by the builders.
+func (m *TenantMutation) OwnerIDs() (ids []int) {
+	if id := m.owner; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetOwner resets all changes to the "owner" edge.
+func (m *TenantMutation) ResetOwner() {
+	m.owner = nil
+	m.clearedowner = false
+}
+
 // SetPlanID sets the "plan" edge to the Plan entity by id.
 func (m *TenantMutation) SetPlanID(id int) {
 	m.plan = &id
@@ -3952,6 +4571,60 @@ func (m *TenantMutation) PlanIDs() (ids []int) {
 func (m *TenantMutation) ResetPlan() {
 	m.plan = nil
 	m.clearedplan = false
+}
+
+// AddInvitationEmployeeIDs adds the "invitation_employees" edge to the InvitationEmployee entity by ids.
+func (m *TenantMutation) AddInvitationEmployeeIDs(ids ...int) {
+	if m.invitation_employees == nil {
+		m.invitation_employees = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.invitation_employees[ids[i]] = struct{}{}
+	}
+}
+
+// ClearInvitationEmployees clears the "invitation_employees" edge to the InvitationEmployee entity.
+func (m *TenantMutation) ClearInvitationEmployees() {
+	m.clearedinvitation_employees = true
+}
+
+// InvitationEmployeesCleared reports if the "invitation_employees" edge to the InvitationEmployee entity was cleared.
+func (m *TenantMutation) InvitationEmployeesCleared() bool {
+	return m.clearedinvitation_employees
+}
+
+// RemoveInvitationEmployeeIDs removes the "invitation_employees" edge to the InvitationEmployee entity by IDs.
+func (m *TenantMutation) RemoveInvitationEmployeeIDs(ids ...int) {
+	if m.removedinvitation_employees == nil {
+		m.removedinvitation_employees = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.invitation_employees, ids[i])
+		m.removedinvitation_employees[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedInvitationEmployees returns the removed IDs of the "invitation_employees" edge to the InvitationEmployee entity.
+func (m *TenantMutation) RemovedInvitationEmployeesIDs() (ids []int) {
+	for id := range m.removedinvitation_employees {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// InvitationEmployeesIDs returns the "invitation_employees" edge IDs in the mutation.
+func (m *TenantMutation) InvitationEmployeesIDs() (ids []int) {
+	for id := range m.invitation_employees {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetInvitationEmployees resets all changes to the "invitation_employees" edge.
+func (m *TenantMutation) ResetInvitationEmployees() {
+	m.invitation_employees = nil
+	m.clearedinvitation_employees = false
+	m.removedinvitation_employees = nil
 }
 
 // AddEmployeeIDs adds the "employees" edge to the Employee entity by ids.
@@ -4008,58 +4681,58 @@ func (m *TenantMutation) ResetEmployees() {
 	m.removedemployees = nil
 }
 
-// AddBranchIDs adds the "branchs" edge to the Branch entity by ids.
+// AddBranchIDs adds the "branches" edge to the Branch entity by ids.
 func (m *TenantMutation) AddBranchIDs(ids ...int) {
-	if m.branchs == nil {
-		m.branchs = make(map[int]struct{})
+	if m.branches == nil {
+		m.branches = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.branchs[ids[i]] = struct{}{}
+		m.branches[ids[i]] = struct{}{}
 	}
 }
 
-// ClearBranchs clears the "branchs" edge to the Branch entity.
-func (m *TenantMutation) ClearBranchs() {
-	m.clearedbranchs = true
+// ClearBranches clears the "branches" edge to the Branch entity.
+func (m *TenantMutation) ClearBranches() {
+	m.clearedbranches = true
 }
 
-// BranchsCleared reports if the "branchs" edge to the Branch entity was cleared.
-func (m *TenantMutation) BranchsCleared() bool {
-	return m.clearedbranchs
+// BranchesCleared reports if the "branches" edge to the Branch entity was cleared.
+func (m *TenantMutation) BranchesCleared() bool {
+	return m.clearedbranches
 }
 
-// RemoveBranchIDs removes the "branchs" edge to the Branch entity by IDs.
+// RemoveBranchIDs removes the "branches" edge to the Branch entity by IDs.
 func (m *TenantMutation) RemoveBranchIDs(ids ...int) {
-	if m.removedbranchs == nil {
-		m.removedbranchs = make(map[int]struct{})
+	if m.removedbranches == nil {
+		m.removedbranches = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.branchs, ids[i])
-		m.removedbranchs[ids[i]] = struct{}{}
+		delete(m.branches, ids[i])
+		m.removedbranches[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedBranchs returns the removed IDs of the "branchs" edge to the Branch entity.
-func (m *TenantMutation) RemovedBranchsIDs() (ids []int) {
-	for id := range m.removedbranchs {
+// RemovedBranches returns the removed IDs of the "branches" edge to the Branch entity.
+func (m *TenantMutation) RemovedBranchesIDs() (ids []int) {
+	for id := range m.removedbranches {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// BranchsIDs returns the "branchs" edge IDs in the mutation.
-func (m *TenantMutation) BranchsIDs() (ids []int) {
-	for id := range m.branchs {
+// BranchesIDs returns the "branches" edge IDs in the mutation.
+func (m *TenantMutation) BranchesIDs() (ids []int) {
+	for id := range m.branches {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetBranchs resets all changes to the "branchs" edge.
-func (m *TenantMutation) ResetBranchs() {
-	m.branchs = nil
-	m.clearedbranchs = false
-	m.removedbranchs = nil
+// ResetBranches resets all changes to the "branches" edge.
+func (m *TenantMutation) ResetBranches() {
+	m.branches = nil
+	m.clearedbranches = false
+	m.removedbranches = nil
 }
 
 // Where appends a list predicates to the TenantMutation builder.
@@ -4221,15 +4894,21 @@ func (m *TenantMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *TenantMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 5)
+	if m.owner != nil {
+		edges = append(edges, tenant.EdgeOwner)
+	}
 	if m.plan != nil {
 		edges = append(edges, tenant.EdgePlan)
+	}
+	if m.invitation_employees != nil {
+		edges = append(edges, tenant.EdgeInvitationEmployees)
 	}
 	if m.employees != nil {
 		edges = append(edges, tenant.EdgeEmployees)
 	}
-	if m.branchs != nil {
-		edges = append(edges, tenant.EdgeBranchs)
+	if m.branches != nil {
+		edges = append(edges, tenant.EdgeBranches)
 	}
 	return edges
 }
@@ -4238,19 +4917,29 @@ func (m *TenantMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *TenantMutation) AddedIDs(name string) []ent.Value {
 	switch name {
+	case tenant.EdgeOwner:
+		if id := m.owner; id != nil {
+			return []ent.Value{*id}
+		}
 	case tenant.EdgePlan:
 		if id := m.plan; id != nil {
 			return []ent.Value{*id}
 		}
+	case tenant.EdgeInvitationEmployees:
+		ids := make([]ent.Value, 0, len(m.invitation_employees))
+		for id := range m.invitation_employees {
+			ids = append(ids, id)
+		}
+		return ids
 	case tenant.EdgeEmployees:
 		ids := make([]ent.Value, 0, len(m.employees))
 		for id := range m.employees {
 			ids = append(ids, id)
 		}
 		return ids
-	case tenant.EdgeBranchs:
-		ids := make([]ent.Value, 0, len(m.branchs))
-		for id := range m.branchs {
+	case tenant.EdgeBranches:
+		ids := make([]ent.Value, 0, len(m.branches))
+		for id := range m.branches {
 			ids = append(ids, id)
 		}
 		return ids
@@ -4260,12 +4949,15 @@ func (m *TenantMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *TenantMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 5)
+	if m.removedinvitation_employees != nil {
+		edges = append(edges, tenant.EdgeInvitationEmployees)
+	}
 	if m.removedemployees != nil {
 		edges = append(edges, tenant.EdgeEmployees)
 	}
-	if m.removedbranchs != nil {
-		edges = append(edges, tenant.EdgeBranchs)
+	if m.removedbranches != nil {
+		edges = append(edges, tenant.EdgeBranches)
 	}
 	return edges
 }
@@ -4274,15 +4966,21 @@ func (m *TenantMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *TenantMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
+	case tenant.EdgeInvitationEmployees:
+		ids := make([]ent.Value, 0, len(m.removedinvitation_employees))
+		for id := range m.removedinvitation_employees {
+			ids = append(ids, id)
+		}
+		return ids
 	case tenant.EdgeEmployees:
 		ids := make([]ent.Value, 0, len(m.removedemployees))
 		for id := range m.removedemployees {
 			ids = append(ids, id)
 		}
 		return ids
-	case tenant.EdgeBranchs:
-		ids := make([]ent.Value, 0, len(m.removedbranchs))
-		for id := range m.removedbranchs {
+	case tenant.EdgeBranches:
+		ids := make([]ent.Value, 0, len(m.removedbranches))
+		for id := range m.removedbranches {
 			ids = append(ids, id)
 		}
 		return ids
@@ -4292,15 +4990,21 @@ func (m *TenantMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *TenantMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 5)
+	if m.clearedowner {
+		edges = append(edges, tenant.EdgeOwner)
+	}
 	if m.clearedplan {
 		edges = append(edges, tenant.EdgePlan)
+	}
+	if m.clearedinvitation_employees {
+		edges = append(edges, tenant.EdgeInvitationEmployees)
 	}
 	if m.clearedemployees {
 		edges = append(edges, tenant.EdgeEmployees)
 	}
-	if m.clearedbranchs {
-		edges = append(edges, tenant.EdgeBranchs)
+	if m.clearedbranches {
+		edges = append(edges, tenant.EdgeBranches)
 	}
 	return edges
 }
@@ -4309,12 +5013,16 @@ func (m *TenantMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *TenantMutation) EdgeCleared(name string) bool {
 	switch name {
+	case tenant.EdgeOwner:
+		return m.clearedowner
 	case tenant.EdgePlan:
 		return m.clearedplan
+	case tenant.EdgeInvitationEmployees:
+		return m.clearedinvitation_employees
 	case tenant.EdgeEmployees:
 		return m.clearedemployees
-	case tenant.EdgeBranchs:
-		return m.clearedbranchs
+	case tenant.EdgeBranches:
+		return m.clearedbranches
 	}
 	return false
 }
@@ -4323,6 +5031,9 @@ func (m *TenantMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *TenantMutation) ClearEdge(name string) error {
 	switch name {
+	case tenant.EdgeOwner:
+		m.ClearOwner()
+		return nil
 	case tenant.EdgePlan:
 		m.ClearPlan()
 		return nil
@@ -4334,14 +5045,20 @@ func (m *TenantMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *TenantMutation) ResetEdge(name string) error {
 	switch name {
+	case tenant.EdgeOwner:
+		m.ResetOwner()
+		return nil
 	case tenant.EdgePlan:
 		m.ResetPlan()
+		return nil
+	case tenant.EdgeInvitationEmployees:
+		m.ResetInvitationEmployees()
 		return nil
 	case tenant.EdgeEmployees:
 		m.ResetEmployees()
 		return nil
-	case tenant.EdgeBranchs:
-		m.ResetBranchs()
+	case tenant.EdgeBranches:
+		m.ResetBranches()
 		return nil
 	}
 	return fmt.Errorf("unknown Tenant edge %s", name)
@@ -4350,22 +5067,24 @@ func (m *TenantMutation) ResetEdge(name string) error {
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	name          *string
-	last_name     *string
-	ci            *int
-	addci         *int
-	phone         *string
-	date_birth    *time.Time
-	clearedFields map[string]struct{}
-	emails        map[int]struct{}
-	removedemails map[int]struct{}
-	clearedemails bool
-	done          bool
-	oldValue      func(context.Context) (*User, error)
-	predicates    []predicate.User
+	op                  Op
+	typ                 string
+	id                  *int
+	name                *string
+	last_name           *string
+	ci                  *int
+	addci               *int
+	phone               *string
+	date_birth          *time.Time
+	clearedFields       map[string]struct{}
+	emails              map[int]struct{}
+	removedemails       map[int]struct{}
+	clearedemails       bool
+	organization        *int
+	clearedorganization bool
+	done                bool
+	oldValue            func(context.Context) (*User, error)
+	predicates          []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -4733,6 +5452,45 @@ func (m *UserMutation) ResetEmails() {
 	m.removedemails = nil
 }
 
+// SetOrganizationID sets the "organization" edge to the Tenant entity by id.
+func (m *UserMutation) SetOrganizationID(id int) {
+	m.organization = &id
+}
+
+// ClearOrganization clears the "organization" edge to the Tenant entity.
+func (m *UserMutation) ClearOrganization() {
+	m.clearedorganization = true
+}
+
+// OrganizationCleared reports if the "organization" edge to the Tenant entity was cleared.
+func (m *UserMutation) OrganizationCleared() bool {
+	return m.clearedorganization
+}
+
+// OrganizationID returns the "organization" edge ID in the mutation.
+func (m *UserMutation) OrganizationID() (id int, exists bool) {
+	if m.organization != nil {
+		return *m.organization, true
+	}
+	return
+}
+
+// OrganizationIDs returns the "organization" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// OrganizationID instead. It exists only for internal usage by the builders.
+func (m *UserMutation) OrganizationIDs() (ids []int) {
+	if id := m.organization; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetOrganization resets all changes to the "organization" edge.
+func (m *UserMutation) ResetOrganization() {
+	m.organization = nil
+	m.clearedorganization = false
+}
+
 // Where appends a list predicates to the UserMutation builder.
 func (m *UserMutation) Where(ps ...predicate.User) {
 	m.predicates = append(m.predicates, ps...)
@@ -4958,9 +5716,12 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.emails != nil {
 		edges = append(edges, user.EdgeEmails)
+	}
+	if m.organization != nil {
+		edges = append(edges, user.EdgeOrganization)
 	}
 	return edges
 }
@@ -4975,13 +5736,17 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeOrganization:
+		if id := m.organization; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.removedemails != nil {
 		edges = append(edges, user.EdgeEmails)
 	}
@@ -5004,9 +5769,12 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.clearedemails {
 		edges = append(edges, user.EdgeEmails)
+	}
+	if m.clearedorganization {
+		edges = append(edges, user.EdgeOrganization)
 	}
 	return edges
 }
@@ -5017,6 +5785,8 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 	switch name {
 	case user.EdgeEmails:
 		return m.clearedemails
+	case user.EdgeOrganization:
+		return m.clearedorganization
 	}
 	return false
 }
@@ -5025,6 +5795,9 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *UserMutation) ClearEdge(name string) error {
 	switch name {
+	case user.EdgeOrganization:
+		m.ClearOrganization()
+		return nil
 	}
 	return fmt.Errorf("unknown User unique edge %s", name)
 }
@@ -5035,6 +5808,9 @@ func (m *UserMutation) ResetEdge(name string) error {
 	switch name {
 	case user.EdgeEmails:
 		m.ResetEmails()
+		return nil
+	case user.EdgeOrganization:
+		m.ResetOrganization()
 		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)

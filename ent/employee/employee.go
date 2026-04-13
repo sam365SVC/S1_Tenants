@@ -16,8 +16,8 @@ const (
 	Label = "employee"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldArea holds the string denoting the area field in the database.
-	FieldArea = "area"
+	// FieldDepartment holds the string denoting the department field in the database.
+	FieldDepartment = "department"
 	// FieldPosition holds the string denoting the position field in the database.
 	FieldPosition = "position"
 	// FieldActive holds the string denoting the active field in the database.
@@ -30,8 +30,8 @@ const (
 	EdgeEmails = "emails"
 	// EdgeTenant holds the string denoting the tenant edge name in mutations.
 	EdgeTenant = "tenant"
-	// EdgeBranch holds the string denoting the branch edge name in mutations.
-	EdgeBranch = "branch"
+	// EdgeBranches holds the string denoting the branches edge name in mutations.
+	EdgeBranches = "branches"
 	// Table holds the table name of the employee in the database.
 	Table = "employees"
 	// EmailsTable is the table that holds the emails relation/edge.
@@ -48,19 +48,19 @@ const (
 	TenantInverseTable = "tenants"
 	// TenantColumn is the table column denoting the tenant relation/edge.
 	TenantColumn = "tenant_employees"
-	// BranchTable is the table that holds the branch relation/edge.
-	BranchTable = "employees"
-	// BranchInverseTable is the table name for the Branch entity.
+	// BranchesTable is the table that holds the branches relation/edge.
+	BranchesTable = "employees"
+	// BranchesInverseTable is the table name for the Branch entity.
 	// It exists in this package in order to avoid circular dependency with the "branch" package.
-	BranchInverseTable = "branches"
-	// BranchColumn is the table column denoting the branch relation/edge.
-	BranchColumn = "branch_employees"
+	BranchesInverseTable = "branches"
+	// BranchesColumn is the table column denoting the branches relation/edge.
+	BranchesColumn = "branch_employees"
 )
 
 // Columns holds all SQL columns for employee fields.
 var Columns = []string{
 	FieldID,
-	FieldArea,
+	FieldDepartment,
 	FieldPosition,
 	FieldActive,
 	FieldJoinAt,
@@ -105,28 +105,28 @@ var (
 	DefaultJoinAt func() time.Time
 )
 
-// Area defines the type for the "area" enum field.
-type Area string
+// Department defines the type for the "department" enum field.
+type Department string
 
-// Area values.
+// Department values.
 const (
-	AreaOffice     Area = "office"
-	AreaLogistics  Area = "logistics"
-	AreaPlant      Area = "plant"
-	AreaCommercial Area = "commercial"
+	DepartmentOffice     Department = "office"
+	DepartmentLogistics  Department = "logistics"
+	DepartmentPlant      Department = "plant"
+	DepartmentCommercial Department = "commercial"
 )
 
-func (a Area) String() string {
-	return string(a)
+func (d Department) String() string {
+	return string(d)
 }
 
-// AreaValidator is a validator for the "area" field enum values. It is called by the builders before save.
-func AreaValidator(a Area) error {
-	switch a {
-	case AreaOffice, AreaLogistics, AreaPlant, AreaCommercial:
+// DepartmentValidator is a validator for the "department" field enum values. It is called by the builders before save.
+func DepartmentValidator(d Department) error {
+	switch d {
+	case DepartmentOffice, DepartmentLogistics, DepartmentPlant, DepartmentCommercial:
 		return nil
 	default:
-		return fmt.Errorf("employee: invalid enum value for area field: %q", a)
+		return fmt.Errorf("employee: invalid enum value for department field: %q", d)
 	}
 }
 
@@ -138,9 +138,9 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByArea orders the results by the area field.
-func ByArea(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldArea, opts...).ToFunc()
+// ByDepartment orders the results by the department field.
+func ByDepartment(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDepartment, opts...).ToFunc()
 }
 
 // ByPosition orders the results by the position field.
@@ -177,10 +177,10 @@ func ByTenantField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByBranchField orders the results by branch field.
-func ByBranchField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByBranchesField orders the results by branches field.
+func ByBranchesField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newBranchStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newBranchesStep(), sql.OrderByField(field, opts...))
 	}
 }
 func newEmailsStep() *sqlgraph.Step {
@@ -197,10 +197,10 @@ func newTenantStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, TenantTable, TenantColumn),
 	)
 }
-func newBranchStep() *sqlgraph.Step {
+func newBranchesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(BranchInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, BranchTable, BranchColumn),
+		sqlgraph.To(BranchesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, BranchesTable, BranchesColumn),
 	)
 }

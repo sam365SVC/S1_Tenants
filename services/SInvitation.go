@@ -6,7 +6,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"net/http"
-	"saas_identidad/dtos"
 	"saas_identidad/ent"
 	"saas_identidad/ent/email"
 	"saas_identidad/ent/invitation"
@@ -26,11 +25,10 @@ func NewInvitationServices(cliente *ent.Client) *InvitationServices {
 func generateToke() string {
 	b := make([]byte, 16)
 	rand.Read(b)
-
 	return hex.EncodeToString(b)
 }
 
-func (s *InvitationServices) VerificationDeveloper(ctx context.Context, req dtos.VerificationDeveloperdto, account string) (token string, status int, err error) {
+func (s *InvitationServices) SendInvitation(ctx context.Context, emailSend, account string) (token string, status int, err error) {
 	tx, err := s._cliente.Tx(ctx)
 	if err != nil {
 		return "", http.StatusInternalServerError, fmt.Errorf("error to created tx: %w", err)
@@ -38,7 +36,7 @@ func (s *InvitationServices) VerificationDeveloper(ctx context.Context, req dtos
 	defer tx.Rollback()
 	t := generateToke()
 
-	emailExist, err := tx.Email.Query().Where(email.EmailEQ(req.Email)).Exist(ctx)
+	emailExist, err := tx.Email.Query().Where(email.EmailEQ(emailSend)).Exist(ctx)
 	if err != nil {
 		return "", http.StatusInternalServerError, fmt.Errorf("error consult email: %w", err)
 	}
@@ -46,7 +44,7 @@ func (s *InvitationServices) VerificationDeveloper(ctx context.Context, req dtos
 		return "", http.StatusConflict, fmt.Errorf("error the email is reguitre in db: %w", err)
 	}
 
-	invitExist, err := tx.Invitation.Query().Where(invitation.EmailEQ(req.Email)).Only(ctx)
+	invitExist, err := tx.Invitation.Query().Where(invitation.EmailEQ(emailSend)).Only(ctx)
 	if err != nil {
 		if !ent.IsNotFound(err) {
 			return "", http.StatusInternalServerError, fmt.Errorf("error searching for user: %w", err)
@@ -62,7 +60,7 @@ func (s *InvitationServices) VerificationDeveloper(ctx context.Context, req dtos
 		}
 	}
 	_, err = tx.Invitation.Create().
-		SetEmail(req.Email).
+		SetEmail(emailSend).
 		SetToken(t).
 		SetAccount(invitation.Account(account)).
 		Save(ctx)
@@ -76,7 +74,7 @@ func (s *InvitationServices) VerificationDeveloper(ctx context.Context, req dtos
 		return "", http.StatusInternalServerError, fmt.Errorf("error to created invitation: %w", err)
 	}
 	go func() {
-		err = mailer.ValidateEmailDeveloper(req.Email, t, account)
+		err = mailer.ValidateEmailDeveloper(emailSend, t, account)
 	}()
 
 	if err := tx.Commit(); err != nil {

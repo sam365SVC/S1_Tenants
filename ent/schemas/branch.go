@@ -52,7 +52,7 @@ func (Branch) Fields() []ent.Field {
 
 func (Branch) Edges()[]ent.Edge{
 	return []ent.Edge{
-		edge.From("tenant",Tenant.Type).Ref("branchs").Unique(),
+		edge.From("tenant",Tenant.Type).Ref("branches").Unique(),
 		edge.To("employees",Employee.Type),
 	}
 }

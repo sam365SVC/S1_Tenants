@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"saas_identidad/ent/invitation"
+	"saas_identidad/ent/invitationemployee"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -50,6 +51,25 @@ func (_c *InvitationCreate) SetNillableExpireAt(v *time.Time) *InvitationCreate 
 		_c.SetExpireAt(*v)
 	}
 	return _c
+}
+
+// SetInvitationEmployeeID sets the "invitation_employee" edge to the InvitationEmployee entity by ID.
+func (_c *InvitationCreate) SetInvitationEmployeeID(id int) *InvitationCreate {
+	_c.mutation.SetInvitationEmployeeID(id)
+	return _c
+}
+
+// SetNillableInvitationEmployeeID sets the "invitation_employee" edge to the InvitationEmployee entity by ID if the given value is not nil.
+func (_c *InvitationCreate) SetNillableInvitationEmployeeID(id *int) *InvitationCreate {
+	if id != nil {
+		_c = _c.SetInvitationEmployeeID(*id)
+	}
+	return _c
+}
+
+// SetInvitationEmployee sets the "invitation_employee" edge to the InvitationEmployee entity.
+func (_c *InvitationCreate) SetInvitationEmployee(v *InvitationEmployee) *InvitationCreate {
+	return _c.SetInvitationEmployeeID(v.ID)
 }
 
 // Mutation returns the InvitationMutation object of the builder.
@@ -163,6 +183,22 @@ func (_c *InvitationCreate) createSpec() (*Invitation, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.ExpireAt(); ok {
 		_spec.SetField(invitation.FieldExpireAt, field.TypeTime, value)
 		_node.ExpireAt = value
+	}
+	if nodes := _c.mutation.InvitationEmployeeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   invitation.InvitationEmployeeTable,
+			Columns: []string{invitation.InvitationEmployeeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitationemployee.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

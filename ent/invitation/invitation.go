@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -22,8 +23,17 @@ const (
 	FieldAccount = "account"
 	// FieldExpireAt holds the string denoting the expire_at field in the database.
 	FieldExpireAt = "expire_at"
+	// EdgeInvitationEmployee holds the string denoting the invitation_employee edge name in mutations.
+	EdgeInvitationEmployee = "invitation_employee"
 	// Table holds the table name of the invitation in the database.
 	Table = "invitations"
+	// InvitationEmployeeTable is the table that holds the invitation_employee relation/edge.
+	InvitationEmployeeTable = "invitation_employees"
+	// InvitationEmployeeInverseTable is the table name for the InvitationEmployee entity.
+	// It exists in this package in order to avoid circular dependency with the "invitationemployee" package.
+	InvitationEmployeeInverseTable = "invitation_employees"
+	// InvitationEmployeeColumn is the table column denoting the invitation_employee relation/edge.
+	InvitationEmployeeColumn = "invitation_invitation_employee"
 )
 
 // Columns holds all SQL columns for invitation fields.
@@ -104,4 +114,18 @@ func ByAccount(opts ...sql.OrderTermOption) OrderOption {
 // ByExpireAt orders the results by the expire_at field.
 func ByExpireAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldExpireAt, opts...).ToFunc()
+}
+
+// ByInvitationEmployeeField orders the results by invitation_employee field.
+func ByInvitationEmployeeField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newInvitationEmployeeStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newInvitationEmployeeStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(InvitationEmployeeInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, InvitationEmployeeTable, InvitationEmployeeColumn),
+	)
 }

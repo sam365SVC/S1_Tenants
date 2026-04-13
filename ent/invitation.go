@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"saas_identidad/ent/invitation"
+	"saas_identidad/ent/invitationemployee"
 	"strings"
 	"time"
 
@@ -24,8 +25,31 @@ type Invitation struct {
 	// Account holds the value of the "account" field.
 	Account invitation.Account `json:"account,omitempty"`
 	// ExpireAt holds the value of the "expire_at" field.
-	ExpireAt     time.Time `json:"expire_at,omitempty"`
+	ExpireAt time.Time `json:"expire_at,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the InvitationQuery when eager-loading is set.
+	Edges        InvitationEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// InvitationEdges holds the relations/edges for other nodes in the graph.
+type InvitationEdges struct {
+	// InvitationEmployee holds the value of the invitation_employee edge.
+	InvitationEmployee *InvitationEmployee `json:"invitation_employee,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// InvitationEmployeeOrErr returns the InvitationEmployee value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e InvitationEdges) InvitationEmployeeOrErr() (*InvitationEmployee, error) {
+	if e.InvitationEmployee != nil {
+		return e.InvitationEmployee, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: invitationemployee.Label}
+	}
+	return nil, &NotLoadedError{edge: "invitation_employee"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -95,6 +119,11 @@ func (_m *Invitation) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (_m *Invitation) Value(name string) (ent.Value, error) {
 	return _m.selectValues.Get(name)
+}
+
+// QueryInvitationEmployee queries the "invitation_employee" edge of the Invitation entity.
+func (_m *Invitation) QueryInvitationEmployee() *InvitationEmployeeQuery {
+	return NewInvitationClient(_m.config).QueryInvitationEmployee(_m)
 }
 
 // Update returns a builder for updating this Invitation.

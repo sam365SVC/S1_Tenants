@@ -10,49 +10,93 @@ import (
 )
 
 type InvitationHandler struct {
-	_service *services.InvitationServices
+	_service   *services.InvitationServices
 	_validator *validator.Validate
 }
 
-func NewInvitationHandler(service *services.InvitationServices, validator *validator.Validate) *InvitationHandler{
+func NewInvitationHandler(service *services.InvitationServices, validator *validator.Validate) *InvitationHandler {
 	return &InvitationHandler{
-		_service: service,
+		_service:   service,
 		_validator: validator,
 	}
 }
-func (h *InvitationHandler) InvitationDeveloper(c echo.Context) error{
-	var req dtos.VerificationDeveloperdto
-	account:="DEVELOPER"
-	if err:=c.Bind(&req);err!=nil {
-		return c.JSON(http.StatusBadRequest,echo.Map{
-			"error":"invalid json format",
+func (h *InvitationHandler) InvitationUserOrAdmin(c echo.Context) error {
+	var req dtos.InvitationUserOrAdmindto
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"error": "invalid json format",
 		})
 	}
-	token,status,err:=h._service.VerificationDeveloper(c.Request().Context(),req,account)
-	if err!=nil {
-		c.Logger().Errorf("FALLO INTERNO - INVITATION DEVELOPER OR USER: %v |Input: %v",err,req)
+	token, status, err := h._service.SendInvitation(c.Request().Context(), req.Email, req.Account)
+	if err != nil {
+		c.Logger().Errorf("FALLO INTERNO - INVITATION ADMIN OR USER: %v |Input: %v", err, req)
 
-		switch status{
+		switch status {
 		case http.StatusConflict:
-			return c.JSON(status,echo.Map{
-				"error":err.Error(),
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   err.Error(),
 			})
 		case http.StatusBadRequest:
-			return c.JSON(status,echo.Map{
-				"error":"Invalid request data",
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   "Invalid request data",
 			})
 		case http.StatusInternalServerError:
-			return c.JSON(status,echo.Map{
-				"error":"internal server error",
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   "internal server error",
 			})
 		default:
-			return c.JSON(status,echo.Map{
-				"error":"contact with support now",
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   "contact with support now",
 			})
 		}
 	}
-	return c.JSON(http.StatusOK,echo.Map{
-		"ok":"email send",
-		"token":token,
+	return c.JSON(http.StatusOK, echo.Map{
+		"success": true,
+		"token":   token,
 	})
+}
+
+func (h *InvitationHandler) InvitationDeveloper(c echo.Context) error {
+	var req dtos.InvitationDeveloper
+
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"error": "invalid json",
+		})
+	}
+	token, status, err := h._service.SendInvitation(c.Request().Context(), req.Email, "DEVELOPER")
+	if err != nil {
+		c.Logger().Errorf("FALLO INTERNO - INVITATION DEVELOPER: %v|Input: %v", err, req)
+		switch status {
+		case http.StatusConflict:
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   err.Error(),
+			})
+		case http.StatusBadRequest:
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   "Invalid request data",
+			})
+		case http.StatusInternalServerError:
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   "internal server error",
+			})
+		default:
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   "contact with support now",
+			})
+		}
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"success": true,
+		"token":   token,
+	})
+
 }

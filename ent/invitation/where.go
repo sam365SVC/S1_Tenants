@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // ID filters vertices based on their ID field.
@@ -257,6 +258,29 @@ func ExpireAtLT(v time.Time) predicate.Invitation {
 // ExpireAtLTE applies the LTE predicate on the "expire_at" field.
 func ExpireAtLTE(v time.Time) predicate.Invitation {
 	return predicate.Invitation(sql.FieldLTE(FieldExpireAt, v))
+}
+
+// HasInvitationEmployee applies the HasEdge predicate on the "invitation_employee" edge.
+func HasInvitationEmployee() predicate.Invitation {
+	return predicate.Invitation(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, InvitationEmployeeTable, InvitationEmployeeColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasInvitationEmployeeWith applies the HasEdge predicate on the "invitation_employee" edge with a given conditions (other predicates).
+func HasInvitationEmployeeWith(preds ...predicate.InvitationEmployee) predicate.Invitation {
+	return predicate.Invitation(func(s *sql.Selector) {
+		step := newInvitationEmployeeStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

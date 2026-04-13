@@ -180,6 +180,29 @@ func EndSuscriptionNotNil() predicate.Tenant {
 	return predicate.Tenant(sql.FieldNotNull(FieldEndSuscription))
 }
 
+// HasOwner applies the HasEdge predicate on the "owner" edge.
+func HasOwner() predicate.Tenant {
+	return predicate.Tenant(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, OwnerTable, OwnerColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasOwnerWith applies the HasEdge predicate on the "owner" edge with a given conditions (other predicates).
+func HasOwnerWith(preds ...predicate.User) predicate.Tenant {
+	return predicate.Tenant(func(s *sql.Selector) {
+		step := newOwnerStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasPlan applies the HasEdge predicate on the "plan" edge.
 func HasPlan() predicate.Tenant {
 	return predicate.Tenant(func(s *sql.Selector) {
@@ -195,6 +218,29 @@ func HasPlan() predicate.Tenant {
 func HasPlanWith(preds ...predicate.Plan) predicate.Tenant {
 	return predicate.Tenant(func(s *sql.Selector) {
 		step := newPlanStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasInvitationEmployees applies the HasEdge predicate on the "invitation_employees" edge.
+func HasInvitationEmployees() predicate.Tenant {
+	return predicate.Tenant(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, InvitationEmployeesTable, InvitationEmployeesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasInvitationEmployeesWith applies the HasEdge predicate on the "invitation_employees" edge with a given conditions (other predicates).
+func HasInvitationEmployeesWith(preds ...predicate.InvitationEmployee) predicate.Tenant {
+	return predicate.Tenant(func(s *sql.Selector) {
+		step := newInvitationEmployeesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -226,21 +272,21 @@ func HasEmployeesWith(preds ...predicate.Employee) predicate.Tenant {
 	})
 }
 
-// HasBranchs applies the HasEdge predicate on the "branchs" edge.
-func HasBranchs() predicate.Tenant {
+// HasBranches applies the HasEdge predicate on the "branches" edge.
+func HasBranches() predicate.Tenant {
 	return predicate.Tenant(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, BranchsTable, BranchsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, BranchesTable, BranchesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasBranchsWith applies the HasEdge predicate on the "branchs" edge with a given conditions (other predicates).
-func HasBranchsWith(preds ...predicate.Branch) predicate.Tenant {
+// HasBranchesWith applies the HasEdge predicate on the "branches" edge with a given conditions (other predicates).
+func HasBranchesWith(preds ...predicate.Branch) predicate.Tenant {
 	return predicate.Tenant(func(s *sql.Selector) {
-		step := newBranchsStep()
+		step := newBranchesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

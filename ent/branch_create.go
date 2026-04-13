@@ -350,7 +350,7 @@ func (_c *BranchCreate) createSpec() (*Branch, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.tenant_branchs = &nodes[0]
+		_node.tenant_branches = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.EmployeesIDs(); len(nodes) > 0 {

@@ -16,7 +16,7 @@ type Employee struct {
 
 func (Employee) Fields() []ent.Field {
 	return []ent.Field{
-		field.Enum("area").
+		field.Enum("department").
 			Values("office", "logistics", "plant", "commercial"),
 		field.String("position").MaxLen(30),
 		field.Bool("active").Default(true),
@@ -28,7 +28,7 @@ func (Employee) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("emails", Email.Type).Ref("employees").Unique(),
 		edge.From("tenant", Tenant.Type).Ref("employees").Unique(),
-		edge.From("branch", Branch.Type).Ref("employees").Unique(),
+		edge.From("branches", Branch.Type).Ref("employees").Unique(),
 	}
 }
 
@@ -48,25 +48,25 @@ func (Employee) Hooks() []ent.Hook {
 					return next.Mutate(ctx, m)
 				}
 
-				areaVal, existA := m.Field("area")
+				departmentVal, existD := m.Field("department")
 				posVal, existP := m.Field("position")
 
 				// Si no se está tocando ninguno de los dos en un Update, saltar
-				if !existA && !existP && !m.Op().Is(ent.OpCreate) {
+				if !existD && !existP && !m.Op().Is(ent.OpCreate) {
 					return next.Mutate(ctx, m)
 				}
 
-				var area, position string
+				var department, position string
 
 				// Lógica para obtener los valores actuales (nuevos o viejos)
-				if existA {
-					area = areaVal.(string)
+				if existD {
+					department = departmentVal.(string)
 				} else {
 					// Si es Update y no viene 'area', buscamos el valor que ya tenía
 					if getter, ok := m.(interface {
-						OldArea(context.Context) (string, error)
+						OldDepartment(context.Context) (string, error)
 					}); ok {
-						area, _ = getter.OldArea(ctx)
+						department, _ = getter.OldDepartment(ctx)
 					}
 				}
 
@@ -82,9 +82,9 @@ func (Employee) Hooks() []ent.Hook {
 				}
 
 				// Validación
-				validPositions, exists := allowedPositions[area]
+				validPositions, exists := allowedPositions[department]
 				if !exists {
-					return nil, fmt.Errorf("el área %s no es válida", area)
+					return nil, fmt.Errorf("el área %s no es válida", department)
 				}
 
 				isAllowed := false
@@ -96,7 +96,7 @@ func (Employee) Hooks() []ent.Hook {
 				}
 
 				if !isAllowed {
-					return nil, fmt.Errorf("el cargo '%s' no está permitido para el área '%s'", position, area)
+					return nil, fmt.Errorf("el cargo '%s' no está permitido para el área '%s'", position, department)
 				}
 
 				return next.Mutate(ctx, m)

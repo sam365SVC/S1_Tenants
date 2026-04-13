@@ -23,9 +23,9 @@ type EmployeeCreate struct {
 	hooks    []Hook
 }
 
-// SetArea sets the "area" field.
-func (_c *EmployeeCreate) SetArea(v employee.Area) *EmployeeCreate {
-	_c.mutation.SetArea(v)
+// SetDepartment sets the "department" field.
+func (_c *EmployeeCreate) SetDepartment(v employee.Department) *EmployeeCreate {
+	_c.mutation.SetDepartment(v)
 	return _c
 }
 
@@ -115,23 +115,23 @@ func (_c *EmployeeCreate) SetTenant(v *Tenant) *EmployeeCreate {
 	return _c.SetTenantID(v.ID)
 }
 
-// SetBranchID sets the "branch" edge to the Branch entity by ID.
-func (_c *EmployeeCreate) SetBranchID(id int) *EmployeeCreate {
-	_c.mutation.SetBranchID(id)
+// SetBranchesID sets the "branches" edge to the Branch entity by ID.
+func (_c *EmployeeCreate) SetBranchesID(id int) *EmployeeCreate {
+	_c.mutation.SetBranchesID(id)
 	return _c
 }
 
-// SetNillableBranchID sets the "branch" edge to the Branch entity by ID if the given value is not nil.
-func (_c *EmployeeCreate) SetNillableBranchID(id *int) *EmployeeCreate {
+// SetNillableBranchesID sets the "branches" edge to the Branch entity by ID if the given value is not nil.
+func (_c *EmployeeCreate) SetNillableBranchesID(id *int) *EmployeeCreate {
 	if id != nil {
-		_c = _c.SetBranchID(*id)
+		_c = _c.SetBranchesID(*id)
 	}
 	return _c
 }
 
-// SetBranch sets the "branch" edge to the Branch entity.
-func (_c *EmployeeCreate) SetBranch(v *Branch) *EmployeeCreate {
-	return _c.SetBranchID(v.ID)
+// SetBranches sets the "branches" edge to the Branch entity.
+func (_c *EmployeeCreate) SetBranches(v *Branch) *EmployeeCreate {
+	return _c.SetBranchesID(v.ID)
 }
 
 // Mutation returns the EmployeeMutation object of the builder.
@@ -187,12 +187,12 @@ func (_c *EmployeeCreate) defaults() error {
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *EmployeeCreate) check() error {
-	if _, ok := _c.mutation.Area(); !ok {
-		return &ValidationError{Name: "area", err: errors.New(`ent: missing required field "Employee.area"`)}
+	if _, ok := _c.mutation.Department(); !ok {
+		return &ValidationError{Name: "department", err: errors.New(`ent: missing required field "Employee.department"`)}
 	}
-	if v, ok := _c.mutation.Area(); ok {
-		if err := employee.AreaValidator(v); err != nil {
-			return &ValidationError{Name: "area", err: fmt.Errorf(`ent: validator failed for field "Employee.area": %w`, err)}
+	if v, ok := _c.mutation.Department(); ok {
+		if err := employee.DepartmentValidator(v); err != nil {
+			return &ValidationError{Name: "department", err: fmt.Errorf(`ent: validator failed for field "Employee.department": %w`, err)}
 		}
 	}
 	if _, ok := _c.mutation.Position(); !ok {
@@ -235,9 +235,9 @@ func (_c *EmployeeCreate) createSpec() (*Employee, *sqlgraph.CreateSpec) {
 		_node = &Employee{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(employee.Table, sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt))
 	)
-	if value, ok := _c.mutation.Area(); ok {
-		_spec.SetField(employee.FieldArea, field.TypeEnum, value)
-		_node.Area = value
+	if value, ok := _c.mutation.Department(); ok {
+		_spec.SetField(employee.FieldDepartment, field.TypeEnum, value)
+		_node.Department = value
 	}
 	if value, ok := _c.mutation.Position(); ok {
 		_spec.SetField(employee.FieldPosition, field.TypeString, value)
@@ -289,12 +289,12 @@ func (_c *EmployeeCreate) createSpec() (*Employee, *sqlgraph.CreateSpec) {
 		_node.tenant_employees = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := _c.mutation.BranchIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.BranchesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.BranchTable,
-			Columns: []string{employee.BranchColumn},
+			Table:   employee.BranchesTable,
+			Columns: []string{employee.BranchesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(branch.FieldID, field.TypeInt),

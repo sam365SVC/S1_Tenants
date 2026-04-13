@@ -18,6 +18,9 @@ type Employee func(*sql.Selector)
 // Invitation is the predicate function for invitation builders.
 type Invitation func(*sql.Selector)
 
+// InvitationEmployee is the predicate function for invitationemployee builders.
+type InvitationEmployee func(*sql.Selector)
+
 // Plan is the predicate function for plan builders.
 type Plan func(*sql.Selector)
 

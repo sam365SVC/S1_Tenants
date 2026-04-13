@@ -20,7 +20,7 @@ var (
 		{Name: "state", Type: field.TypeEnum, Enums: []string{"LP", "SC", "CB", "OR", "PT", "TJ", "CH", "BE", "PA"}, Default: "LP"},
 		{Name: "is_active", Type: field.TypeBool, Default: true},
 		{Name: "create_at", Type: field.TypeTime},
-		{Name: "tenant_branchs", Type: field.TypeInt, Nullable: true},
+		{Name: "tenant_branches", Type: field.TypeInt, Nullable: true},
 	}
 	// BranchesTable holds the schema information for the "branches" table.
 	BranchesTable = &schema.Table{
@@ -29,7 +29,7 @@ var (
 		PrimaryKey: []*schema.Column{BranchesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "branches_tenants_branchs",
+				Symbol:     "branches_tenants_branches",
 				Columns:    []*schema.Column{BranchesColumns[10]},
 				RefColumns: []*schema.Column{TenantsColumns[0]},
 				OnDelete:   schema.SetNull,
@@ -63,7 +63,7 @@ var (
 	// EmployeesColumns holds the columns for the "employees" table.
 	EmployeesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "area", Type: field.TypeEnum, Enums: []string{"office", "logistics", "plant", "commercial"}},
+		{Name: "department", Type: field.TypeEnum, Enums: []string{"office", "logistics", "plant", "commercial"}},
 		{Name: "position", Type: field.TypeString, Size: 30},
 		{Name: "active", Type: field.TypeBool, Default: true},
 		{Name: "join_at", Type: field.TypeTime},
@@ -112,6 +112,34 @@ var (
 		Columns:    InvitationsColumns,
 		PrimaryKey: []*schema.Column{InvitationsColumns[0]},
 	}
+	// InvitationEmployeesColumns holds the columns for the "invitation_employees" table.
+	InvitationEmployeesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "department", Type: field.TypeString},
+		{Name: "position", Type: field.TypeString},
+		{Name: "invitation_invitation_employee", Type: field.TypeInt, Unique: true, Nullable: true},
+		{Name: "tenant_invitation_employees", Type: field.TypeInt, Nullable: true},
+	}
+	// InvitationEmployeesTable holds the schema information for the "invitation_employees" table.
+	InvitationEmployeesTable = &schema.Table{
+		Name:       "invitation_employees",
+		Columns:    InvitationEmployeesColumns,
+		PrimaryKey: []*schema.Column{InvitationEmployeesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "invitation_employees_invitations_invitation_employee",
+				Columns:    []*schema.Column{InvitationEmployeesColumns[3]},
+				RefColumns: []*schema.Column{InvitationsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "invitation_employees_tenants_invitation_employees",
+				Columns:    []*schema.Column{InvitationEmployeesColumns[4]},
+				RefColumns: []*schema.Column{TenantsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// PlansColumns holds the columns for the "plans" table.
 	PlansColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -133,6 +161,7 @@ var (
 		{Name: "name", Type: field.TypeString, Unique: true, Size: 50},
 		{Name: "end_suscription", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"postgres": "date"}},
 		{Name: "plan_tenants", Type: field.TypeInt, Nullable: true},
+		{Name: "user_organization", Type: field.TypeInt, Unique: true},
 	}
 	// TenantsTable holds the schema information for the "tenants" table.
 	TenantsTable = &schema.Table{
@@ -145,6 +174,12 @@ var (
 				Columns:    []*schema.Column{TenantsColumns[3]},
 				RefColumns: []*schema.Column{PlansColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "tenants_users_organization",
+				Columns:    []*schema.Column{TenantsColumns[4]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
@@ -169,6 +204,7 @@ var (
 		EmailsTable,
 		EmployeesTable,
 		InvitationsTable,
+		InvitationEmployeesTable,
 		PlansTable,
 		TenantsTable,
 		UsersTable,
@@ -181,5 +217,8 @@ func init() {
 	EmployeesTable.ForeignKeys[0].RefTable = BranchesTable
 	EmployeesTable.ForeignKeys[1].RefTable = EmailsTable
 	EmployeesTable.ForeignKeys[2].RefTable = TenantsTable
+	InvitationEmployeesTable.ForeignKeys[0].RefTable = InvitationsTable
+	InvitationEmployeesTable.ForeignKeys[1].RefTable = TenantsTable
 	TenantsTable.ForeignKeys[0].RefTable = PlansTable
+	TenantsTable.ForeignKeys[1].RefTable = UsersTable
 }
