@@ -260,21 +260,21 @@ func LeftAtNotNil() predicate.Employee {
 	return predicate.Employee(sql.FieldNotNull(FieldLeftAt))
 }
 
-// HasEmails applies the HasEdge predicate on the "emails" edge.
-func HasEmails() predicate.Employee {
+// HasEmail applies the HasEdge predicate on the "email" edge.
+func HasEmail() predicate.Employee {
 	return predicate.Employee(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, EmailsTable, EmailsColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, EmailTable, EmailColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasEmailsWith applies the HasEdge predicate on the "emails" edge with a given conditions (other predicates).
-func HasEmailsWith(preds ...predicate.Email) predicate.Employee {
+// HasEmailWith applies the HasEdge predicate on the "email" edge with a given conditions (other predicates).
+func HasEmailWith(preds ...predicate.Email) predicate.Employee {
 	return predicate.Employee(func(s *sql.Selector) {
-		step := newEmailsStep()
+		step := newEmailStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -306,21 +306,21 @@ func HasTenantWith(preds ...predicate.Tenant) predicate.Employee {
 	})
 }
 
-// HasBranches applies the HasEdge predicate on the "branches" edge.
-func HasBranches() predicate.Employee {
+// HasBranch applies the HasEdge predicate on the "branch" edge.
+func HasBranch() predicate.Employee {
 	return predicate.Employee(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, BranchesTable, BranchesColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, BranchTable, BranchColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasBranchesWith applies the HasEdge predicate on the "branches" edge with a given conditions (other predicates).
-func HasBranchesWith(preds ...predicate.Branch) predicate.Employee {
+// HasBranchWith applies the HasEdge predicate on the "branch" edge with a given conditions (other predicates).
+func HasBranchWith(preds ...predicate.Branch) predicate.Employee {
 	return predicate.Employee(func(s *sql.Selector) {
-		step := newBranchesStep()
+		step := newBranchStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

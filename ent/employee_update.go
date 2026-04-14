@@ -107,23 +107,23 @@ func (_u *EmployeeUpdate) ClearLeftAt() *EmployeeUpdate {
 	return _u
 }
 
-// SetEmailsID sets the "emails" edge to the Email entity by ID.
-func (_u *EmployeeUpdate) SetEmailsID(id int) *EmployeeUpdate {
-	_u.mutation.SetEmailsID(id)
+// SetEmailID sets the "email" edge to the Email entity by ID.
+func (_u *EmployeeUpdate) SetEmailID(id int) *EmployeeUpdate {
+	_u.mutation.SetEmailID(id)
 	return _u
 }
 
-// SetNillableEmailsID sets the "emails" edge to the Email entity by ID if the given value is not nil.
-func (_u *EmployeeUpdate) SetNillableEmailsID(id *int) *EmployeeUpdate {
+// SetNillableEmailID sets the "email" edge to the Email entity by ID if the given value is not nil.
+func (_u *EmployeeUpdate) SetNillableEmailID(id *int) *EmployeeUpdate {
 	if id != nil {
-		_u = _u.SetEmailsID(*id)
+		_u = _u.SetEmailID(*id)
 	}
 	return _u
 }
 
-// SetEmails sets the "emails" edge to the Email entity.
-func (_u *EmployeeUpdate) SetEmails(v *Email) *EmployeeUpdate {
-	return _u.SetEmailsID(v.ID)
+// SetEmail sets the "email" edge to the Email entity.
+func (_u *EmployeeUpdate) SetEmail(v *Email) *EmployeeUpdate {
+	return _u.SetEmailID(v.ID)
 }
 
 // SetTenantID sets the "tenant" edge to the Tenant entity by ID.
@@ -145,23 +145,23 @@ func (_u *EmployeeUpdate) SetTenant(v *Tenant) *EmployeeUpdate {
 	return _u.SetTenantID(v.ID)
 }
 
-// SetBranchesID sets the "branches" edge to the Branch entity by ID.
-func (_u *EmployeeUpdate) SetBranchesID(id int) *EmployeeUpdate {
-	_u.mutation.SetBranchesID(id)
+// SetBranchID sets the "branch" edge to the Branch entity by ID.
+func (_u *EmployeeUpdate) SetBranchID(id int) *EmployeeUpdate {
+	_u.mutation.SetBranchID(id)
 	return _u
 }
 
-// SetNillableBranchesID sets the "branches" edge to the Branch entity by ID if the given value is not nil.
-func (_u *EmployeeUpdate) SetNillableBranchesID(id *int) *EmployeeUpdate {
+// SetNillableBranchID sets the "branch" edge to the Branch entity by ID if the given value is not nil.
+func (_u *EmployeeUpdate) SetNillableBranchID(id *int) *EmployeeUpdate {
 	if id != nil {
-		_u = _u.SetBranchesID(*id)
+		_u = _u.SetBranchID(*id)
 	}
 	return _u
 }
 
-// SetBranches sets the "branches" edge to the Branch entity.
-func (_u *EmployeeUpdate) SetBranches(v *Branch) *EmployeeUpdate {
-	return _u.SetBranchesID(v.ID)
+// SetBranch sets the "branch" edge to the Branch entity.
+func (_u *EmployeeUpdate) SetBranch(v *Branch) *EmployeeUpdate {
+	return _u.SetBranchID(v.ID)
 }
 
 // Mutation returns the EmployeeMutation object of the builder.
@@ -169,9 +169,9 @@ func (_u *EmployeeUpdate) Mutation() *EmployeeMutation {
 	return _u.mutation
 }
 
-// ClearEmails clears the "emails" edge to the Email entity.
-func (_u *EmployeeUpdate) ClearEmails() *EmployeeUpdate {
-	_u.mutation.ClearEmails()
+// ClearEmail clears the "email" edge to the Email entity.
+func (_u *EmployeeUpdate) ClearEmail() *EmployeeUpdate {
+	_u.mutation.ClearEmail()
 	return _u
 }
 
@@ -181,9 +181,9 @@ func (_u *EmployeeUpdate) ClearTenant() *EmployeeUpdate {
 	return _u
 }
 
-// ClearBranches clears the "branches" edge to the Branch entity.
-func (_u *EmployeeUpdate) ClearBranches() *EmployeeUpdate {
-	_u.mutation.ClearBranches()
+// ClearBranch clears the "branch" edge to the Branch entity.
+func (_u *EmployeeUpdate) ClearBranch() *EmployeeUpdate {
+	_u.mutation.ClearBranch()
 	return _u
 }
 
@@ -259,12 +259,12 @@ func (_u *EmployeeUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if _u.mutation.LeftAtCleared() {
 		_spec.ClearField(employee.FieldLeftAt, field.TypeTime)
 	}
-	if _u.mutation.EmailsCleared() {
+	if _u.mutation.EmailCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.EmailsTable,
-			Columns: []string{employee.EmailsColumn},
+			Table:   employee.EmailTable,
+			Columns: []string{employee.EmailColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeInt),
@@ -272,12 +272,12 @@ func (_u *EmployeeUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := _u.mutation.EmailsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.EmailIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.EmailsTable,
-			Columns: []string{employee.EmailsColumn},
+			Table:   employee.EmailTable,
+			Columns: []string{employee.EmailColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeInt),
@@ -317,12 +317,12 @@ func (_u *EmployeeUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if _u.mutation.BranchesCleared() {
+	if _u.mutation.BranchCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.BranchesTable,
-			Columns: []string{employee.BranchesColumn},
+			Table:   employee.BranchTable,
+			Columns: []string{employee.BranchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(branch.FieldID, field.TypeInt),
@@ -330,12 +330,12 @@ func (_u *EmployeeUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := _u.mutation.BranchesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.BranchIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.BranchesTable,
-			Columns: []string{employee.BranchesColumn},
+			Table:   employee.BranchTable,
+			Columns: []string{employee.BranchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(branch.FieldID, field.TypeInt),
@@ -442,23 +442,23 @@ func (_u *EmployeeUpdateOne) ClearLeftAt() *EmployeeUpdateOne {
 	return _u
 }
 
-// SetEmailsID sets the "emails" edge to the Email entity by ID.
-func (_u *EmployeeUpdateOne) SetEmailsID(id int) *EmployeeUpdateOne {
-	_u.mutation.SetEmailsID(id)
+// SetEmailID sets the "email" edge to the Email entity by ID.
+func (_u *EmployeeUpdateOne) SetEmailID(id int) *EmployeeUpdateOne {
+	_u.mutation.SetEmailID(id)
 	return _u
 }
 
-// SetNillableEmailsID sets the "emails" edge to the Email entity by ID if the given value is not nil.
-func (_u *EmployeeUpdateOne) SetNillableEmailsID(id *int) *EmployeeUpdateOne {
+// SetNillableEmailID sets the "email" edge to the Email entity by ID if the given value is not nil.
+func (_u *EmployeeUpdateOne) SetNillableEmailID(id *int) *EmployeeUpdateOne {
 	if id != nil {
-		_u = _u.SetEmailsID(*id)
+		_u = _u.SetEmailID(*id)
 	}
 	return _u
 }
 
-// SetEmails sets the "emails" edge to the Email entity.
-func (_u *EmployeeUpdateOne) SetEmails(v *Email) *EmployeeUpdateOne {
-	return _u.SetEmailsID(v.ID)
+// SetEmail sets the "email" edge to the Email entity.
+func (_u *EmployeeUpdateOne) SetEmail(v *Email) *EmployeeUpdateOne {
+	return _u.SetEmailID(v.ID)
 }
 
 // SetTenantID sets the "tenant" edge to the Tenant entity by ID.
@@ -480,23 +480,23 @@ func (_u *EmployeeUpdateOne) SetTenant(v *Tenant) *EmployeeUpdateOne {
 	return _u.SetTenantID(v.ID)
 }
 
-// SetBranchesID sets the "branches" edge to the Branch entity by ID.
-func (_u *EmployeeUpdateOne) SetBranchesID(id int) *EmployeeUpdateOne {
-	_u.mutation.SetBranchesID(id)
+// SetBranchID sets the "branch" edge to the Branch entity by ID.
+func (_u *EmployeeUpdateOne) SetBranchID(id int) *EmployeeUpdateOne {
+	_u.mutation.SetBranchID(id)
 	return _u
 }
 
-// SetNillableBranchesID sets the "branches" edge to the Branch entity by ID if the given value is not nil.
-func (_u *EmployeeUpdateOne) SetNillableBranchesID(id *int) *EmployeeUpdateOne {
+// SetNillableBranchID sets the "branch" edge to the Branch entity by ID if the given value is not nil.
+func (_u *EmployeeUpdateOne) SetNillableBranchID(id *int) *EmployeeUpdateOne {
 	if id != nil {
-		_u = _u.SetBranchesID(*id)
+		_u = _u.SetBranchID(*id)
 	}
 	return _u
 }
 
-// SetBranches sets the "branches" edge to the Branch entity.
-func (_u *EmployeeUpdateOne) SetBranches(v *Branch) *EmployeeUpdateOne {
-	return _u.SetBranchesID(v.ID)
+// SetBranch sets the "branch" edge to the Branch entity.
+func (_u *EmployeeUpdateOne) SetBranch(v *Branch) *EmployeeUpdateOne {
+	return _u.SetBranchID(v.ID)
 }
 
 // Mutation returns the EmployeeMutation object of the builder.
@@ -504,9 +504,9 @@ func (_u *EmployeeUpdateOne) Mutation() *EmployeeMutation {
 	return _u.mutation
 }
 
-// ClearEmails clears the "emails" edge to the Email entity.
-func (_u *EmployeeUpdateOne) ClearEmails() *EmployeeUpdateOne {
-	_u.mutation.ClearEmails()
+// ClearEmail clears the "email" edge to the Email entity.
+func (_u *EmployeeUpdateOne) ClearEmail() *EmployeeUpdateOne {
+	_u.mutation.ClearEmail()
 	return _u
 }
 
@@ -516,9 +516,9 @@ func (_u *EmployeeUpdateOne) ClearTenant() *EmployeeUpdateOne {
 	return _u
 }
 
-// ClearBranches clears the "branches" edge to the Branch entity.
-func (_u *EmployeeUpdateOne) ClearBranches() *EmployeeUpdateOne {
-	_u.mutation.ClearBranches()
+// ClearBranch clears the "branch" edge to the Branch entity.
+func (_u *EmployeeUpdateOne) ClearBranch() *EmployeeUpdateOne {
+	_u.mutation.ClearBranch()
 	return _u
 }
 
@@ -624,12 +624,12 @@ func (_u *EmployeeUpdateOne) sqlSave(ctx context.Context) (_node *Employee, err 
 	if _u.mutation.LeftAtCleared() {
 		_spec.ClearField(employee.FieldLeftAt, field.TypeTime)
 	}
-	if _u.mutation.EmailsCleared() {
+	if _u.mutation.EmailCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.EmailsTable,
-			Columns: []string{employee.EmailsColumn},
+			Table:   employee.EmailTable,
+			Columns: []string{employee.EmailColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeInt),
@@ -637,12 +637,12 @@ func (_u *EmployeeUpdateOne) sqlSave(ctx context.Context) (_node *Employee, err 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := _u.mutation.EmailsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.EmailIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.EmailsTable,
-			Columns: []string{employee.EmailsColumn},
+			Table:   employee.EmailTable,
+			Columns: []string{employee.EmailColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeInt),
@@ -682,12 +682,12 @@ func (_u *EmployeeUpdateOne) sqlSave(ctx context.Context) (_node *Employee, err 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if _u.mutation.BranchesCleared() {
+	if _u.mutation.BranchCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.BranchesTable,
-			Columns: []string{employee.BranchesColumn},
+			Table:   employee.BranchTable,
+			Columns: []string{employee.BranchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(branch.FieldID, field.TypeInt),
@@ -695,12 +695,12 @@ func (_u *EmployeeUpdateOne) sqlSave(ctx context.Context) (_node *Employee, err 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := _u.mutation.BranchesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.BranchIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.BranchesTable,
-			Columns: []string{employee.BranchesColumn},
+			Table:   employee.BranchTable,
+			Columns: []string{employee.BranchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(branch.FieldID, field.TypeInt),

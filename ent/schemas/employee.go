@@ -26,9 +26,9 @@ func (Employee) Fields() []ent.Field {
 }
 func (Employee) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("emails", Email.Type).Ref("employees").Unique(),
+		edge.From("email", Email.Type).Ref("employees").Unique(),
 		edge.From("tenant", Tenant.Type).Ref("employees").Unique(),
-		edge.From("branches", Branch.Type).Ref("employees").Unique(),
+		edge.From("branch", Branch.Type).Ref("employees").Unique(),
 	}
 }
 

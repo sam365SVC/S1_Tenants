@@ -26,21 +26,21 @@ const (
 	FieldJoinAt = "join_at"
 	// FieldLeftAt holds the string denoting the left_at field in the database.
 	FieldLeftAt = "left_at"
-	// EdgeEmails holds the string denoting the emails edge name in mutations.
-	EdgeEmails = "emails"
+	// EdgeEmail holds the string denoting the email edge name in mutations.
+	EdgeEmail = "email"
 	// EdgeTenant holds the string denoting the tenant edge name in mutations.
 	EdgeTenant = "tenant"
-	// EdgeBranches holds the string denoting the branches edge name in mutations.
-	EdgeBranches = "branches"
+	// EdgeBranch holds the string denoting the branch edge name in mutations.
+	EdgeBranch = "branch"
 	// Table holds the table name of the employee in the database.
 	Table = "employees"
-	// EmailsTable is the table that holds the emails relation/edge.
-	EmailsTable = "employees"
-	// EmailsInverseTable is the table name for the Email entity.
+	// EmailTable is the table that holds the email relation/edge.
+	EmailTable = "employees"
+	// EmailInverseTable is the table name for the Email entity.
 	// It exists in this package in order to avoid circular dependency with the "email" package.
-	EmailsInverseTable = "emails"
-	// EmailsColumn is the table column denoting the emails relation/edge.
-	EmailsColumn = "email_employees"
+	EmailInverseTable = "emails"
+	// EmailColumn is the table column denoting the email relation/edge.
+	EmailColumn = "email_employees"
 	// TenantTable is the table that holds the tenant relation/edge.
 	TenantTable = "employees"
 	// TenantInverseTable is the table name for the Tenant entity.
@@ -48,13 +48,13 @@ const (
 	TenantInverseTable = "tenants"
 	// TenantColumn is the table column denoting the tenant relation/edge.
 	TenantColumn = "tenant_employees"
-	// BranchesTable is the table that holds the branches relation/edge.
-	BranchesTable = "employees"
-	// BranchesInverseTable is the table name for the Branch entity.
+	// BranchTable is the table that holds the branch relation/edge.
+	BranchTable = "employees"
+	// BranchInverseTable is the table name for the Branch entity.
 	// It exists in this package in order to avoid circular dependency with the "branch" package.
-	BranchesInverseTable = "branches"
-	// BranchesColumn is the table column denoting the branches relation/edge.
-	BranchesColumn = "branch_employees"
+	BranchInverseTable = "branches"
+	// BranchColumn is the table column denoting the branch relation/edge.
+	BranchColumn = "branch_employees"
 )
 
 // Columns holds all SQL columns for employee fields.
@@ -163,10 +163,10 @@ func ByLeftAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLeftAt, opts...).ToFunc()
 }
 
-// ByEmailsField orders the results by emails field.
-func ByEmailsField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByEmailField orders the results by email field.
+func ByEmailField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEmailsStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newEmailStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -177,17 +177,17 @@ func ByTenantField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByBranchesField orders the results by branches field.
-func ByBranchesField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByBranchField orders the results by branch field.
+func ByBranchField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newBranchesStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newBranchStep(), sql.OrderByField(field, opts...))
 	}
 }
-func newEmailsStep() *sqlgraph.Step {
+func newEmailStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(EmailsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, EmailsTable, EmailsColumn),
+		sqlgraph.To(EmailInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, EmailTable, EmailColumn),
 	)
 }
 func newTenantStep() *sqlgraph.Step {
@@ -197,10 +197,10 @@ func newTenantStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, TenantTable, TenantColumn),
 	)
 }
-func newBranchesStep() *sqlgraph.Step {
+func newBranchStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(BranchesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, BranchesTable, BranchesColumn),
+		sqlgraph.To(BranchInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, BranchTable, BranchColumn),
 	)
 }

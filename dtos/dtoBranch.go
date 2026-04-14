@@ -9,3 +9,4 @@ type BranchCreateDto struct{
 	City	string	`json:"city" validate:"required,max=50"`
 	State	string	`json:"state" validate:"required,oneof=LP SC CB OR PT TJ CH BE PA"`
 }
+

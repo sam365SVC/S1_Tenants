@@ -57,7 +57,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	}
 
 	// 3. Llamar al servicio de Login
-	jwtT, status, err := h._service.Login(c.Request().Context(), req)
+	jwtT,list, status, err := h._service.Login(c.Request().Context(), req)
 
 	if err != nil {
 		// Log del error para el desarrollador (en consola)
@@ -79,6 +79,13 @@ func (h *AuthHandler) Login(c echo.Context) error {
 				"error": "Authentication failed, please contact support",
 			})
 		}
+	}
+	if list!=nil {
+		return c.JSON(status,echo.Map{
+			"success": true,
+			"token":   jwtT,
+			"employees":list,
+		})
 	}
 	return c.JSON(status, echo.Map{
 		"success": true,

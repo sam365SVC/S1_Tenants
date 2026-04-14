@@ -65,17 +65,15 @@ func (s *OrganizationServices) CreateOrganization(ctx context.Context, userId in
 	_, err = tx.Employee.Create().
 		SetDepartment(employee.Department("office")).
 		SetPosition("boss").
-		SetEmails(emailEntity).
+		SetEmail(emailEntity).
 		SetTenant(tenantCreated).
-		SetBranches(branchCreated).
+		SetBranch(branchCreated).
 		Save(ctx)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("error making employee: %w", err)
 	}
-
 	if err := tx.Commit(); err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("error making commit: %w", err)
 	}
-
 	return http.StatusCreated, nil
 }

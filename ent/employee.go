@@ -41,26 +41,26 @@ type Employee struct {
 
 // EmployeeEdges holds the relations/edges for other nodes in the graph.
 type EmployeeEdges struct {
-	// Emails holds the value of the emails edge.
-	Emails *Email `json:"emails,omitempty"`
+	// Email holds the value of the email edge.
+	Email *Email `json:"email,omitempty"`
 	// Tenant holds the value of the tenant edge.
 	Tenant *Tenant `json:"tenant,omitempty"`
-	// Branches holds the value of the branches edge.
-	Branches *Branch `json:"branches,omitempty"`
+	// Branch holds the value of the branch edge.
+	Branch *Branch `json:"branch,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [3]bool
 }
 
-// EmailsOrErr returns the Emails value or an error if the edge
+// EmailOrErr returns the Email value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e EmployeeEdges) EmailsOrErr() (*Email, error) {
-	if e.Emails != nil {
-		return e.Emails, nil
+func (e EmployeeEdges) EmailOrErr() (*Email, error) {
+	if e.Email != nil {
+		return e.Email, nil
 	} else if e.loadedTypes[0] {
 		return nil, &NotFoundError{label: email.Label}
 	}
-	return nil, &NotLoadedError{edge: "emails"}
+	return nil, &NotLoadedError{edge: "email"}
 }
 
 // TenantOrErr returns the Tenant value or an error if the edge
@@ -74,15 +74,15 @@ func (e EmployeeEdges) TenantOrErr() (*Tenant, error) {
 	return nil, &NotLoadedError{edge: "tenant"}
 }
 
-// BranchesOrErr returns the Branches value or an error if the edge
+// BranchOrErr returns the Branch value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e EmployeeEdges) BranchesOrErr() (*Branch, error) {
-	if e.Branches != nil {
-		return e.Branches, nil
+func (e EmployeeEdges) BranchOrErr() (*Branch, error) {
+	if e.Branch != nil {
+		return e.Branch, nil
 	} else if e.loadedTypes[2] {
 		return nil, &NotFoundError{label: branch.Label}
 	}
-	return nil, &NotLoadedError{edge: "branches"}
+	return nil, &NotLoadedError{edge: "branch"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -190,9 +190,9 @@ func (_m *Employee) Value(name string) (ent.Value, error) {
 	return _m.selectValues.Get(name)
 }
 
-// QueryEmails queries the "emails" edge of the Employee entity.
-func (_m *Employee) QueryEmails() *EmailQuery {
-	return NewEmployeeClient(_m.config).QueryEmails(_m)
+// QueryEmail queries the "email" edge of the Employee entity.
+func (_m *Employee) QueryEmail() *EmailQuery {
+	return NewEmployeeClient(_m.config).QueryEmail(_m)
 }
 
 // QueryTenant queries the "tenant" edge of the Employee entity.
@@ -200,9 +200,9 @@ func (_m *Employee) QueryTenant() *TenantQuery {
 	return NewEmployeeClient(_m.config).QueryTenant(_m)
 }
 
-// QueryBranches queries the "branches" edge of the Employee entity.
-func (_m *Employee) QueryBranches() *BranchQuery {
-	return NewEmployeeClient(_m.config).QueryBranches(_m)
+// QueryBranch queries the "branch" edge of the Employee entity.
+func (_m *Employee) QueryBranch() *BranchQuery {
+	return NewEmployeeClient(_m.config).QueryBranch(_m)
 }
 
 // Update returns a builder for updating this Employee.

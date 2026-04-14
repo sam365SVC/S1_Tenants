@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"saas_identidad/dtos"
 	"saas_identidad/services"
+	"strconv"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -19,6 +20,20 @@ func NewPlanHandler(service *services.PlanServices, validator *validator.Validat
 		_service:   service,
 		_validator: validator,
 	}
+}
+func (h PlanHandler) AllPlan(c echo.Context) error {
+	list, status, err := h._service.AllPlan(c.Request().Context())
+	if err != nil {
+		c.Logger().Errorf("FALLO INTERNO - PLAN ALL: %v", err)
+		return c.JSON(status, echo.Map{
+			"success": false,
+			"error":   "Internal server error. Please try again later.",
+		})
+	}
+	return c.JSON(status, echo.Map{
+		"success": true,
+		"plans":   list,
+	})
 }
 
 func (h PlanHandler) CreatePlan(c echo.Context) error {
@@ -39,6 +54,8 @@ func (h PlanHandler) CreatePlan(c echo.Context) error {
 				campoAfectado := e.Field()
 
 				switch e.Tag() {
+				case "required":
+					errores[campoAfectado] = "This field is mandatory"
 				case "max":
 					errores[campoAfectado] = "It must have at most " + e.Param() + " characters"
 				case "gte":
@@ -79,5 +96,77 @@ func (h PlanHandler) CreatePlan(c echo.Context) error {
 	return c.JSON(status, echo.Map{
 		"success": true,
 		"message": "plan create success",
+	})
+}
+
+func (h PlanHandler) UpdatePlan(c echo.Context) error {
+	idParamStr := c.Param("id")
+	idParam, err := strconv.Atoi(idParamStr)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"success": false,
+			"error":   "the id plan must be number valit",
+		})
+	}
+	var req dtos.PlanUpdateDto
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"success": false,
+			"error":   "invalid data format",
+		})
+	}
+	if err := h._validator.Struct(&req); err != nil {
+		errores := make(map[string]string)
+
+		if validationsErrors, ok := err.(validator.ValidationErrors); ok {
+			for _, e := range validationsErrors {
+				campoAfectado := e.Field()
+
+				switch e.Tag() {
+				case "max":
+					errores[campoAfectado] = "It must have at most " + e.Param() + " characters"
+				case "gte":
+					errores[campoAfectado] = "The value must be greater than or equal to " + e.Param()
+				default:
+					errores[campoAfectado] = "Validation error: " + e.Tag()
+				}
+			}
+			return c.JSON(http.StatusBadRequest, echo.Map{
+				"success": false,
+				"error":   "Validation failed",
+				"details": errores,
+			})
+		}
+
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"success": false,
+			"error":   "Invalid request parameters",
+		})
+	}
+	planUpdate, status, err := h._service.UpdatePlan(c.Request().Context(), req, idParam)
+	if err != nil {
+
+		switch status {
+		case http.StatusNotFound:
+			c.JSON(status, echo.Map{
+				"success": false,
+				"error":   "Invalid request parameters",
+			})
+		case http.StatusInternalServerError:
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   "Internal server error. Please try again later.",
+			})
+		default:
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   "An unexpected error occurred. Please contact support now.",
+			})
+		}
+	}
+	return c.JSON(status, echo.Map{
+		"success": true,
+		"message": "Plan update success",
+		"plan":    planUpdate,
 	})
 }

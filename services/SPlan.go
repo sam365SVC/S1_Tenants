@@ -17,6 +17,13 @@ func NewPlanServices(client *ent.Client) *PlanServices {
 		_client: *client,
 	}
 }
+func (s *PlanServices) AllPlan(ctx context.Context)(list []*ent.Plan,status int,err error){
+	listPlan,err:=s._client.Plan.Query().All(ctx)
+	if err!=nil {
+		return nil,http.StatusInternalServerError,fmt.Errorf("error get all plan: %w",err)
+	}
+	return listPlan,http.StatusOK,nil
+}
 
 func (s *PlanServices) CreatePlan(ctx context.Context, req dtos.PlanCreateDto) (status int, err error) {
 	tx, err := s._client.Tx(ctx)
@@ -38,4 +45,33 @@ func (s *PlanServices) CreatePlan(ctx context.Context, req dtos.PlanCreateDto) (
 		return http.StatusInternalServerError, fmt.Errorf("error making commit: %w", err)
 	}
 	return http.StatusCreated, nil
+}
+
+func (s *PlanServices) UpdatePlan(ctx context.Context,req dtos.PlanUpdateDto,planId int)(plan *ent.Plan,status int, err error){
+	updatePlan:=s._client.Plan.UpdateOneID(planId)
+
+	if req.Subscription!=nil {
+		updatePlan.SetSubscription(*req.Subscription)
+	}
+	if req.Price!=nil {
+		updatePlan.SetPrice(*req.Price)
+	}
+	if req.MaxEmployees!=nil {
+		updatePlan.SetMaxEmployees(*req.MaxEmployees)
+	}
+	if req.MaxBranches!=nil {
+		updatePlan.SetMaxBranches(*req.MaxBranches)
+	}
+	if req.MaxBosses!=nil {
+		updatePlan.SetMaxBosses(*req.MaxBosses)
+	}
+
+	planUpdate,err:=updatePlan.Save(ctx)
+	if err!=nil {
+		if ent.IsNotFound(err) {
+			return nil,http.StatusNotFound,fmt.Errorf("error plan not fount: %w",err)
+		}
+		return nil,http.StatusInternalServerError,fmt.Errorf("error update plan: %w",err)
+	}
+	return planUpdate,http.StatusOK,nil
 }

@@ -11,7 +11,6 @@ import (
 type Email struct {
 	ent.Schema
 }
-
 func (Email)Fields()[]ent.Field{
 	return []ent.Field{
 		field.String("email").NotEmpty().MaxLen(150).Validate(ValidateEmail).Unique(),

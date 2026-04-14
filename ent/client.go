@@ -702,15 +702,15 @@ func (c *EmployeeClient) GetX(ctx context.Context, id int) *Employee {
 	return obj
 }
 
-// QueryEmails queries the emails edge of a Employee.
-func (c *EmployeeClient) QueryEmails(_m *Employee) *EmailQuery {
+// QueryEmail queries the email edge of a Employee.
+func (c *EmployeeClient) QueryEmail(_m *Employee) *EmailQuery {
 	query := (&EmailClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(employee.Table, employee.FieldID, id),
 			sqlgraph.To(email.Table, email.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, employee.EmailsTable, employee.EmailsColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, employee.EmailTable, employee.EmailColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -734,15 +734,15 @@ func (c *EmployeeClient) QueryTenant(_m *Employee) *TenantQuery {
 	return query
 }
 
-// QueryBranches queries the branches edge of a Employee.
-func (c *EmployeeClient) QueryBranches(_m *Employee) *BranchQuery {
+// QueryBranch queries the branch edge of a Employee.
+func (c *EmployeeClient) QueryBranch(_m *Employee) *BranchQuery {
 	query := (&BranchClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(employee.Table, employee.FieldID, id),
 			sqlgraph.To(branch.Table, branch.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, employee.BranchesTable, employee.BranchesColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, employee.BranchTable, employee.BranchColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil

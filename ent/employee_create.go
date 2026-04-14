@@ -77,23 +77,23 @@ func (_c *EmployeeCreate) SetNillableLeftAt(v *time.Time) *EmployeeCreate {
 	return _c
 }
 
-// SetEmailsID sets the "emails" edge to the Email entity by ID.
-func (_c *EmployeeCreate) SetEmailsID(id int) *EmployeeCreate {
-	_c.mutation.SetEmailsID(id)
+// SetEmailID sets the "email" edge to the Email entity by ID.
+func (_c *EmployeeCreate) SetEmailID(id int) *EmployeeCreate {
+	_c.mutation.SetEmailID(id)
 	return _c
 }
 
-// SetNillableEmailsID sets the "emails" edge to the Email entity by ID if the given value is not nil.
-func (_c *EmployeeCreate) SetNillableEmailsID(id *int) *EmployeeCreate {
+// SetNillableEmailID sets the "email" edge to the Email entity by ID if the given value is not nil.
+func (_c *EmployeeCreate) SetNillableEmailID(id *int) *EmployeeCreate {
 	if id != nil {
-		_c = _c.SetEmailsID(*id)
+		_c = _c.SetEmailID(*id)
 	}
 	return _c
 }
 
-// SetEmails sets the "emails" edge to the Email entity.
-func (_c *EmployeeCreate) SetEmails(v *Email) *EmployeeCreate {
-	return _c.SetEmailsID(v.ID)
+// SetEmail sets the "email" edge to the Email entity.
+func (_c *EmployeeCreate) SetEmail(v *Email) *EmployeeCreate {
+	return _c.SetEmailID(v.ID)
 }
 
 // SetTenantID sets the "tenant" edge to the Tenant entity by ID.
@@ -115,23 +115,23 @@ func (_c *EmployeeCreate) SetTenant(v *Tenant) *EmployeeCreate {
 	return _c.SetTenantID(v.ID)
 }
 
-// SetBranchesID sets the "branches" edge to the Branch entity by ID.
-func (_c *EmployeeCreate) SetBranchesID(id int) *EmployeeCreate {
-	_c.mutation.SetBranchesID(id)
+// SetBranchID sets the "branch" edge to the Branch entity by ID.
+func (_c *EmployeeCreate) SetBranchID(id int) *EmployeeCreate {
+	_c.mutation.SetBranchID(id)
 	return _c
 }
 
-// SetNillableBranchesID sets the "branches" edge to the Branch entity by ID if the given value is not nil.
-func (_c *EmployeeCreate) SetNillableBranchesID(id *int) *EmployeeCreate {
+// SetNillableBranchID sets the "branch" edge to the Branch entity by ID if the given value is not nil.
+func (_c *EmployeeCreate) SetNillableBranchID(id *int) *EmployeeCreate {
 	if id != nil {
-		_c = _c.SetBranchesID(*id)
+		_c = _c.SetBranchID(*id)
 	}
 	return _c
 }
 
-// SetBranches sets the "branches" edge to the Branch entity.
-func (_c *EmployeeCreate) SetBranches(v *Branch) *EmployeeCreate {
-	return _c.SetBranchesID(v.ID)
+// SetBranch sets the "branch" edge to the Branch entity.
+func (_c *EmployeeCreate) SetBranch(v *Branch) *EmployeeCreate {
+	return _c.SetBranchID(v.ID)
 }
 
 // Mutation returns the EmployeeMutation object of the builder.
@@ -255,12 +255,12 @@ func (_c *EmployeeCreate) createSpec() (*Employee, *sqlgraph.CreateSpec) {
 		_spec.SetField(employee.FieldLeftAt, field.TypeTime, value)
 		_node.LeftAt = &value
 	}
-	if nodes := _c.mutation.EmailsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.EmailIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.EmailsTable,
-			Columns: []string{employee.EmailsColumn},
+			Table:   employee.EmailTable,
+			Columns: []string{employee.EmailColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeInt),
@@ -289,12 +289,12 @@ func (_c *EmployeeCreate) createSpec() (*Employee, *sqlgraph.CreateSpec) {
 		_node.tenant_employees = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := _c.mutation.BranchesIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.BranchIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.BranchesTable,
-			Columns: []string{employee.BranchesColumn},
+			Table:   employee.BranchTable,
+			Columns: []string{employee.BranchColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(branch.FieldID, field.TypeInt),

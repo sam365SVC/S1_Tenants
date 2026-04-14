@@ -1708,24 +1708,24 @@ func (m *EmailMutation) ResetEdge(name string) error {
 // EmployeeMutation represents an operation that mutates the Employee nodes in the graph.
 type EmployeeMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *int
-	department      *employee.Department
-	position        *string
-	active          *bool
-	join_at         *time.Time
-	left_at         *time.Time
-	clearedFields   map[string]struct{}
-	emails          *int
-	clearedemails   bool
-	tenant          *int
-	clearedtenant   bool
-	branches        *int
-	clearedbranches bool
-	done            bool
-	oldValue        func(context.Context) (*Employee, error)
-	predicates      []predicate.Employee
+	op            Op
+	typ           string
+	id            *int
+	department    *employee.Department
+	position      *string
+	active        *bool
+	join_at       *time.Time
+	left_at       *time.Time
+	clearedFields map[string]struct{}
+	email         *int
+	clearedemail  bool
+	tenant        *int
+	clearedtenant bool
+	branch        *int
+	clearedbranch bool
+	done          bool
+	oldValue      func(context.Context) (*Employee, error)
+	predicates    []predicate.Employee
 }
 
 var _ ent.Mutation = (*EmployeeMutation)(nil)
@@ -2019,43 +2019,43 @@ func (m *EmployeeMutation) ResetLeftAt() {
 	delete(m.clearedFields, employee.FieldLeftAt)
 }
 
-// SetEmailsID sets the "emails" edge to the Email entity by id.
-func (m *EmployeeMutation) SetEmailsID(id int) {
-	m.emails = &id
+// SetEmailID sets the "email" edge to the Email entity by id.
+func (m *EmployeeMutation) SetEmailID(id int) {
+	m.email = &id
 }
 
-// ClearEmails clears the "emails" edge to the Email entity.
-func (m *EmployeeMutation) ClearEmails() {
-	m.clearedemails = true
+// ClearEmail clears the "email" edge to the Email entity.
+func (m *EmployeeMutation) ClearEmail() {
+	m.clearedemail = true
 }
 
-// EmailsCleared reports if the "emails" edge to the Email entity was cleared.
-func (m *EmployeeMutation) EmailsCleared() bool {
-	return m.clearedemails
+// EmailCleared reports if the "email" edge to the Email entity was cleared.
+func (m *EmployeeMutation) EmailCleared() bool {
+	return m.clearedemail
 }
 
-// EmailsID returns the "emails" edge ID in the mutation.
-func (m *EmployeeMutation) EmailsID() (id int, exists bool) {
-	if m.emails != nil {
-		return *m.emails, true
+// EmailID returns the "email" edge ID in the mutation.
+func (m *EmployeeMutation) EmailID() (id int, exists bool) {
+	if m.email != nil {
+		return *m.email, true
 	}
 	return
 }
 
-// EmailsIDs returns the "emails" edge IDs in the mutation.
+// EmailIDs returns the "email" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// EmailsID instead. It exists only for internal usage by the builders.
-func (m *EmployeeMutation) EmailsIDs() (ids []int) {
-	if id := m.emails; id != nil {
+// EmailID instead. It exists only for internal usage by the builders.
+func (m *EmployeeMutation) EmailIDs() (ids []int) {
+	if id := m.email; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetEmails resets all changes to the "emails" edge.
-func (m *EmployeeMutation) ResetEmails() {
-	m.emails = nil
-	m.clearedemails = false
+// ResetEmail resets all changes to the "email" edge.
+func (m *EmployeeMutation) ResetEmail() {
+	m.email = nil
+	m.clearedemail = false
 }
 
 // SetTenantID sets the "tenant" edge to the Tenant entity by id.
@@ -2097,43 +2097,43 @@ func (m *EmployeeMutation) ResetTenant() {
 	m.clearedtenant = false
 }
 
-// SetBranchesID sets the "branches" edge to the Branch entity by id.
-func (m *EmployeeMutation) SetBranchesID(id int) {
-	m.branches = &id
+// SetBranchID sets the "branch" edge to the Branch entity by id.
+func (m *EmployeeMutation) SetBranchID(id int) {
+	m.branch = &id
 }
 
-// ClearBranches clears the "branches" edge to the Branch entity.
-func (m *EmployeeMutation) ClearBranches() {
-	m.clearedbranches = true
+// ClearBranch clears the "branch" edge to the Branch entity.
+func (m *EmployeeMutation) ClearBranch() {
+	m.clearedbranch = true
 }
 
-// BranchesCleared reports if the "branches" edge to the Branch entity was cleared.
-func (m *EmployeeMutation) BranchesCleared() bool {
-	return m.clearedbranches
+// BranchCleared reports if the "branch" edge to the Branch entity was cleared.
+func (m *EmployeeMutation) BranchCleared() bool {
+	return m.clearedbranch
 }
 
-// BranchesID returns the "branches" edge ID in the mutation.
-func (m *EmployeeMutation) BranchesID() (id int, exists bool) {
-	if m.branches != nil {
-		return *m.branches, true
+// BranchID returns the "branch" edge ID in the mutation.
+func (m *EmployeeMutation) BranchID() (id int, exists bool) {
+	if m.branch != nil {
+		return *m.branch, true
 	}
 	return
 }
 
-// BranchesIDs returns the "branches" edge IDs in the mutation.
+// BranchIDs returns the "branch" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// BranchesID instead. It exists only for internal usage by the builders.
-func (m *EmployeeMutation) BranchesIDs() (ids []int) {
-	if id := m.branches; id != nil {
+// BranchID instead. It exists only for internal usage by the builders.
+func (m *EmployeeMutation) BranchIDs() (ids []int) {
+	if id := m.branch; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetBranches resets all changes to the "branches" edge.
-func (m *EmployeeMutation) ResetBranches() {
-	m.branches = nil
-	m.clearedbranches = false
+// ResetBranch resets all changes to the "branch" edge.
+func (m *EmployeeMutation) ResetBranch() {
+	m.branch = nil
+	m.clearedbranch = false
 }
 
 // Where appends a list predicates to the EmployeeMutation builder.
@@ -2347,14 +2347,14 @@ func (m *EmployeeMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *EmployeeMutation) AddedEdges() []string {
 	edges := make([]string, 0, 3)
-	if m.emails != nil {
-		edges = append(edges, employee.EdgeEmails)
+	if m.email != nil {
+		edges = append(edges, employee.EdgeEmail)
 	}
 	if m.tenant != nil {
 		edges = append(edges, employee.EdgeTenant)
 	}
-	if m.branches != nil {
-		edges = append(edges, employee.EdgeBranches)
+	if m.branch != nil {
+		edges = append(edges, employee.EdgeBranch)
 	}
 	return edges
 }
@@ -2363,16 +2363,16 @@ func (m *EmployeeMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *EmployeeMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case employee.EdgeEmails:
-		if id := m.emails; id != nil {
+	case employee.EdgeEmail:
+		if id := m.email; id != nil {
 			return []ent.Value{*id}
 		}
 	case employee.EdgeTenant:
 		if id := m.tenant; id != nil {
 			return []ent.Value{*id}
 		}
-	case employee.EdgeBranches:
-		if id := m.branches; id != nil {
+	case employee.EdgeBranch:
+		if id := m.branch; id != nil {
 			return []ent.Value{*id}
 		}
 	}
@@ -2394,14 +2394,14 @@ func (m *EmployeeMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *EmployeeMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 3)
-	if m.clearedemails {
-		edges = append(edges, employee.EdgeEmails)
+	if m.clearedemail {
+		edges = append(edges, employee.EdgeEmail)
 	}
 	if m.clearedtenant {
 		edges = append(edges, employee.EdgeTenant)
 	}
-	if m.clearedbranches {
-		edges = append(edges, employee.EdgeBranches)
+	if m.clearedbranch {
+		edges = append(edges, employee.EdgeBranch)
 	}
 	return edges
 }
@@ -2410,12 +2410,12 @@ func (m *EmployeeMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *EmployeeMutation) EdgeCleared(name string) bool {
 	switch name {
-	case employee.EdgeEmails:
-		return m.clearedemails
+	case employee.EdgeEmail:
+		return m.clearedemail
 	case employee.EdgeTenant:
 		return m.clearedtenant
-	case employee.EdgeBranches:
-		return m.clearedbranches
+	case employee.EdgeBranch:
+		return m.clearedbranch
 	}
 	return false
 }
@@ -2424,14 +2424,14 @@ func (m *EmployeeMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *EmployeeMutation) ClearEdge(name string) error {
 	switch name {
-	case employee.EdgeEmails:
-		m.ClearEmails()
+	case employee.EdgeEmail:
+		m.ClearEmail()
 		return nil
 	case employee.EdgeTenant:
 		m.ClearTenant()
 		return nil
-	case employee.EdgeBranches:
-		m.ClearBranches()
+	case employee.EdgeBranch:
+		m.ClearBranch()
 		return nil
 	}
 	return fmt.Errorf("unknown Employee unique edge %s", name)
@@ -2441,14 +2441,14 @@ func (m *EmployeeMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *EmployeeMutation) ResetEdge(name string) error {
 	switch name {
-	case employee.EdgeEmails:
-		m.ResetEmails()
+	case employee.EdgeEmail:
+		m.ResetEmail()
 		return nil
 	case employee.EdgeTenant:
 		m.ResetTenant()
 		return nil
-	case employee.EdgeBranches:
-		m.ResetBranches()
+	case employee.EdgeBranch:
+		m.ResetBranch()
 		return nil
 	}
 	return fmt.Errorf("unknown Employee edge %s", name)
