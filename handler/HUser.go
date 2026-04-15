@@ -104,7 +104,7 @@ func (h *UserHandler) CreateUser(c echo.Context) error {
 	})
 }
 func (h *UserHandler) AllUser(c echo.Context) error {
-	pageStr := c.Param(":page")
+	pageStr := c.Param("page")
 	page, err := strconv.Atoi(pageStr)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{
