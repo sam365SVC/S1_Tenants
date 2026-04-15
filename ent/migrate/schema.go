@@ -117,6 +117,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "department", Type: field.TypeString},
 		{Name: "position", Type: field.TypeString},
+		{Name: "branch_invitation_employees", Type: field.TypeInt, Nullable: true},
 		{Name: "invitation_invitation_employee", Type: field.TypeInt, Unique: true, Nullable: true},
 		{Name: "tenant_invitation_employees", Type: field.TypeInt, Nullable: true},
 	}
@@ -127,14 +128,20 @@ var (
 		PrimaryKey: []*schema.Column{InvitationEmployeesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "invitation_employees_invitations_invitation_employee",
+				Symbol:     "invitation_employees_branches_invitation_employees",
 				Columns:    []*schema.Column{InvitationEmployeesColumns[3]},
+				RefColumns: []*schema.Column{BranchesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "invitation_employees_invitations_invitation_employee",
+				Columns:    []*schema.Column{InvitationEmployeesColumns[4]},
 				RefColumns: []*schema.Column{InvitationsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "invitation_employees_tenants_invitation_employees",
-				Columns:    []*schema.Column{InvitationEmployeesColumns[4]},
+				Columns:    []*schema.Column{InvitationEmployeesColumns[5]},
 				RefColumns: []*schema.Column{TenantsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -217,8 +224,9 @@ func init() {
 	EmployeesTable.ForeignKeys[0].RefTable = BranchesTable
 	EmployeesTable.ForeignKeys[1].RefTable = EmailsTable
 	EmployeesTable.ForeignKeys[2].RefTable = TenantsTable
-	InvitationEmployeesTable.ForeignKeys[0].RefTable = InvitationsTable
-	InvitationEmployeesTable.ForeignKeys[1].RefTable = TenantsTable
+	InvitationEmployeesTable.ForeignKeys[0].RefTable = BranchesTable
+	InvitationEmployeesTable.ForeignKeys[1].RefTable = InvitationsTable
+	InvitationEmployeesTable.ForeignKeys[2].RefTable = TenantsTable
 	TenantsTable.ForeignKeys[0].RefTable = PlansTable
 	TenantsTable.ForeignKeys[1].RefTable = UsersTable
 }

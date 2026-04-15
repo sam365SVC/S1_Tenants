@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"saas_identidad/ent/branch"
 	"saas_identidad/ent/invitation"
 	"saas_identidad/ent/invitationemployee"
 	"saas_identidad/ent/predicate"
@@ -26,6 +27,7 @@ type InvitationEmployeeQuery struct {
 	predicates     []predicate.InvitationEmployee
 	withInvitation *InvitationQuery
 	withTenant     *TenantQuery
+	withBranch     *BranchQuery
 	withFKs        bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -100,6 +102,28 @@ func (_q *InvitationEmployeeQuery) QueryTenant() *TenantQuery {
 			sqlgraph.From(invitationemployee.Table, invitationemployee.FieldID, selector),
 			sqlgraph.To(tenant.Table, tenant.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, invitationemployee.TenantTable, invitationemployee.TenantColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryBranch chains the current query on the "branch" edge.
+func (_q *InvitationEmployeeQuery) QueryBranch() *BranchQuery {
+	query := (&BranchClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(invitationemployee.Table, invitationemployee.FieldID, selector),
+			sqlgraph.To(branch.Table, branch.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, invitationemployee.BranchTable, invitationemployee.BranchColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -301,6 +325,7 @@ func (_q *InvitationEmployeeQuery) Clone() *InvitationEmployeeQuery {
 		predicates:     append([]predicate.InvitationEmployee{}, _q.predicates...),
 		withInvitation: _q.withInvitation.Clone(),
 		withTenant:     _q.withTenant.Clone(),
+		withBranch:     _q.withBranch.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -326,6 +351,17 @@ func (_q *InvitationEmployeeQuery) WithTenant(opts ...func(*TenantQuery)) *Invit
 		opt(query)
 	}
 	_q.withTenant = query
+	return _q
+}
+
+// WithBranch tells the query-builder to eager-load the nodes that are connected to
+// the "branch" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *InvitationEmployeeQuery) WithBranch(opts ...func(*BranchQuery)) *InvitationEmployeeQuery {
+	query := (&BranchClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withBranch = query
 	return _q
 }
 
@@ -408,12 +444,13 @@ func (_q *InvitationEmployeeQuery) sqlAll(ctx context.Context, hooks ...queryHoo
 		nodes       = []*InvitationEmployee{}
 		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			_q.withInvitation != nil,
 			_q.withTenant != nil,
+			_q.withBranch != nil,
 		}
 	)
-	if _q.withInvitation != nil || _q.withTenant != nil {
+	if _q.withInvitation != nil || _q.withTenant != nil || _q.withBranch != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -446,6 +483,12 @@ func (_q *InvitationEmployeeQuery) sqlAll(ctx context.Context, hooks ...queryHoo
 	if query := _q.withTenant; query != nil {
 		if err := _q.loadTenant(ctx, query, nodes, nil,
 			func(n *InvitationEmployee, e *Tenant) { n.Edges.Tenant = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withBranch; query != nil {
+		if err := _q.loadBranch(ctx, query, nodes, nil,
+			func(n *InvitationEmployee, e *Branch) { n.Edges.Branch = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -509,6 +552,38 @@ func (_q *InvitationEmployeeQuery) loadTenant(ctx context.Context, query *Tenant
 		nodes, ok := nodeids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "tenant_invitation_employees" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (_q *InvitationEmployeeQuery) loadBranch(ctx context.Context, query *BranchQuery, nodes []*InvitationEmployee, init func(*InvitationEmployee), assign func(*InvitationEmployee, *Branch)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*InvitationEmployee)
+	for i := range nodes {
+		if nodes[i].branch_invitation_employees == nil {
+			continue
+		}
+		fk := *nodes[i].branch_invitation_employees
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(branch.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "branch_invitation_employees" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

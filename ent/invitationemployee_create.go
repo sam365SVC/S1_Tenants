@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"saas_identidad/ent/branch"
 	"saas_identidad/ent/invitation"
 	"saas_identidad/ent/invitationemployee"
 	"saas_identidad/ent/tenant"
@@ -69,6 +70,25 @@ func (_c *InvitationEmployeeCreate) SetNillableTenantID(id *int) *InvitationEmpl
 // SetTenant sets the "tenant" edge to the Tenant entity.
 func (_c *InvitationEmployeeCreate) SetTenant(v *Tenant) *InvitationEmployeeCreate {
 	return _c.SetTenantID(v.ID)
+}
+
+// SetBranchID sets the "branch" edge to the Branch entity by ID.
+func (_c *InvitationEmployeeCreate) SetBranchID(id int) *InvitationEmployeeCreate {
+	_c.mutation.SetBranchID(id)
+	return _c
+}
+
+// SetNillableBranchID sets the "branch" edge to the Branch entity by ID if the given value is not nil.
+func (_c *InvitationEmployeeCreate) SetNillableBranchID(id *int) *InvitationEmployeeCreate {
+	if id != nil {
+		_c = _c.SetBranchID(*id)
+	}
+	return _c
+}
+
+// SetBranch sets the "branch" edge to the Branch entity.
+func (_c *InvitationEmployeeCreate) SetBranch(v *Branch) *InvitationEmployeeCreate {
+	return _c.SetBranchID(v.ID)
 }
 
 // Mutation returns the InvitationEmployeeMutation object of the builder.
@@ -187,6 +207,23 @@ func (_c *InvitationEmployeeCreate) createSpec() (*InvitationEmployee, *sqlgraph
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.tenant_invitation_employees = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.BranchIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   invitationemployee.BranchTable,
+			Columns: []string{invitationemployee.BranchColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(branch.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.branch_invitation_employees = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

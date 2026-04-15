@@ -34,8 +34,12 @@ func JWTMiddleware(jwtKey string) echo.MiddlewareFunc {
 				c.Set("user_id", claims["user_id"])
 				c.Set("account", claims["account"])
 				c.Set("email", claims["email"])
+				// los datos que faltan
+				c.Set("tenant_id", claims["tenant_id"])
+				c.Set("tenant_name", claims["tenant_name"])
+				c.Set("department", claims["department"])
+				c.Set("position", claims["position"])
 			}
-
 			return next(c)
 		}
 	}
@@ -62,6 +66,28 @@ func RequireRoles(allowedRoles ...string) echo.MiddlewareFunc {
 				return c.JSON(http.StatusUnauthorized, echo.Map{
 					"error": "could not identify the user's role (invalid token)",
 				})
+			}
+			return next(c)
+		}
+	}
+}
+
+// RequireOfficeBoss verifica que el usuario pertenezca al departamento 'office' y sea 'boss'
+func RequireOfficeBoss() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			userToken := c.Get("user").(*jwt.Token)
+
+			claims, ok := userToken.Claims.(*CustomClaimsJWT)
+			if !ok {
+				return echo.NewHTTPError(http.StatusInternalServerError, "error al parsear claims")
+			}
+			// Usamos strings.ToLower para evitar problemas de mayúsculas/minúsculas
+			isOffice := strings.ToLower(claims.Department) == "office"
+			isBoss := strings.ToLower(claims.Position) == "boss"
+
+			if !isOffice || !isBoss {
+				return echo.NewHTTPError(http.StatusForbidden, "Acceso denegado: se requiere ser Boss de Office")
 			}
 			return next(c)
 		}

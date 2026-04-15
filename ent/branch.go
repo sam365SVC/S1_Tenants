@@ -49,9 +49,11 @@ type BranchEdges struct {
 	Tenant *Tenant `json:"tenant,omitempty"`
 	// Employees holds the value of the employees edge.
 	Employees []*Employee `json:"employees,omitempty"`
+	// InvitationEmployees holds the value of the invitation_employees edge.
+	InvitationEmployees []*InvitationEmployee `json:"invitation_employees,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // TenantOrErr returns the Tenant value or an error if the edge
@@ -72,6 +74,15 @@ func (e BranchEdges) EmployeesOrErr() ([]*Employee, error) {
 		return e.Employees, nil
 	}
 	return nil, &NotLoadedError{edge: "employees"}
+}
+
+// InvitationEmployeesOrErr returns the InvitationEmployees value or an error if the edge
+// was not loaded in eager-loading.
+func (e BranchEdges) InvitationEmployeesOrErr() ([]*InvitationEmployee, error) {
+	if e.loadedTypes[2] {
+		return e.InvitationEmployees, nil
+	}
+	return nil, &NotLoadedError{edge: "invitation_employees"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -192,6 +203,11 @@ func (_m *Branch) QueryTenant() *TenantQuery {
 // QueryEmployees queries the "employees" edge of the Branch entity.
 func (_m *Branch) QueryEmployees() *EmployeeQuery {
 	return NewBranchClient(_m.config).QueryEmployees(_m)
+}
+
+// QueryInvitationEmployees queries the "invitation_employees" edge of the Branch entity.
+func (_m *Branch) QueryInvitationEmployees() *InvitationEmployeeQuery {
+	return NewBranchClient(_m.config).QueryInvitationEmployees(_m)
 }
 
 // Update returns a builder for updating this Branch.

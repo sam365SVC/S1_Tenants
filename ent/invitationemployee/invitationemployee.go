@@ -20,6 +20,8 @@ const (
 	EdgeInvitation = "invitation"
 	// EdgeTenant holds the string denoting the tenant edge name in mutations.
 	EdgeTenant = "tenant"
+	// EdgeBranch holds the string denoting the branch edge name in mutations.
+	EdgeBranch = "branch"
 	// Table holds the table name of the invitationemployee in the database.
 	Table = "invitation_employees"
 	// InvitationTable is the table that holds the invitation relation/edge.
@@ -36,6 +38,13 @@ const (
 	TenantInverseTable = "tenants"
 	// TenantColumn is the table column denoting the tenant relation/edge.
 	TenantColumn = "tenant_invitation_employees"
+	// BranchTable is the table that holds the branch relation/edge.
+	BranchTable = "invitation_employees"
+	// BranchInverseTable is the table name for the Branch entity.
+	// It exists in this package in order to avoid circular dependency with the "branch" package.
+	BranchInverseTable = "branches"
+	// BranchColumn is the table column denoting the branch relation/edge.
+	BranchColumn = "branch_invitation_employees"
 )
 
 // Columns holds all SQL columns for invitationemployee fields.
@@ -48,6 +57,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "invitation_employees"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
+	"branch_invitation_employees",
 	"invitation_invitation_employee",
 	"tenant_invitation_employees",
 }
@@ -105,6 +115,13 @@ func ByTenantField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newTenantStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByBranchField orders the results by branch field.
+func ByBranchField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newBranchStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newInvitationStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -117,5 +134,12 @@ func newTenantStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(TenantInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, TenantTable, TenantColumn),
+	)
+}
+func newBranchStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(BranchInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, BranchTable, BranchColumn),
 	)
 }

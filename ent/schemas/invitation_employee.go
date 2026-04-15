@@ -24,5 +24,6 @@ func (InvitationEmployee)Edges()[]ent.Edge{
 	return []ent.Edge{
 		edge.From("invitation",Invitation.Type).Ref("invitation_employee").Unique(),
 		edge.From("tenant",Tenant.Type).Ref("invitation_employees").Unique(),
+		edge.From("branch",Branch.Type).Ref("invitation_employees").Unique(),
 	}
 }

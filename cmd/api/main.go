@@ -76,24 +76,36 @@ func main() {
 	{
 		RInvitationDeveloper.POST("", HInvitation.InvitationDeveloper)
 	}
+	RInvitationJob := RInvitation.Group("/job", jwtAuth, security.RequireRoles("ADMIN"))
+	{
+		RInvitationJob.POST("", HInvitation.InvitationJob)
+	}
 
 	RUser := api.Group("/user")
 	{
 		RUser.POST("", HUser.CreateUser)
+		RUser.GET("/:id",HUser.GetUserId)
 	}
 	ROrganization := api.Group("/organization", jwtAuth, security.RequireRoles("ADMIN"))
 	{
 		ROrganization.POST("", HOrganization.CreateOrganization)
 	}
-	RPlan := api.Group("/plan", jwtAuth, security.RequireRoles("DEVELOPER"))
+	RPlan := api.Group("/plan")
 	{
-		RPlan.POST("", HPlan.CreatePlan)
+		RPlan.GET("", HPlan.AllPlan)
 	}
-
+	RPlanS := RPlan.Group("", jwtAuth, security.RequireRoles("DEVELOPER"))
+	{
+		RPlanS.POST("", HPlan.CreatePlan)
+		RPlanS.PUT("/:id", HPlan.UpdatePlan)
+	}
 	RLogin := api.Group("/login")
 	{
 		RLogin.POST("", HLogin.Login)
 	}
-
+	RLoginTenant := RLogin.Group("/tenant", jwtAuth, security.RequireRoles("ADMIN"))
+	{
+		RLoginTenant.POST("", HLogin.LoginTenant)
+	}
 	app.Logger.Fatal(app.Start(":8080"))
 }
