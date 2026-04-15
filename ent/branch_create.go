@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"saas_identidad/ent/branch"
 	"saas_identidad/ent/employee"
+	"saas_identidad/ent/invitationemployee"
 	"saas_identidad/ent/tenant"
 	"time"
 
@@ -164,6 +165,21 @@ func (_c *BranchCreate) AddEmployees(v ...*Employee) *BranchCreate {
 		ids[i] = v[i].ID
 	}
 	return _c.AddEmployeeIDs(ids...)
+}
+
+// AddInvitationEmployeeIDs adds the "invitation_employees" edge to the InvitationEmployee entity by IDs.
+func (_c *BranchCreate) AddInvitationEmployeeIDs(ids ...int) *BranchCreate {
+	_c.mutation.AddInvitationEmployeeIDs(ids...)
+	return _c
+}
+
+// AddInvitationEmployees adds the "invitation_employees" edges to the InvitationEmployee entity.
+func (_c *BranchCreate) AddInvitationEmployees(v ...*InvitationEmployee) *BranchCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddInvitationEmployeeIDs(ids...)
 }
 
 // Mutation returns the BranchMutation object of the builder.
@@ -362,6 +378,22 @@ func (_c *BranchCreate) createSpec() (*Branch, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.InvitationEmployeesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   branch.InvitationEmployeesTable,
+			Columns: []string{branch.InvitationEmployeesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitationemployee.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

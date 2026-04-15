@@ -27,7 +27,8 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	// 1. Parsear el JSON
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{
-			"error": "Invalid JSON format",
+			"success": false,
+			"error":   "Invalid JSON format",
 		})
 	}
 
@@ -57,7 +58,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	}
 
 	// 3. Llamar al servicio de Login
-	jwtT,list, status, err := h._service.Login(c.Request().Context(), req)
+	jwtT, list, status, err := h._service.Login(c.Request().Context(), req)
 
 	if err != nil {
 		// Log del error para el desarrollador (en consola)
@@ -80,15 +81,94 @@ func (h *AuthHandler) Login(c echo.Context) error {
 			})
 		}
 	}
-	if list!=nil {
-		return c.JSON(status,echo.Map{
-			"success": true,
-			"token":   jwtT,
-			"employees":list,
+	if list != nil {
+		return c.JSON(status, echo.Map{
+			"success":   true,
+			"token":     jwtT,
+			"employees": list,
 		})
 	}
 	return c.JSON(status, echo.Map{
 		"success": true,
 		"token":   jwtT,
+	})
+}
+func (h *AuthHandler) LoginTenant(c echo.Context) error {
+	var req dtos.LoginTenantDto
+
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"success": false,
+			"error":   "Invalid JSON format",
+		})
+	}
+	if err := h._validator.Struct(&req); err != nil {
+		errores := make(map[string]string)
+
+		if validationsErrors, ok := err.(validator.ValidationErrors); ok {
+			for _, e := range validationsErrors {
+				switch e.Tag() {
+				case "required":
+					errores[e.Field()] = "This field is mandatory"
+				case "gte":
+					errores[e.Field()] = "The value must be greater than or equal to " + e.Param()
+				default:
+					errores[e.Field()] = "Validation error: " + e.Tag()
+				}
+			}
+		}
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"error":   "Validation failed",
+			"details": errores,
+		})
+	}
+	userIdRaw := c.Get("user_id")
+	emailRaw := c.Get("email")
+
+	if userIdRaw == nil || emailRaw == nil {
+		return c.JSON(http.StatusUnauthorized, echo.Map{
+			"success": false,
+			"error":   "Missing authentication claims in token",
+		})
+	}
+	userIdFloat, okId := userIdRaw.(float64)
+	email, okEmail := emailRaw.(string)
+
+	if !okId || !okEmail {
+		return c.JSON(http.StatusUnauthorized, echo.Map{
+			"success": false,
+			"error":   "Invalid token claims format",
+		})
+	}
+	tokenEmployee, status, err := h._service.LoginTenant(c.Request().Context(), int(userIdFloat), email, req)
+	if err != nil {
+		c.Logger().Errorf("FALLO INTERNO - LOGIN TENANT: %v |Request: %v", err, req)
+		switch status {
+		case http.StatusForbidden:
+			// Caso: ent.IsNotFound -> El usuario no existe en esa empresa o está inactivo
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   "You do not have access to this organization or your employment is inactive.",
+			})
+
+		case http.StatusInternalServerError:
+			// Caso: Falló la base de datos o falló la generación del JWT
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   "Internal server error. Please try again later.",
+			})
+
+		default:
+			// Fallback de seguridad por si en el futuro agregas más códigos en el servicio
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   "An unexpected error occurred. Please contact support now.",
+			})
+		}
+	}
+	return c.JSON(status, echo.Map{
+		"success": true,
+		"message": "login tenant success",
+		"token":   tokenEmployee,
 	})
 }

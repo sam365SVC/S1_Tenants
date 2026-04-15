@@ -404,6 +404,22 @@ func (c *BranchClient) QueryEmployees(_m *Branch) *EmployeeQuery {
 	return query
 }
 
+// QueryInvitationEmployees queries the invitation_employees edge of a Branch.
+func (c *BranchClient) QueryInvitationEmployees(_m *Branch) *InvitationEmployeeQuery {
+	query := (&InvitationEmployeeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(branch.Table, branch.FieldID, id),
+			sqlgraph.To(invitationemployee.Table, invitationemployee.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, branch.InvitationEmployeesTable, branch.InvitationEmployeesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *BranchClient) Hooks() []Hook {
 	return c.hooks.Branch
@@ -1058,6 +1074,22 @@ func (c *InvitationEmployeeClient) QueryTenant(_m *InvitationEmployee) *TenantQu
 			sqlgraph.From(invitationemployee.Table, invitationemployee.FieldID, id),
 			sqlgraph.To(tenant.Table, tenant.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, invitationemployee.TenantTable, invitationemployee.TenantColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryBranch queries the branch edge of a InvitationEmployee.
+func (c *InvitationEmployeeClient) QueryBranch(_m *InvitationEmployee) *BranchQuery {
+	query := (&BranchClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(invitationemployee.Table, invitationemployee.FieldID, id),
+			sqlgraph.To(branch.Table, branch.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, invitationemployee.BranchTable, invitationemployee.BranchColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil

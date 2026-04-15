@@ -4,6 +4,7 @@ package ent
 
 import (
 	"fmt"
+	"saas_identidad/ent/branch"
 	"saas_identidad/ent/invitation"
 	"saas_identidad/ent/invitationemployee"
 	"saas_identidad/ent/tenant"
@@ -25,6 +26,7 @@ type InvitationEmployee struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the InvitationEmployeeQuery when eager-loading is set.
 	Edges                          InvitationEmployeeEdges `json:"edges"`
+	branch_invitation_employees    *int
 	invitation_invitation_employee *int
 	tenant_invitation_employees    *int
 	selectValues                   sql.SelectValues
@@ -36,9 +38,11 @@ type InvitationEmployeeEdges struct {
 	Invitation *Invitation `json:"invitation,omitempty"`
 	// Tenant holds the value of the tenant edge.
 	Tenant *Tenant `json:"tenant,omitempty"`
+	// Branch holds the value of the branch edge.
+	Branch *Branch `json:"branch,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // InvitationOrErr returns the Invitation value or an error if the edge
@@ -63,6 +67,17 @@ func (e InvitationEmployeeEdges) TenantOrErr() (*Tenant, error) {
 	return nil, &NotLoadedError{edge: "tenant"}
 }
 
+// BranchOrErr returns the Branch value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e InvitationEmployeeEdges) BranchOrErr() (*Branch, error) {
+	if e.Branch != nil {
+		return e.Branch, nil
+	} else if e.loadedTypes[2] {
+		return nil, &NotFoundError{label: branch.Label}
+	}
+	return nil, &NotLoadedError{edge: "branch"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*InvitationEmployee) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -72,9 +87,11 @@ func (*InvitationEmployee) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case invitationemployee.FieldDepartment, invitationemployee.FieldPosition:
 			values[i] = new(sql.NullString)
-		case invitationemployee.ForeignKeys[0]: // invitation_invitation_employee
+		case invitationemployee.ForeignKeys[0]: // branch_invitation_employees
 			values[i] = new(sql.NullInt64)
-		case invitationemployee.ForeignKeys[1]: // tenant_invitation_employees
+		case invitationemployee.ForeignKeys[1]: // invitation_invitation_employee
+			values[i] = new(sql.NullInt64)
+		case invitationemployee.ForeignKeys[2]: // tenant_invitation_employees
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -111,12 +128,19 @@ func (_m *InvitationEmployee) assignValues(columns []string, values []any) error
 			}
 		case invitationemployee.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field branch_invitation_employees", value)
+			} else if value.Valid {
+				_m.branch_invitation_employees = new(int)
+				*_m.branch_invitation_employees = int(value.Int64)
+			}
+		case invitationemployee.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field invitation_invitation_employee", value)
 			} else if value.Valid {
 				_m.invitation_invitation_employee = new(int)
 				*_m.invitation_invitation_employee = int(value.Int64)
 			}
-		case invitationemployee.ForeignKeys[1]:
+		case invitationemployee.ForeignKeys[2]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field tenant_invitation_employees", value)
 			} else if value.Valid {
@@ -144,6 +168,11 @@ func (_m *InvitationEmployee) QueryInvitation() *InvitationQuery {
 // QueryTenant queries the "tenant" edge of the InvitationEmployee entity.
 func (_m *InvitationEmployee) QueryTenant() *TenantQuery {
 	return NewInvitationEmployeeClient(_m.config).QueryTenant(_m)
+}
+
+// QueryBranch queries the "branch" edge of the InvitationEmployee entity.
+func (_m *InvitationEmployee) QueryBranch() *BranchQuery {
+	return NewInvitationEmployeeClient(_m.config).QueryBranch(_m)
 }
 
 // Update returns a builder for updating this InvitationEmployee.

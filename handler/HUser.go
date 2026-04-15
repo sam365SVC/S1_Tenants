@@ -2,8 +2,10 @@ package handler
 
 import (
 	"net/http"
+	"os"
 	"saas_identidad/dtos"
 	"saas_identidad/services"
+	"strconv"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -99,5 +101,83 @@ func (h *UserHandler) CreateUser(c echo.Context) error {
 	}
 	return c.JSON(status, echo.Map{
 		"message": "user created with exit",
+	})
+}
+func (h *UserHandler) AllUser(c echo.Context) error {
+	pageStr := c.Param(":page")
+	page, err := strconv.Atoi(pageStr)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"success": false,
+			"error":   "invalid value param",
+		})
+	}
+	sizeStr := os.Getenv("PageSize")
+	size, err := strconv.Atoi(sizeStr)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"success": false,
+			"error":   "error convert size",
+		})
+	}
+	list, status, err := h._service.GetPageUser(c.Request().Context(), size, page)
+	if err != nil {
+		c.Logger().Errorf("FALLO INTERNO - USER CREATE: %v |Param: %w", err, page)
+		switch status {
+		case http.StatusInternalServerError:
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   "internal server error",
+			})
+		default:
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   "contact with support now",
+			})
+		}
+	}
+	return c.JSON(http.StatusOK, echo.Map{
+		"success": true,
+		"data":    list,
+	})
+}
+func (h *UserHandler)GetUserId(c echo.Context)error{
+	userIdStr:=c.Param("id")
+	userId,err:=strconv.Atoi(userIdStr)
+	if err!=nil {
+		return c.JSON(http.StatusBadRequest,echo.Map{
+			"success":false,
+			"error":"error param is invalid",
+		})
+	}
+	user,status,err:=h._service.GetUserId(c.Request().Context(),userId)
+	if err!=nil {
+		c.Logger().Errorf("FALLO INTERNO - USER CREATE: %v |Param: %s",err,userIdStr)
+		switch status{
+		case http.StatusBadRequest:
+			return c.JSON(status,echo.Map{
+				"success":false,
+				"error": err,
+			})
+		case http.StatusNotFound:
+			return c.JSON(status,echo.Map{
+				"success":false,
+				"error": "user %d not found",
+			})
+		case http.StatusInternalServerError:
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   "internal server error",
+			})
+		default:
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   "contact with support now",
+			})
+		}		
+	}
+	return c.JSON(status,echo.Map{
+		"success":true,
+		"user":user,
 	})
 }

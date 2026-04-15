@@ -37,6 +37,8 @@ const (
 	EdgeTenant = "tenant"
 	// EdgeEmployees holds the string denoting the employees edge name in mutations.
 	EdgeEmployees = "employees"
+	// EdgeInvitationEmployees holds the string denoting the invitation_employees edge name in mutations.
+	EdgeInvitationEmployees = "invitation_employees"
 	// Table holds the table name of the branch in the database.
 	Table = "branches"
 	// TenantTable is the table that holds the tenant relation/edge.
@@ -53,6 +55,13 @@ const (
 	EmployeesInverseTable = "employees"
 	// EmployeesColumn is the table column denoting the employees relation/edge.
 	EmployeesColumn = "branch_employees"
+	// InvitationEmployeesTable is the table that holds the invitation_employees relation/edge.
+	InvitationEmployeesTable = "invitation_employees"
+	// InvitationEmployeesInverseTable is the table name for the InvitationEmployee entity.
+	// It exists in this package in order to avoid circular dependency with the "invitationemployee" package.
+	InvitationEmployeesInverseTable = "invitation_employees"
+	// InvitationEmployeesColumn is the table column denoting the invitation_employees relation/edge.
+	InvitationEmployeesColumn = "branch_invitation_employees"
 )
 
 // Columns holds all SQL columns for branch fields.
@@ -217,6 +226,20 @@ func ByEmployees(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newEmployeesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByInvitationEmployeesCount orders the results by invitation_employees count.
+func ByInvitationEmployeesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newInvitationEmployeesStep(), opts...)
+	}
+}
+
+// ByInvitationEmployees orders the results by invitation_employees terms.
+func ByInvitationEmployees(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newInvitationEmployeesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newTenantStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -229,5 +252,12 @@ func newEmployeesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EmployeesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, EmployeesTable, EmployeesColumn),
+	)
+}
+func newInvitationEmployeesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(InvitationEmployeesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, InvitationEmployeesTable, InvitationEmployeesColumn),
 	)
 }

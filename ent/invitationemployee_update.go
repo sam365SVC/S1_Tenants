@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"saas_identidad/ent/branch"
 	"saas_identidad/ent/invitation"
 	"saas_identidad/ent/invitationemployee"
 	"saas_identidad/ent/predicate"
@@ -95,6 +96,25 @@ func (_u *InvitationEmployeeUpdate) SetTenant(v *Tenant) *InvitationEmployeeUpda
 	return _u.SetTenantID(v.ID)
 }
 
+// SetBranchID sets the "branch" edge to the Branch entity by ID.
+func (_u *InvitationEmployeeUpdate) SetBranchID(id int) *InvitationEmployeeUpdate {
+	_u.mutation.SetBranchID(id)
+	return _u
+}
+
+// SetNillableBranchID sets the "branch" edge to the Branch entity by ID if the given value is not nil.
+func (_u *InvitationEmployeeUpdate) SetNillableBranchID(id *int) *InvitationEmployeeUpdate {
+	if id != nil {
+		_u = _u.SetBranchID(*id)
+	}
+	return _u
+}
+
+// SetBranch sets the "branch" edge to the Branch entity.
+func (_u *InvitationEmployeeUpdate) SetBranch(v *Branch) *InvitationEmployeeUpdate {
+	return _u.SetBranchID(v.ID)
+}
+
 // Mutation returns the InvitationEmployeeMutation object of the builder.
 func (_u *InvitationEmployeeUpdate) Mutation() *InvitationEmployeeMutation {
 	return _u.mutation
@@ -109,6 +129,12 @@ func (_u *InvitationEmployeeUpdate) ClearInvitation() *InvitationEmployeeUpdate 
 // ClearTenant clears the "tenant" edge to the Tenant entity.
 func (_u *InvitationEmployeeUpdate) ClearTenant() *InvitationEmployeeUpdate {
 	_u.mutation.ClearTenant()
+	return _u
+}
+
+// ClearBranch clears the "branch" edge to the Branch entity.
+func (_u *InvitationEmployeeUpdate) ClearBranch() *InvitationEmployeeUpdate {
+	_u.mutation.ClearBranch()
 	return _u
 }
 
@@ -230,6 +256,35 @@ func (_u *InvitationEmployeeUpdate) sqlSave(ctx context.Context) (_node int, err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.BranchCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   invitationemployee.BranchTable,
+			Columns: []string{invitationemployee.BranchColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(branch.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.BranchIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   invitationemployee.BranchTable,
+			Columns: []string{invitationemployee.BranchColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(branch.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{invitationemployee.Label}
@@ -316,6 +371,25 @@ func (_u *InvitationEmployeeUpdateOne) SetTenant(v *Tenant) *InvitationEmployeeU
 	return _u.SetTenantID(v.ID)
 }
 
+// SetBranchID sets the "branch" edge to the Branch entity by ID.
+func (_u *InvitationEmployeeUpdateOne) SetBranchID(id int) *InvitationEmployeeUpdateOne {
+	_u.mutation.SetBranchID(id)
+	return _u
+}
+
+// SetNillableBranchID sets the "branch" edge to the Branch entity by ID if the given value is not nil.
+func (_u *InvitationEmployeeUpdateOne) SetNillableBranchID(id *int) *InvitationEmployeeUpdateOne {
+	if id != nil {
+		_u = _u.SetBranchID(*id)
+	}
+	return _u
+}
+
+// SetBranch sets the "branch" edge to the Branch entity.
+func (_u *InvitationEmployeeUpdateOne) SetBranch(v *Branch) *InvitationEmployeeUpdateOne {
+	return _u.SetBranchID(v.ID)
+}
+
 // Mutation returns the InvitationEmployeeMutation object of the builder.
 func (_u *InvitationEmployeeUpdateOne) Mutation() *InvitationEmployeeMutation {
 	return _u.mutation
@@ -330,6 +404,12 @@ func (_u *InvitationEmployeeUpdateOne) ClearInvitation() *InvitationEmployeeUpda
 // ClearTenant clears the "tenant" edge to the Tenant entity.
 func (_u *InvitationEmployeeUpdateOne) ClearTenant() *InvitationEmployeeUpdateOne {
 	_u.mutation.ClearTenant()
+	return _u
+}
+
+// ClearBranch clears the "branch" edge to the Branch entity.
+func (_u *InvitationEmployeeUpdateOne) ClearBranch() *InvitationEmployeeUpdateOne {
+	_u.mutation.ClearBranch()
 	return _u
 }
 
@@ -474,6 +554,35 @@ func (_u *InvitationEmployeeUpdateOne) sqlSave(ctx context.Context) (_node *Invi
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(tenant.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.BranchCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   invitationemployee.BranchTable,
+			Columns: []string{invitationemployee.BranchColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(branch.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.BranchIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   invitationemployee.BranchTable,
+			Columns: []string{invitationemployee.BranchColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(branch.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

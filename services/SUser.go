@@ -100,3 +100,39 @@ func (s *UserServices) CreateUser(ctx context.Context, req dtos.UserCreateDto) (
 	}
 	return http.StatusCreated, nil
 }
+
+func (s *UserServices) GetPageUser(ctx context.Context,pageSize int, page int)(listUser []*ent.User,status int, err error){
+	if page<1{
+		page=1
+	}
+	offset:=(page-1)*pageSize
+	listUser,err=s._client.User.Query().Limit(pageSize).Offset(offset).All(ctx)
+
+	if err!=nil {
+		return nil,http.StatusInternalServerError,fmt.Errorf("error making pagination: %w",err)
+	}
+	return listUser,http.StatusOK,nil
+}
+
+func (s *UserServices) GetUserId(ctx context.Context,user_id int)(res dtos.UserResponseDto,status int,err error){
+	if user_id<=0 {
+		return dtos.UserResponseDto{},http.StatusBadRequest,fmt.Errorf("invalid user id: must be positive")
+	}
+	userFind,err:=s._client.User.Get(ctx,user_id)
+	if err!=nil {
+		if ent.IsNotFound(err) {
+			return dtos.UserResponseDto{},http.StatusNotFound,fmt.Errorf("user %d not found: %w",user_id,err)
+		}
+		return dtos.UserResponseDto{},http.StatusInternalServerError,fmt.Errorf("error searching user: %w",err)
+	}
+	dateBirth:=userFind.DateBirth.Format("02/01/2006")
+
+	res=dtos.UserResponseDto{
+		Id: userFind.ID,
+		Name: userFind.Name,
+		LastName: userFind.LastName,
+		CI: userFind.Ci,
+		DateBirth: dateBirth,
+	}
+	return res,http.StatusOK,nil
+}

@@ -240,6 +240,29 @@ func HasTenantWith(preds ...predicate.Tenant) predicate.InvitationEmployee {
 	})
 }
 
+// HasBranch applies the HasEdge predicate on the "branch" edge.
+func HasBranch() predicate.InvitationEmployee {
+	return predicate.InvitationEmployee(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, BranchTable, BranchColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasBranchWith applies the HasEdge predicate on the "branch" edge with a given conditions (other predicates).
+func HasBranchWith(preds ...predicate.Branch) predicate.InvitationEmployee {
+	return predicate.InvitationEmployee(func(s *sql.Selector) {
+		step := newBranchStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.InvitationEmployee) predicate.InvitationEmployee {
 	return predicate.InvitationEmployee(sql.AndPredicates(predicates...))

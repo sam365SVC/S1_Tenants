@@ -44,27 +44,30 @@ const (
 // BranchMutation represents an operation that mutates the Branch nodes in the graph.
 type BranchMutation struct {
 	config
-	op               Op
-	typ              string
-	id               *int
-	name             *string
-	phone            *string
-	street           *string
-	zone             *string
-	reference        *string
-	city             *string
-	state            *branch.State
-	is_active        *bool
-	create_at        *time.Time
-	clearedFields    map[string]struct{}
-	tenant           *int
-	clearedtenant    bool
-	employees        map[int]struct{}
-	removedemployees map[int]struct{}
-	clearedemployees bool
-	done             bool
-	oldValue         func(context.Context) (*Branch, error)
-	predicates       []predicate.Branch
+	op                          Op
+	typ                         string
+	id                          *int
+	name                        *string
+	phone                       *string
+	street                      *string
+	zone                        *string
+	reference                   *string
+	city                        *string
+	state                       *branch.State
+	is_active                   *bool
+	create_at                   *time.Time
+	clearedFields               map[string]struct{}
+	tenant                      *int
+	clearedtenant               bool
+	employees                   map[int]struct{}
+	removedemployees            map[int]struct{}
+	clearedemployees            bool
+	invitation_employees        map[int]struct{}
+	removedinvitation_employees map[int]struct{}
+	clearedinvitation_employees bool
+	done                        bool
+	oldValue                    func(context.Context) (*Branch, error)
+	predicates                  []predicate.Branch
 }
 
 var _ ent.Mutation = (*BranchMutation)(nil)
@@ -621,6 +624,60 @@ func (m *BranchMutation) ResetEmployees() {
 	m.removedemployees = nil
 }
 
+// AddInvitationEmployeeIDs adds the "invitation_employees" edge to the InvitationEmployee entity by ids.
+func (m *BranchMutation) AddInvitationEmployeeIDs(ids ...int) {
+	if m.invitation_employees == nil {
+		m.invitation_employees = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.invitation_employees[ids[i]] = struct{}{}
+	}
+}
+
+// ClearInvitationEmployees clears the "invitation_employees" edge to the InvitationEmployee entity.
+func (m *BranchMutation) ClearInvitationEmployees() {
+	m.clearedinvitation_employees = true
+}
+
+// InvitationEmployeesCleared reports if the "invitation_employees" edge to the InvitationEmployee entity was cleared.
+func (m *BranchMutation) InvitationEmployeesCleared() bool {
+	return m.clearedinvitation_employees
+}
+
+// RemoveInvitationEmployeeIDs removes the "invitation_employees" edge to the InvitationEmployee entity by IDs.
+func (m *BranchMutation) RemoveInvitationEmployeeIDs(ids ...int) {
+	if m.removedinvitation_employees == nil {
+		m.removedinvitation_employees = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.invitation_employees, ids[i])
+		m.removedinvitation_employees[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedInvitationEmployees returns the removed IDs of the "invitation_employees" edge to the InvitationEmployee entity.
+func (m *BranchMutation) RemovedInvitationEmployeesIDs() (ids []int) {
+	for id := range m.removedinvitation_employees {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// InvitationEmployeesIDs returns the "invitation_employees" edge IDs in the mutation.
+func (m *BranchMutation) InvitationEmployeesIDs() (ids []int) {
+	for id := range m.invitation_employees {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetInvitationEmployees resets all changes to the "invitation_employees" edge.
+func (m *BranchMutation) ResetInvitationEmployees() {
+	m.invitation_employees = nil
+	m.clearedinvitation_employees = false
+	m.removedinvitation_employees = nil
+}
+
 // Where appends a list predicates to the BranchMutation builder.
 func (m *BranchMutation) Where(ps ...predicate.Branch) {
 	m.predicates = append(m.predicates, ps...)
@@ -911,12 +968,15 @@ func (m *BranchMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *BranchMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.tenant != nil {
 		edges = append(edges, branch.EdgeTenant)
 	}
 	if m.employees != nil {
 		edges = append(edges, branch.EdgeEmployees)
+	}
+	if m.invitation_employees != nil {
+		edges = append(edges, branch.EdgeInvitationEmployees)
 	}
 	return edges
 }
@@ -935,15 +995,24 @@ func (m *BranchMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case branch.EdgeInvitationEmployees:
+		ids := make([]ent.Value, 0, len(m.invitation_employees))
+		for id := range m.invitation_employees {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *BranchMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.removedemployees != nil {
 		edges = append(edges, branch.EdgeEmployees)
+	}
+	if m.removedinvitation_employees != nil {
+		edges = append(edges, branch.EdgeInvitationEmployees)
 	}
 	return edges
 }
@@ -958,18 +1027,27 @@ func (m *BranchMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case branch.EdgeInvitationEmployees:
+		ids := make([]ent.Value, 0, len(m.removedinvitation_employees))
+		for id := range m.removedinvitation_employees {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *BranchMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedtenant {
 		edges = append(edges, branch.EdgeTenant)
 	}
 	if m.clearedemployees {
 		edges = append(edges, branch.EdgeEmployees)
+	}
+	if m.clearedinvitation_employees {
+		edges = append(edges, branch.EdgeInvitationEmployees)
 	}
 	return edges
 }
@@ -982,6 +1060,8 @@ func (m *BranchMutation) EdgeCleared(name string) bool {
 		return m.clearedtenant
 	case branch.EdgeEmployees:
 		return m.clearedemployees
+	case branch.EdgeInvitationEmployees:
+		return m.clearedinvitation_employees
 	}
 	return false
 }
@@ -1006,6 +1086,9 @@ func (m *BranchMutation) ResetEdge(name string) error {
 		return nil
 	case branch.EdgeEmployees:
 		m.ResetEmployees()
+		return nil
+	case branch.EdgeInvitationEmployees:
+		m.ResetInvitationEmployees()
 		return nil
 	}
 	return fmt.Errorf("unknown Branch edge %s", name)
@@ -3022,6 +3105,8 @@ type InvitationEmployeeMutation struct {
 	clearedinvitation bool
 	tenant            *int
 	clearedtenant     bool
+	branch            *int
+	clearedbranch     bool
 	done              bool
 	oldValue          func(context.Context) (*InvitationEmployee, error)
 	predicates        []predicate.InvitationEmployee
@@ -3275,6 +3360,45 @@ func (m *InvitationEmployeeMutation) ResetTenant() {
 	m.clearedtenant = false
 }
 
+// SetBranchID sets the "branch" edge to the Branch entity by id.
+func (m *InvitationEmployeeMutation) SetBranchID(id int) {
+	m.branch = &id
+}
+
+// ClearBranch clears the "branch" edge to the Branch entity.
+func (m *InvitationEmployeeMutation) ClearBranch() {
+	m.clearedbranch = true
+}
+
+// BranchCleared reports if the "branch" edge to the Branch entity was cleared.
+func (m *InvitationEmployeeMutation) BranchCleared() bool {
+	return m.clearedbranch
+}
+
+// BranchID returns the "branch" edge ID in the mutation.
+func (m *InvitationEmployeeMutation) BranchID() (id int, exists bool) {
+	if m.branch != nil {
+		return *m.branch, true
+	}
+	return
+}
+
+// BranchIDs returns the "branch" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// BranchID instead. It exists only for internal usage by the builders.
+func (m *InvitationEmployeeMutation) BranchIDs() (ids []int) {
+	if id := m.branch; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetBranch resets all changes to the "branch" edge.
+func (m *InvitationEmployeeMutation) ResetBranch() {
+	m.branch = nil
+	m.clearedbranch = false
+}
+
 // Where appends a list predicates to the InvitationEmployeeMutation builder.
 func (m *InvitationEmployeeMutation) Where(ps ...predicate.InvitationEmployee) {
 	m.predicates = append(m.predicates, ps...)
@@ -3425,12 +3549,15 @@ func (m *InvitationEmployeeMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *InvitationEmployeeMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.invitation != nil {
 		edges = append(edges, invitationemployee.EdgeInvitation)
 	}
 	if m.tenant != nil {
 		edges = append(edges, invitationemployee.EdgeTenant)
+	}
+	if m.branch != nil {
+		edges = append(edges, invitationemployee.EdgeBranch)
 	}
 	return edges
 }
@@ -3447,13 +3574,17 @@ func (m *InvitationEmployeeMutation) AddedIDs(name string) []ent.Value {
 		if id := m.tenant; id != nil {
 			return []ent.Value{*id}
 		}
+	case invitationemployee.EdgeBranch:
+		if id := m.branch; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *InvitationEmployeeMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	return edges
 }
 
@@ -3465,12 +3596,15 @@ func (m *InvitationEmployeeMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *InvitationEmployeeMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedinvitation {
 		edges = append(edges, invitationemployee.EdgeInvitation)
 	}
 	if m.clearedtenant {
 		edges = append(edges, invitationemployee.EdgeTenant)
+	}
+	if m.clearedbranch {
+		edges = append(edges, invitationemployee.EdgeBranch)
 	}
 	return edges
 }
@@ -3483,6 +3617,8 @@ func (m *InvitationEmployeeMutation) EdgeCleared(name string) bool {
 		return m.clearedinvitation
 	case invitationemployee.EdgeTenant:
 		return m.clearedtenant
+	case invitationemployee.EdgeBranch:
+		return m.clearedbranch
 	}
 	return false
 }
@@ -3497,6 +3633,9 @@ func (m *InvitationEmployeeMutation) ClearEdge(name string) error {
 	case invitationemployee.EdgeTenant:
 		m.ClearTenant()
 		return nil
+	case invitationemployee.EdgeBranch:
+		m.ClearBranch()
+		return nil
 	}
 	return fmt.Errorf("unknown InvitationEmployee unique edge %s", name)
 }
@@ -3510,6 +3649,9 @@ func (m *InvitationEmployeeMutation) ResetEdge(name string) error {
 		return nil
 	case invitationemployee.EdgeTenant:
 		m.ResetTenant()
+		return nil
+	case invitationemployee.EdgeBranch:
+		m.ResetBranch()
 		return nil
 	}
 	return fmt.Errorf("unknown InvitationEmployee edge %s", name)

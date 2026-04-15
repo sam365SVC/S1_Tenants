@@ -9,6 +9,7 @@ import (
 	"math"
 	"saas_identidad/ent/branch"
 	"saas_identidad/ent/employee"
+	"saas_identidad/ent/invitationemployee"
 	"saas_identidad/ent/predicate"
 	"saas_identidad/ent/tenant"
 
@@ -21,13 +22,14 @@ import (
 // BranchQuery is the builder for querying Branch entities.
 type BranchQuery struct {
 	config
-	ctx           *QueryContext
-	order         []branch.OrderOption
-	inters        []Interceptor
-	predicates    []predicate.Branch
-	withTenant    *TenantQuery
-	withEmployees *EmployeeQuery
-	withFKs       bool
+	ctx                     *QueryContext
+	order                   []branch.OrderOption
+	inters                  []Interceptor
+	predicates              []predicate.Branch
+	withTenant              *TenantQuery
+	withEmployees           *EmployeeQuery
+	withInvitationEmployees *InvitationEmployeeQuery
+	withFKs                 bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -101,6 +103,28 @@ func (_q *BranchQuery) QueryEmployees() *EmployeeQuery {
 			sqlgraph.From(branch.Table, branch.FieldID, selector),
 			sqlgraph.To(employee.Table, employee.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, branch.EmployeesTable, branch.EmployeesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryInvitationEmployees chains the current query on the "invitation_employees" edge.
+func (_q *BranchQuery) QueryInvitationEmployees() *InvitationEmployeeQuery {
+	query := (&InvitationEmployeeClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(branch.Table, branch.FieldID, selector),
+			sqlgraph.To(invitationemployee.Table, invitationemployee.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, branch.InvitationEmployeesTable, branch.InvitationEmployeesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -295,13 +319,14 @@ func (_q *BranchQuery) Clone() *BranchQuery {
 		return nil
 	}
 	return &BranchQuery{
-		config:        _q.config,
-		ctx:           _q.ctx.Clone(),
-		order:         append([]branch.OrderOption{}, _q.order...),
-		inters:        append([]Interceptor{}, _q.inters...),
-		predicates:    append([]predicate.Branch{}, _q.predicates...),
-		withTenant:    _q.withTenant.Clone(),
-		withEmployees: _q.withEmployees.Clone(),
+		config:                  _q.config,
+		ctx:                     _q.ctx.Clone(),
+		order:                   append([]branch.OrderOption{}, _q.order...),
+		inters:                  append([]Interceptor{}, _q.inters...),
+		predicates:              append([]predicate.Branch{}, _q.predicates...),
+		withTenant:              _q.withTenant.Clone(),
+		withEmployees:           _q.withEmployees.Clone(),
+		withInvitationEmployees: _q.withInvitationEmployees.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -327,6 +352,17 @@ func (_q *BranchQuery) WithEmployees(opts ...func(*EmployeeQuery)) *BranchQuery 
 		opt(query)
 	}
 	_q.withEmployees = query
+	return _q
+}
+
+// WithInvitationEmployees tells the query-builder to eager-load the nodes that are connected to
+// the "invitation_employees" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *BranchQuery) WithInvitationEmployees(opts ...func(*InvitationEmployeeQuery)) *BranchQuery {
+	query := (&InvitationEmployeeClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withInvitationEmployees = query
 	return _q
 }
 
@@ -409,9 +445,10 @@ func (_q *BranchQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Branc
 		nodes       = []*Branch{}
 		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			_q.withTenant != nil,
 			_q.withEmployees != nil,
+			_q.withInvitationEmployees != nil,
 		}
 	)
 	if _q.withTenant != nil {
@@ -448,6 +485,15 @@ func (_q *BranchQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Branc
 		if err := _q.loadEmployees(ctx, query, nodes,
 			func(n *Branch) { n.Edges.Employees = []*Employee{} },
 			func(n *Branch, e *Employee) { n.Edges.Employees = append(n.Edges.Employees, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withInvitationEmployees; query != nil {
+		if err := _q.loadInvitationEmployees(ctx, query, nodes,
+			func(n *Branch) { n.Edges.InvitationEmployees = []*InvitationEmployee{} },
+			func(n *Branch, e *InvitationEmployee) {
+				n.Edges.InvitationEmployees = append(n.Edges.InvitationEmployees, e)
+			}); err != nil {
 			return nil, err
 		}
 	}
@@ -512,6 +558,37 @@ func (_q *BranchQuery) loadEmployees(ctx context.Context, query *EmployeeQuery, 
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "branch_employees" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *BranchQuery) loadInvitationEmployees(ctx context.Context, query *InvitationEmployeeQuery, nodes []*Branch, init func(*Branch), assign func(*Branch, *InvitationEmployee)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Branch)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.InvitationEmployee(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(branch.InvitationEmployeesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.branch_invitation_employees
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "branch_invitation_employees" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "branch_invitation_employees" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
