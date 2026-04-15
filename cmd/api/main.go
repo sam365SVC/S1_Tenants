@@ -54,12 +54,18 @@ func main() {
 	// create services
 	SLogin := services.NewLoginServices(client)
 	SInvitation := services.NewInvitationServices(client)
+	STenant := services.NewTenantServices(client)
+	SEmployee := services.NewEmployeeServices(client)
+	SBranch := services.NewBranchServices(client)
 	SUser := services.NewUserServices(client)
 	SPlan := services.NewPlanServices(client)
 	SOrganization := services.NewOrganizationServices(client)
 	// create handler
 	HLogin := handler.NewAuthHandler(SLogin, validation.Validator)
 	HInvitation := handler.NewInvitationHandler(SInvitation, validation.Validator)
+	HTenant := handler.NewTenantHandler(STenant, validation.Validator)
+	HEmployee := handler.NewEmployeeHandler(SEmployee, validation.Validator)
+	HBranch := handler.NewBranchHandler(SBranch, validation.Validator)
 	HUser := handler.NewUserHandler(SUser, validation.Validator)
 	HPlan := handler.NewPlanHandler(SPlan, validation.Validator)
 	HOrganization := handler.NewOrganizationHandler(SOrganization, validation.Validator)
@@ -84,7 +90,20 @@ func main() {
 	RUser := api.Group("/user")
 	{
 		RUser.POST("", HUser.CreateUser)
-		RUser.GET("/:id",HUser.GetUserId)
+		RUser.GET("/:id", HUser.GetUserId)
+		RUser.GET("/page/:page", HUser.AllUser)
+	}
+	RTenant := api.Group("/tenant")
+	{
+		RTenant.GET("/page/:page", HTenant.GetPageTenant)
+	}
+	REmployee := api.Group("/employee")
+	{
+		REmployee.GET("/page/:page", HEmployee.GetPageEmployee)
+	}
+	RBranch := api.Group("/branch")
+	{
+		RBranch.GET("/page/:page", HBranch.GetPageBranch)
 	}
 	ROrganization := api.Group("/organization", jwtAuth, security.RequireRoles("ADMIN"))
 	{
