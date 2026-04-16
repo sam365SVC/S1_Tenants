@@ -79,3 +79,85 @@ func (s *EmployeeServices) GetEmployee(ctx context.Context, page int, pageSize i
 	}
 	return listEmployee, http.StatusOK, nil
 }
+func (s *EmployeeServices) RemplaceEmployee(ctx context.Context, req dtos.EmployeeRemplaceDto, employeeId int) (res dtos.EmployeeResponseDto, status int, err error) {
+	employeeRemplace, err := s._client.Employee.Query().
+		Where(employee.IDEQ(employeeId)).
+		WithTenant().
+		Only(ctx)
+
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return dtos.EmployeeResponseDto{}, http.StatusNotFound, fmt.Errorf("employee not exist: %w", err)
+		}
+		return dtos.EmployeeResponseDto{}, http.StatusInternalServerError, fmt.Errorf("error searching employee: %w", err)
+	}
+
+	employeeUpdate, err := employeeRemplace.Update().
+		SetDepartment(employee.Department(req.Department)).
+		SetPosition(req.Posistion).
+		SetActive(req.Active).
+		Save(ctx)
+
+	if err != nil {
+		if ent.IsConstraintError(err) {
+			return dtos.EmployeeResponseDto{}, http.StatusBadRequest, fmt.Errorf("invalid constraint data for employee: %w", err)
+		}
+		return dtos.EmployeeResponseDto{}, http.StatusInternalServerError, fmt.Errorf("error updating employee: %w", err)
+	}
+
+	res = dtos.EmployeeResponseDto{
+		Id:         employeeUpdate.ID,
+		TenantId:   employeeRemplace.Edges.Tenant.ID,
+		TenantName: employeeRemplace.Edges.Tenant.Name,
+		Department: employeeUpdate.Department.String(),
+		Posistion:  employeeUpdate.Position,
+	}
+	return res, http.StatusOK, nil
+}
+
+func (s *EmployeeServices) PatchEmployee(ctx context.Context, req dtos.EmployeePatchDto, employeeId int) (res dtos.EmployeeResponseDto, status int, err error) {
+	
+	employeeBase, err := s._client.Employee.Query().
+		Where(employee.IDEQ(employeeId)).
+		WithTenant().
+		Only(ctx)
+
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return dtos.EmployeeResponseDto{}, http.StatusNotFound, fmt.Errorf("employee not exist: %w", err)
+		}
+		return dtos.EmployeeResponseDto{}, http.StatusInternalServerError, fmt.Errorf("error searching employee: %w", err)
+	}
+
+	updater := employeeBase.Update()
+	if req.Department != "" {
+		updater.SetDepartment(employee.Department(req.Department))
+	}
+
+	if req.Posistion != "" {
+		updater.SetPosition(req.Posistion)
+	}
+
+	if req.Active != nil {
+		updater.SetActive(*req.Active) // Desreferenciamos con * para obtener el valor true/false
+	}
+
+	employeeUpdate, err := updater.Save(ctx)
+
+	if err != nil {
+		if ent.IsConstraintError(err) {
+			return dtos.EmployeeResponseDto{}, http.StatusBadRequest, fmt.Errorf("invalid constraint data for employee (e.g. invalid department): %w", err)
+		}
+		return dtos.EmployeeResponseDto{}, http.StatusInternalServerError, fmt.Errorf("error updating employee: %w", err)
+	}
+
+	res = dtos.EmployeeResponseDto{
+		Id:         employeeUpdate.ID,
+		TenantId:   employeeBase.Edges.Tenant.ID,
+		TenantName: employeeBase.Edges.Tenant.Name,
+		Department: employeeUpdate.Department.String(),
+		Posistion:  employeeUpdate.Position,
+	}
+
+	return res, http.StatusOK, nil
+}

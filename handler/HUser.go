@@ -141,28 +141,28 @@ func (h *UserHandler) AllUser(c echo.Context) error {
 		"data":    list,
 	})
 }
-func (h *UserHandler)GetUserId(c echo.Context)error{
-	userIdStr:=c.Param("id")
-	userId,err:=strconv.Atoi(userIdStr)
-	if err!=nil {
-		return c.JSON(http.StatusBadRequest,echo.Map{
-			"success":false,
-			"error":"error param is invalid",
+func (h *UserHandler) GetUserId(c echo.Context) error {
+	userIdStr := c.Param("id")
+	userId, err := strconv.Atoi(userIdStr)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"success": false,
+			"error":   "error param is invalid",
 		})
 	}
-	user,status,err:=h._service.GetUserId(c.Request().Context(),userId)
-	if err!=nil {
-		c.Logger().Errorf("FALLO INTERNO - USER CREATE: %v |Param: %s",err,userIdStr)
-		switch status{
+	user, status, err := h._service.GetUserId(c.Request().Context(), userId)
+	if err != nil {
+		c.Logger().Errorf("FALLO INTERNO - USER CREATE: %v |Param: %s", err, userIdStr)
+		switch status {
 		case http.StatusBadRequest:
-			return c.JSON(status,echo.Map{
-				"success":false,
-				"error": err,
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   err,
 			})
 		case http.StatusNotFound:
-			return c.JSON(status,echo.Map{
-				"success":false,
-				"error": "user %d not found",
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   "user %d not found",
 			})
 		case http.StatusInternalServerError:
 			return c.JSON(status, echo.Map{
@@ -174,10 +174,166 @@ func (h *UserHandler)GetUserId(c echo.Context)error{
 				"success": false,
 				"error":   "contact with support now",
 			})
-		}		
+		}
 	}
-	return c.JSON(status,echo.Map{
-		"success":true,
-		"user":user,
+	return c.JSON(status, echo.Map{
+		"success": true,
+		"user":    user,
+	})
+}
+func (h *UserHandler) RemplaceUser(c echo.Context) error {
+	userIdStr := c.Param("id")
+	userId, err := strconv.Atoi(userIdStr)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"success": false,
+			"error":   "Invalid user ID in the URL",
+		})
+	}
+
+	var req dtos.UserRemplaceDto
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"success": false,
+			"error":   "Invalid request format",
+		})
+	}
+
+	if err := h._validator.Struct(&req); err != nil {
+		errores := make(map[string]string)
+
+		if validationsErrors, ok := err.(validator.ValidationErrors); ok {
+			for _, e := range validationsErrors {
+				switch e.Tag() {
+				case "required":
+					errores[e.Field()] = "This field is mandatory"
+				case "max":
+					errores[e.Field()] = "It must have at most " + e.Param() + " characters"
+				case "gt":
+					errores[e.Field()] = "The value must be greater than " + e.Param()
+				case "lte":
+					errores[e.Field()] = "The value must be less than or equal to " + e.Param()
+				case "datetime":
+					errores[e.Field()] = "The date format is not valid (use the format: " + e.Param() + ")"
+				case "is_name":
+					errores[e.Field()] = "It must be a valid name (letters only and no special characters)"
+				case "age_gte_16":
+					errores[e.Field()] = "You must be at least 16 years old to register"
+				default:
+					errores[e.Field()] = "Validation error: " + e.Tag()
+				}
+			}
+		}
+
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"success":  false,
+			"error":    "Validation errors in the submitted data",
+			"detalles": errores,
+		})
+	}
+
+	res, status, err := h._service.RemplaceUser(c.Request().Context(), userId, req)
+	
+	if err != nil {
+		c.Logger().Errorf("ERROR PUT USER: %v | ID: %d", err, userId)
+		
+		switch status {
+		case http.StatusNotFound:
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   "The requested user does not exist.",
+			})
+		case http.StatusInternalServerError:
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   "An internal error occurred while replacing the user data.",
+			})
+		default:
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   "An unexpected error occurred.",
+			})
+		}
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{
+		"success": true,
+		"message": "User replaced successfully",
+		"data":    res,
+	})
+}
+func (h *UserHandler) PatchUser(c echo.Context) error {
+	userIdStr := c.Param("id")
+	userId, err := strconv.Atoi(userIdStr)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"success": false,
+			"error":   "Invalid user ID in the URL",
+		})
+	}
+	var req dtos.UserPatchDto
+
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"success": false,
+			"error":   "invalid json format",
+		})
+	}
+	if err := h._validator.Struct(&req); err != nil {
+		errores := make(map[string]string)
+
+		if validationsErrors, ok := err.(validator.ValidationErrors); ok {
+			for _, e := range validationsErrors {
+				switch e.Tag() {
+				case "max":
+					errores[e.Field()] = "It must have at most " + e.Param() + " characters"
+				case "gt":
+					errores[e.Field()] = "The value must be greater than " + e.Param()
+				case "lte":
+					errores[e.Field()] = "The value must be less than or equal to " + e.Param()
+				case "datetime":
+					errores[e.Field()] = "The date format is not valid (use the format: " + e.Param() + ")"
+				case "is_name":
+					errores[e.Field()] = "It must be a valid name (letters only and no special characters)"
+				case "age_gte_16":
+					errores[e.Field()] = "You must be at least 16 years old to register"
+				default:
+					errores[e.Field()] = "Validation error: " + e.Tag()
+				}
+			}
+		}
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"success":  false,
+			"error":    "Validation errors in the submitted data",
+			"detalles": errores,
+		})
+	}
+	res, status, err := h._service.PatchUser(c.Request().Context(), userId, req)
+
+	if err != nil {
+		c.Logger().Errorf("ERROR PATCH USER: %v | ID: %d", err, userId)
+		switch status {
+		case http.StatusNotFound:
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   "The requested user does not exist.",
+			})
+		case http.StatusInternalServerError:
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   "An internal error occurred while updating the user.",
+			})
+		default:
+			return c.JSON(status, echo.Map{
+				"success": false,
+				"error":   "An unexpected error occurred.",
+			})
+		}
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{
+		"success": true,
+		"message": "User updated successfully",
+		"data":    res,
 	})
 }

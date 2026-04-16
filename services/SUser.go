@@ -51,17 +51,17 @@ func (s *UserServices) CreateUser(ctx context.Context, req dtos.UserCreateDto) (
 		hasSameAccountType, err := datesUser.QueryEmails().
 			Where(email.AccountEQ(email.Account(invit.Account))).Exist(ctx)
 		if err != nil {
-			return http.StatusInternalServerError, fmt.Errorf("error querying user accounts: %w",err)
+			return http.StatusInternalServerError, fmt.Errorf("error querying user accounts: %w", err)
 		}
 		if hasSameAccountType {
 			return http.StatusConflict, fmt.Errorf("error the user with CI:%d have an account: %s", datesUser.Ci, invit.Account)
 		}
-	}else{
-		if req.Name==""||req.LastName==""||req.DateBirth==""{
-			return http.StatusBadRequest,fmt.Errorf("error the user don't exist in the api(name, last_name and date_birth are require)")
+	} else {
+		if req.Name == "" || req.LastName == "" || req.DateBirth == "" {
+			return http.StatusBadRequest, fmt.Errorf("error the user don't exist in the api(name, last_name and date_birth are require)")
 		}
 		dateBirth, err := time.Parse("02/01/2006", req.DateBirth)
-		if err!=nil {
+		if err != nil {
 			return http.StatusBadRequest, fmt.Errorf("invalid date format, use DD/MM/YYYY: %w", err)
 		}
 		datesUser, err = tx.User.Create().
@@ -76,7 +76,7 @@ func (s *UserServices) CreateUser(ctx context.Context, req dtos.UserCreateDto) (
 			}
 			return http.StatusInternalServerError, fmt.Errorf("error to create user: %w", err)
 		}
-	}	
+	}
 	_, err = tx.Email.Create().
 		SetEmail(req.Email).
 		SetPaswordHash(password_hash).
@@ -92,8 +92,8 @@ func (s *UserServices) CreateUser(ctx context.Context, req dtos.UserCreateDto) (
 		}
 		return http.StatusInternalServerError, fmt.Errorf("error to created email: %w", err)
 	}
-	if err:=tx.Invitation.DeleteOne(invit).Exec(ctx);err!=nil {
-		return http.StatusInternalServerError,fmt.Errorf("error when delete invitation: %w",err)
+	if err := tx.Invitation.DeleteOne(invit).Exec(ctx); err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("error when delete invitation: %w", err)
 	}
 	if err := tx.Commit(); err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("error when making commit: %w", err)
@@ -101,38 +101,108 @@ func (s *UserServices) CreateUser(ctx context.Context, req dtos.UserCreateDto) (
 	return http.StatusCreated, nil
 }
 
-func (s *UserServices) GetPageUser(ctx context.Context,pageSize int, page int)(listUser []*ent.User,status int, err error){
-	if page<1{
-		page=1
+func (s *UserServices) GetPageUser(ctx context.Context, pageSize int, page int) (listUser []*ent.User, status int, err error) {
+	if page < 1 {
+		page = 1
 	}
-	offset:=(page-1)*pageSize
-	listUser,err=s._client.User.Query().Limit(pageSize).Offset(offset).All(ctx)
+	offset := (page - 1) * pageSize
+	listUser, err = s._client.User.Query().Limit(pageSize).Offset(offset).All(ctx)
 
-	if err!=nil {
-		return nil,http.StatusInternalServerError,fmt.Errorf("error making pagination: %w",err)
+	if err != nil {
+		return nil, http.StatusInternalServerError, fmt.Errorf("error making pagination: %w", err)
 	}
-	return listUser,http.StatusOK,nil
+	return listUser, http.StatusOK, nil
 }
 
-func (s *UserServices) GetUserId(ctx context.Context,user_id int)(res dtos.UserResponseDto,status int,err error){
-	if user_id<=0 {
-		return dtos.UserResponseDto{},http.StatusBadRequest,fmt.Errorf("invalid user id: must be positive")
+func (s *UserServices) GetUserId(ctx context.Context, user_id int) (res dtos.UserResponseDto, status int, err error) {
+	if user_id <= 0 {
+		return dtos.UserResponseDto{}, http.StatusBadRequest, fmt.Errorf("invalid user id: must be positive")
 	}
-	userFind,err:=s._client.User.Get(ctx,user_id)
-	if err!=nil {
+	userFind, err := s._client.User.Get(ctx, user_id)
+	if err != nil {
 		if ent.IsNotFound(err) {
-			return dtos.UserResponseDto{},http.StatusNotFound,fmt.Errorf("user %d not found: %w",user_id,err)
+			return dtos.UserResponseDto{}, http.StatusNotFound, fmt.Errorf("user %d not found: %w", user_id, err)
 		}
-		return dtos.UserResponseDto{},http.StatusInternalServerError,fmt.Errorf("error searching user: %w",err)
+		return dtos.UserResponseDto{}, http.StatusInternalServerError, fmt.Errorf("error searching user: %w", err)
 	}
-	dateBirth:=userFind.DateBirth.Format("02/01/2006")
+	dateBirth := userFind.DateBirth.Format("02/01/2006")
 
-	res=dtos.UserResponseDto{
-		Id: userFind.ID,
-		Name: userFind.Name,
-		LastName: userFind.LastName,
-		CI: userFind.Ci,
+	res = dtos.UserResponseDto{
+		Id:        userFind.ID,
+		Name:      userFind.Name,
+		LastName:  userFind.LastName,
+		CI:        userFind.Ci,
 		DateBirth: dateBirth,
 	}
-	return res,http.StatusOK,nil
+	return res, http.StatusOK, nil
+}
+
+func (s *UserServices) RemplaceUser(ctx context.Context, userId int, req dtos.UserRemplaceDto) (res dtos.UserResponseDto, status int, err error) {
+	userRemplace, err := s._client.User.Get(ctx, userId)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return dtos.UserResponseDto{}, http.StatusNotFound, fmt.Errorf("user not exist: %w", err)
+		}
+		return dtos.UserResponseDto{}, http.StatusInternalServerError, fmt.Errorf("error searching user: %w", err)
+	}
+	dateBith, err := time.Parse("02/01/2026", req.DateBirth)
+	if err != nil {
+		return dtos.UserResponseDto{}, http.StatusInternalServerError, fmt.Errorf("error change date bith: %w", err)
+	}
+	userUpdate, err := userRemplace.Update().
+		SetName(req.Name).
+		SetLastName(req.LastName).
+		SetCi(req.CI).
+		SetDateBirth(dateBith).
+		Save(ctx)
+	if err != nil {
+		return dtos.UserResponseDto{}, http.StatusInternalServerError, fmt.Errorf("error updating user: %w", err)
+	}
+	res = dtos.UserResponseDto{
+		Id:        userUpdate.ID,
+		Name:      userUpdate.Name,
+		LastName:  userUpdate.LastName,
+		CI:        userUpdate.Ci,
+		DateBirth: dateBith.Format("02/01/2006"),
+	}
+	return res, http.StatusOK, nil
+}
+
+func (s *UserServices) PatchUser(ctx context.Context, userId int, req dtos.UserPatchDto) (res dtos.UserResponseDto, status int, err error) {
+	updater := s._client.User.UpdateOneID(userId)
+
+	if req.Name != "" {
+		updater.SetName(req.Name)
+	}
+	if req.LastName != "" {
+		updater.SetLastName(req.LastName)
+	}
+	if req.CI != 0 {
+		updater.SetCi(req.CI)
+	}
+	if req.DateBirth != "" {
+		parseDate, err := time.Parse("02/01/2006", req.DateBirth)
+		if err != nil {
+			return dtos.UserResponseDto{}, http.StatusBadRequest, fmt.Errorf("invalid date format: %w", err)
+		}
+		updater.SetDateBirth(parseDate)
+	}
+	updatedUser, err := updater.Save(ctx)
+	if err != nil {
+		if ent.IsConstraintError(err) {
+			return dtos.UserResponseDto{}, http.StatusConflict, fmt.Errorf("error conflit user: %w", err)
+		}
+		if ent.IsNotFound(err) {
+			return dtos.UserResponseDto{}, http.StatusNotFound, fmt.Errorf("error user: %d not fount", userId)
+		}
+		return dtos.UserResponseDto{}, http.StatusInternalServerError, fmt.Errorf("error updating user: %w", err)
+	}
+	res = dtos.UserResponseDto{
+		Id:        updatedUser.ID,
+		Name:      updatedUser.Name,
+		LastName:  updatedUser.LastName,
+		CI:        updatedUser.Ci,
+		DateBirth: updatedUser.DateBirth.Format("02/01/2006"),
+	}
+	return res, http.StatusOK, nil
 }
