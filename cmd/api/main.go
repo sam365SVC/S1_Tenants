@@ -92,6 +92,8 @@ func main() {
 		RUser.POST("", HUser.CreateUser)
 		RUser.GET("/:id", HUser.GetUserId)
 		RUser.GET("/page/:page", HUser.AllUser)
+		RUser.PUT("/:id", HUser.RemplaceUser)
+		RUser.PATCH("/:id", HUser.PatchUser)
 	}
 	RTenant := api.Group("/tenant")
 	{
@@ -100,6 +102,8 @@ func main() {
 	REmployee := api.Group("/employee")
 	{
 		REmployee.GET("/page/:page", HEmployee.GetPageEmployee)
+		REmployee.PUT("/:id", HEmployee.RemplaceEmployee)
+		REmployee.PATCH("/:id", HEmployee.PatchEmployee)
 	}
 	RBranch := api.Group("/branch")
 	{

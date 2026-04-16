@@ -17,8 +17,13 @@ type UserCreateDto struct {
 	Email     string `json:"email" validate:"required,email"`
 	Password  string `json:"password" validate:"required,min=7,secure_password"`
 }
-
-type UserUpdateDto struct {
+type UserRemplaceDto struct {
+	Name      string `json:"name" validate:"required,max=50,is_name"`
+	LastName  string `json:"last_name" validate:"required,max=50,is_name"`
+	CI        int    `json:"CI" validate:"required,gt=11111,lte=999999999"`
+	DateBirth string `json:"date_birth" validate:"required,datetime=02/01/2006,age_gte_16"`
+}
+type UserPatchDto struct {
 	Name      string `json:"name" validate:"omitempty,max=50,is_name"`
 	LastName  string `json:"last_name" validate:"omitempty,max=50,is_name"`
 	CI        int    `json:"CI" validate:"omitempty,gt=11111,lte=999999999"`
